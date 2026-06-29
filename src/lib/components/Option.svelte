@@ -81,17 +81,19 @@
   });
 </script>
 
-<div class="relative w-full md:w-auto max-w-[400px] md:max-w-none" class:pointer-events-none={!isMobile} style:z-index={isSelected && !isMobile ? 5 : option.zIndex}>
-	{#if isMobile}
-		<button
-			onclick={onConfirm}
-			class="w-full py-2 text-center text-fg text-5xl italic tracking-[-0.14em] outline-none"
-			style="font-family: var(--font-rodin)"
-			title={option.description}
-		>
-			{option.name}
-		</button>
-	{:else}
+<div class="relative w-full md:w-auto max-w-[400px] md:max-w-none" style:z-index={isSelected && !isMobile ? 5 : option.zIndex}>
+	<!-- Mobile: plain HTML button -->
+	<button
+		onclick={onConfirm}
+		class="md:hidden w-full py-2 text-center text-fg text-5xl italic tracking-[-0.14em] outline-none"
+		style="font-family: var(--font-rodin)"
+		title={option.description}
+	>
+		{option.name}
+	</button>
+
+	<!-- Desktop: SVG button -->
+	<div class="hidden md:block relative pointer-events-none">
 		<button
 			class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-16 outline-none pointer-events-auto"
 			onmouseover={onSelect}
@@ -107,7 +109,7 @@
 			height="200"
 			viewBox="0 0 950 200"
 			xmlns="http://www.w3.org/2000/svg"
-			class="outline-none pointer-events-none w-full md:w-[950px] max-w-[950px] h-auto"
+			class="outline-none pointer-events-none w-[950px] max-w-[950px] h-auto"
 			transform-origin="25% center"
 		>
 			<defs>
@@ -155,7 +157,7 @@
 				x="150"
 				y="120"
 				class={cn(
-					"text-6xl md:text-7xl tracking-[-0.14em] italic",
+					"text-7xl tracking-[-0.14em] italic",
 					{
 						[colors[(index + 2) % colors.length]]: !isSelected,
 						"text-black": isSelected && !isMobile,
@@ -172,12 +174,12 @@
 						transform-origin="25% center"
 						x="150"
 						y="120"
-						class="text-6xl md:text-7xl tracking-[-0.14em] italic fill-red"
+						class="text-7xl tracking-[-0.14em] italic fill-red"
 					>
 						{option.name}
 					</text>
 				</g>
 			{/if}
 		</svg>
-	{/if}
+	</div>
 </div>

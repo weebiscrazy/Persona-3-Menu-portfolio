@@ -177,16 +177,19 @@
 		</div>
 
 		<footer class="submenu-footer flex items-center justify-center gap-2 md:gap-8 p-2 md:p-5 border-t border-fg/10 flex-shrink-0">
-			{#if isMobile}
+			<!-- Mobile tap buttons -->
+			<div class="flex md:hidden items-center gap-2 w-full">
 				<button onclick={() => { if (activeTab > 0) { activeTab--; contentKey++; } }} class="px-4 py-2 bg-fg/10 rounded-md text-fg text-lg font-new-rodin">← Prev</button>
 				<button onclick={() => { if (activeTab < tabs.length - 1) { activeTab++; contentKey++; } }} class="px-4 py-2 bg-fg/10 rounded-md text-fg text-lg font-new-rodin">Next →</button>
 				<div class="grow"></div>
 				<button onclick={close} class="px-6 py-2 bg-pink/20 rounded-md text-pink text-lg font-new-rodin font-bold">Close</button>
-			{:else}
+			</div>
+			<!-- Desktop keyboard hints -->
+			<div class="hidden md:flex items-center gap-8">
 				<Control key="← →">Tabs</Control>
 				<span class="hidden md:inline"><Control key="↑ ↓">Scroll</Control></span>
 				<Control key="B">Back</Control>
-			{/if}
+			</div>
 		</footer>
 	</div>
 </div>
