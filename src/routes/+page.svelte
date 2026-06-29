@@ -171,18 +171,18 @@
 
 <main class="h-screen w-screen relative overflow-hidden">
 	{#if !isStarted}
-		<div class="fixed bg-bg/90 size-full flex flex-col gap-32 justify-center items-center z-20" transition:fade>
-			<div class="rotate-3 space-y-2">
-				<h1 class="bg-fg text-bg px-6 py-4 rounded-md text-6xl tracking-[-0.08em]">
+		<div class="fixed bg-bg/90 size-full flex flex-col gap-16 md:gap-32 justify-center items-center z-20 px-4" transition:fade>
+			<div class="rotate-3 space-y-2 w-full max-w-lg md:max-w-none">
+				<h1 class="bg-fg text-bg px-4 md:px-6 py-3 md:py-4 rounded-md text-3xl md:text-6xl tracking-[-0.08em] text-center md:text-left">
 					PERSONA 3 RELOAD<br>
 					PAUSE MENU
 				</h1>
-				<h2 class="flex items-center w-full gap-2 italic text-xl font-new-rodin text-shadow-under">
-					<span>
+				<h2 class="flex items-center w-full gap-2 italic text-base md:text-xl font-new-rodin text-shadow-under">
+					<span class="whitespace-nowrap">
 						Recreated with Svelte
 					</span>
 					<hr class="border border-fg grow shadow-under">
-					<a href="https://deltea.space">
+					<a href="https://deltea.space" class="whitespace-nowrap">
 						By ayush
 					</a>
 				</h2>
@@ -202,9 +202,9 @@
 				></div>
 			</div>
 
-			<button onclick={start} class="text-6xl flex gap-4">
+			<button onclick={start} class="text-4xl md:text-6xl flex gap-4">
 				<span class="tracking-[-0.05em]">ENTER</span>
-				<iconify-icon icon="mdi:arrow-right-bold" class=" text-6xl"></iconify-icon>
+				<iconify-icon icon="mdi:arrow-right-bold" class="text-4xl md:text-6xl"></iconify-icon>
 			</button>
 		</div>
 	{/if}
@@ -215,7 +215,7 @@
 		bind:this={backgroundVideo}
 		loop
 		src="/background.mp4"
-		class="fixed h-full w-full object-cover md:object-left object-center -z-10"
+		class="fixed h-full w-full object-cover object-left -z-10"
 	></video>
 
 	<!-- Submenu Overlay -->
@@ -234,9 +234,9 @@
 	<!-- Main Menu Options -->
 	<div class="flex flex-col justify-center h-full relative transition-all duration-500
 	            md:left-[42rem] 3xl:left-[55rem]
-	            md:-space-y-32 -space-y-10
+	            md:-space-y-32 -space-y-8
 	            md:items-start items-center
-	            w-full md:w-auto md:px-0 px-4">
+	            w-full md:w-auto px-4 md:px-0">
 		{#each options as option, i}
 			<Option
 				index={i}

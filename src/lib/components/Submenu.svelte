@@ -103,7 +103,7 @@
 	<div class="submenu-noise"></div>
 	<div class="submenu-vignette"></div>
 
-	<div class="submenu-panel w-[90vw] h-[90vh] md:w-[90vw] md:h-[90vh] w-[95vw] h-[92vh] max-w-7xl flex flex-col overflow-hidden"
+	<div class="submenu-panel w-[95vw] h-[92vh] md:w-[90vw] md:h-[90vh] max-w-7xl flex flex-col overflow-hidden"
 		style="clip-path: polygon(0% 3%, 2% 0%, 98% 0.5%, 100% 2%, 100% 98%, 97% 100%, 3% 99%, 0% 96%)"
 	>
 		<div class="submenu-bg-layer"></div>

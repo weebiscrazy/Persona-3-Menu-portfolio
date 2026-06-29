@@ -56,13 +56,12 @@
   }
 
   onMount(() => {
-    utils.set(element, {
-      translateX: option.offsetX,
-      translateY: option.offsetY,
-      rotate: option.rotation
-    });
-
     if (!isMobile) {
+      utils.set(element, {
+        translateX: option.offsetX,
+        translateY: option.offsetY,
+        rotate: option.rotation
+      });
       createTimeline({
         loop: Infinity
       }).add([backgroundElement, backgroundMaskElement], {
@@ -77,7 +76,7 @@
   });
 </script>
 
-<div class="relative pointer-events-none" style:z-index={isSelected && !isMobile ? 5 : option.zIndex}>
+<div class="relative pointer-events-none w-full md:w-auto max-w-[400px] md:max-w-none" style:z-index={isSelected && !isMobile ? 5 : option.zIndex}>
   <button
     class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-16 outline-none pointer-events-auto"
     onmouseover={onSelect}
@@ -140,7 +139,7 @@
       x="150"
       y="120"
       class={cn(
-        "text-4xl md:text-7xl tracking-[-0.14em] italic",
+        "text-6xl md:text-7xl tracking-[-0.14em] italic",
         {
           [colors[(index + 2) % colors.length]]: !isSelected,
           "text-black": isSelected && !isMobile,
@@ -158,7 +157,7 @@
           transform-origin="25% center"
           x="150"
           y="120"
-          class="text-4xl md:text-7xl tracking-[-0.14em] italic fill-red"
+          class="text-6xl md:text-7xl tracking-[-0.14em] italic fill-red"
         >
           {option.name}
         </text>
