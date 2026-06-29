@@ -1,6 +1,6 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
-  import { onMount, type Snippet } from "svelte";
+  import { onMount } from "svelte";
   import { animate, createTimeline, spring, utils } from "animejs";
   import type { OptionValue } from "$lib/types";
 
@@ -10,17 +10,19 @@
     "fill-button-3"
   ];
 
-  let element: SVGElement;
-  let textElement: SVGTextElement;
-  let textRedElement: SVGTextElement;
-  let backgroundElement: SVGPathElement;
-  let backgroundMaskElement: SVGPathElement;
+  let element: SVGElement = $state()!;
+  let textElement: SVGTextElement = $state()!;
+  let textRedElement: SVGTextElement = $state()!;
+  let backgroundElement: SVGPathElement = $state()!;
+  let backgroundMaskElement: SVGPathElement = $state()!;
 
-  let { index, isSelected, onSelect, option }: {
+  let { index, isSelected, onSelect, onConfirm, option, isMobile = false }: {
     index: number,
     isSelected: boolean,
     onSelect: () => void
+    onConfirm?: () => void
     option: OptionValue
+    isMobile?: boolean
   } = $props();
 
   const selectorPath = "M 24.853754, 93.31573 135.14625, 49.684266 114.14751, 97.331142 Z";
@@ -29,6 +31,7 @@
   const selectorTransform = $derived(`translate(-60, -10) rotate(8, 0, 100) scale(${option.name.replaceAll(" ", "").length * 0.5 + 1.5}, 3)`);
 
   $effect(() => {
+    if (isMobile) return;
     if (isSelected) {
       select();
     } else {
@@ -59,24 +62,27 @@
       rotate: option.rotation
     });
 
-    createTimeline({
-      loop: Infinity
-    }).add([backgroundElement, backgroundMaskElement], {
-      delay: 600,
-      duration: 100,
-      scale: 1.05,
-    }).add([backgroundElement, backgroundMaskElement], {
-      duration: 50,
-      scale: 1,
-    });
+    if (!isMobile) {
+      createTimeline({
+        loop: Infinity
+      }).add([backgroundElement, backgroundMaskElement], {
+        delay: 600,
+        duration: 100,
+        scale: 1.05,
+      }).add([backgroundElement, backgroundMaskElement], {
+        duration: 50,
+        scale: 1,
+      });
+    }
   });
 </script>
 
-<div class="relative pointer-events-none" style:z-index={isSelected ? 5 : option.zIndex}>
+<div class="relative pointer-events-none" style:z-index={isSelected && !isMobile ? 5 : option.zIndex}>
   <button
-    class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-16 outline-none pointer-events-auto cursor-pointer"
+    class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-16 outline-none pointer-events-auto"
     onmouseover={onSelect}
     onfocus={onSelect}
+    onclick={onConfirm}
     title={option.description}
   ></button>
 
@@ -84,8 +90,9 @@
     bind:this={element}
     width="950"
     height="200"
+    viewBox="0 0 950 200"
     xmlns="http://www.w3.org/2000/svg"
-    class="cursor-pointer outline-none pointer-events-none"
+    class="outline-none pointer-events-none w-full md:w-[950px] max-w-[950px] h-auto"
     transform-origin="25% center"
   >
     <defs>
@@ -114,7 +121,7 @@
       </mask>
     </defs>
 
-    <g transform={selectorTransform} transform-origin="left center" style:display={isSelected ? "block" : "none"}>
+    <g transform={selectorTransform} transform-origin="left center" style:display={!isMobile && isSelected ? "block" : "none"}>
       <path
         bind:this={backgroundElement}
         class="fill-pink"
@@ -133,24 +140,25 @@
       x="150"
       y="120"
       class={cn(
-        "text-7xl tracking-[-0.14em] italic",
+        "text-4xl md:text-7xl tracking-[-0.14em] italic",
         {
           [colors[(index + 2) % colors.length]]: !isSelected,
-          "text-black": isSelected,
+          "text-black": isSelected && !isMobile,
+          "text-fg": isMobile
         }
       )}
     >
       {option.name}
     </text>
 
-    {#if isSelected}
+    {#if !isMobile && isSelected}
       <g mask={`url(#${selectorMaskId})`}>
         <text
           bind:this={textRedElement}
           transform-origin="25% center"
           x="150"
           y="120"
-          class="text-7xl tracking-[-0.14em] italic fill-red"
+          class="text-4xl md:text-7xl tracking-[-0.14em] italic fill-red"
         >
           {option.name}
         </text>

@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html {
+	cursor: url('/cursor/pointer.svg') 18 10, auto;
+}
+
 @font-face {
   font-family: "Rodin Pro";
   src: url("/fonts/Rodin Pro EB.otf") format("opentype");
@@ -27,8 +31,8 @@
 
 @theme {
   --color-fg: #fff;
-  --color-bg: #015FCC;
-  --color-bg-dark: #031F64;
+  --color-bg: #003E96;
+  --color-bg-dark: #00225A;
   --color-red: #F00;
   --color-muted: #808080;
   --color-pink: #FD77D9;
@@ -36,6 +40,9 @@
   --color-button-1: #16CFFB;
   --color-button-2: #7DE6FD;
   --color-button-3: #77FEFC;
+
+  --color-water-mid: #0066CC;
+  --color-water-glow: #1AD5FF;
 
   --color-border: #5D6A88;
 
