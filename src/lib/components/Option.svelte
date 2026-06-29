@@ -81,93 +81,103 @@
   });
 </script>
 
-<div class="relative pointer-events-none w-full md:w-auto max-w-[400px] md:max-w-none" style:z-index={isSelected && !isMobile ? 5 : option.zIndex}>
-  <button
-    class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-16 outline-none pointer-events-auto"
-    onmouseover={onSelect}
-    onfocus={onSelect}
-    onclick={onConfirm}
-    ontouchstart={handleTouch}
-    title={option.description}
-  ></button>
+<div class="relative w-full md:w-auto max-w-[400px] md:max-w-none" class:pointer-events-none={!isMobile} style:z-index={isSelected && !isMobile ? 5 : option.zIndex}>
+	{#if isMobile}
+		<button
+			onclick={onConfirm}
+			class="w-full py-2 text-center text-fg text-5xl italic tracking-[-0.14em] outline-none"
+			style="font-family: var(--font-rodin)"
+			title={option.description}
+		>
+			{option.name}
+		</button>
+	{:else}
+		<button
+			class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-16 outline-none pointer-events-auto"
+			onmouseover={onSelect}
+			onfocus={onSelect}
+			onclick={onConfirm}
+			ontouchstart={handleTouch}
+			title={option.description}
+		></button>
 
-  <svg
-    bind:this={element}
-    width="950"
-    height="200"
-    viewBox="0 0 950 200"
-    xmlns="http://www.w3.org/2000/svg"
-    class="outline-none pointer-events-none w-full md:w-[950px] max-w-[950px] h-auto"
-    transform-origin="25% center"
-  >
-    <defs>
-      <mask
-        id={selectorMaskId}
-        maskUnits="userSpaceOnUse"
-        maskContentUnits="userSpaceOnUse"
-        x="0"
-        y="0"
-        width="950"
-        height="200"
-      >
-        <rect width="100%" height="100%" fill="black" />
-        <g transform={selectorTransform} transform-origin="left center">
-          <path
-            fill="white"
-            d={selectorPath}
-          />
-          <path
-            bind:this={backgroundMaskElement}
-            transform-origin="52 100"
-            fill="white"
-            d={selectorBackgroundPath}
-          />
-        </g>
-      </mask>
-    </defs>
+		<svg
+			bind:this={element}
+			width="950"
+			height="200"
+			viewBox="0 0 950 200"
+			xmlns="http://www.w3.org/2000/svg"
+			class="outline-none pointer-events-none w-full md:w-[950px] max-w-[950px] h-auto"
+			transform-origin="25% center"
+		>
+			<defs>
+				<mask
+					id={selectorMaskId}
+					maskUnits="userSpaceOnUse"
+					maskContentUnits="userSpaceOnUse"
+					x="0"
+					y="0"
+					width="950"
+					height="200"
+				>
+					<rect width="100%" height="100%" fill="black" />
+					<g transform={selectorTransform} transform-origin="left center">
+						<path
+							fill="white"
+							d={selectorPath}
+						/>
+						<path
+							bind:this={backgroundMaskElement}
+							transform-origin="52 100"
+							fill="white"
+							d={selectorBackgroundPath}
+						/>
+					</g>
+				</mask>
+			</defs>
 
-    <g transform={selectorTransform} transform-origin="left center" style:display={!isMobile && isSelected ? "block" : "none"}>
-      <path
-        bind:this={backgroundElement}
-        class="fill-pink"
-        transform-origin="52 100"
-        d={selectorBackgroundPath}
-      />
-      <path
-        class="fill-fg"
-        d={selectorPath}
-      />
-    </g>
+			<g transform={selectorTransform} transform-origin="left center" style:display={!isMobile && isSelected ? "block" : "none"}>
+				<path
+					bind:this={backgroundElement}
+					class="fill-pink"
+					transform-origin="52 100"
+					d={selectorBackgroundPath}
+				/>
+				<path
+					class="fill-fg"
+					d={selectorPath}
+				/>
+			</g>
 
-    <text
-      bind:this={textElement}
-      transform-origin="25% center"
-      x="150"
-      y="120"
-      class={cn(
-        "text-6xl md:text-7xl tracking-[-0.14em] italic",
-        {
-          [colors[(index + 2) % colors.length]]: !isSelected,
-          "text-black": isSelected && !isMobile,
-          "text-fg": isMobile
-        }
-      )}
-    >
-      {option.name}
-    </text>
+			<text
+				bind:this={textElement}
+				transform-origin="25% center"
+				x="150"
+				y="120"
+				class={cn(
+					"text-6xl md:text-7xl tracking-[-0.14em] italic",
+					{
+						[colors[(index + 2) % colors.length]]: !isSelected,
+						"text-black": isSelected && !isMobile,
+					}
+				)}
+			>
+				{option.name}
+			</text>
 
-    {#if !isMobile && isSelected}
-      <g mask={`url(#${selectorMaskId})`}>
-        <text
-          bind:this={textRedElement}
-          transform-origin="25% center"
-          x="150"
-          y="120"
-          class="text-6xl md:text-7xl tracking-[-0.14em] italic fill-red"
-        >
-          {option.name}
-        </text>
-      </g>
-    {/if}
-  </svg>
+			{#if !isMobile && isSelected}
+				<g mask={`url(#${selectorMaskId})`}>
+					<text
+						bind:this={textRedElement}
+						transform-origin="25% center"
+						x="150"
+						y="120"
+						class="text-6xl md:text-7xl tracking-[-0.14em] italic fill-red"
+					>
+						{option.name}
+					</text>
+				</g>
+			{/if}
+		</svg>
+	{/if}
 </div>

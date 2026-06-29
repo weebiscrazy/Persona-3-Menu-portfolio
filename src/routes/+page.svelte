@@ -186,6 +186,11 @@
 						By ayush
 					</a>
 				</h2>
+				{#if isMobile}
+					<p class="text-xs md:hidden text-muted italic text-center mt-4 opacity-60">
+						Recommended to be viewed on desktop — site may not work as intended on mobile
+					</p>
+				{/if}
 			</div>
 
 			<div class="flex flex-col gap-2 relative">
