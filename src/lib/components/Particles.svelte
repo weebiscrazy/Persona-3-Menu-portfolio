@@ -1,5 +1,6 @@
 <script lang="ts">
-	const bubbles = Array.from({ length: 22 }, (_, i) => ({
+	let { isMobile = false }: { isMobile?: boolean } = $props();
+	const bubbles = Array.from({ length: isMobile ? 8 : 22 }, (_, i) => ({
 		id: i,
 		size: Math.random() * 30 + 10,
 		left: Math.random() * 100,

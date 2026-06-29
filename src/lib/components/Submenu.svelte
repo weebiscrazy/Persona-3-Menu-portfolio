@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from "svelte";
 	import type { Snippet } from "svelte";
 	import Control from "./Control.svelte";
 	import Particles from "./Particles.svelte";
@@ -25,6 +26,12 @@
 	let contentKey = $state(0);
 	let touchStartX = 0;
 	let touchStartY = 0;
+	let isMobile = $state(false);
+
+	onMount(() => {
+		const mq = window.matchMedia("(max-width: 767px)");
+		isMobile = mq.matches;
+	});
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (closing) return;
@@ -91,14 +98,16 @@
 	tabindex="-1"
 	class:submenu-closing={closing}
 >
-	<svg aria-hidden="true" style="position:absolute;width:0;height:0;pointer-events:none;z-index:0">
-		<defs>
-			<filter id="water-distortion">
-				<feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="3" result="noise"/>
-				<feDisplacementMap in="SourceGraphic" in2="noise" scale="35" xChannelSelector="R" yChannelSelector="G"/>
-			</filter>
-		</defs>
-	</svg>
+	{#if !isMobile}
+		<svg aria-hidden="true" style="position:absolute;width:0;height:0;pointer-events:none;z-index:0">
+			<defs>
+				<filter id="water-distortion">
+					<feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="3" result="noise"/>
+					<feDisplacementMap in="SourceGraphic" in2="noise" scale="35" xChannelSelector="R" yChannelSelector="G"/>
+				</filter>
+			</defs>
+		</svg>
+	{/if}
 
 	<div class="submenu-noise"></div>
 	<div class="submenu-vignette"></div>
@@ -107,7 +116,7 @@
 		style="clip-path: polygon(0% 3%, 2% 0%, 98% 0.5%, 100% 2%, 100% 98%, 97% 100%, 3% 99%, 0% 96%)"
 	>
 		<div class="submenu-bg-layer"></div>
-		<Particles />
+		<Particles {isMobile} />
 		<header class="submenu-header flex items-center justify-between p-4 md:p-8 border-b border-fg/10 flex-shrink-0">
 			<h1 class="font-skip text-2xl md:text-4xl tracking-tight text-fg" style="text-shadow: var(--text-shadow-border)">{title}</h1>
 			<div class="flex gap-1 md:gap-2 overflow-x-auto" role="tablist" aria-label="Submenu tabs">
@@ -215,7 +224,11 @@
 		z-index: 0;
 		overflow: hidden;
 		background: linear-gradient(135deg, var(--color-bg-dark), var(--color-water-mid), var(--color-bg), var(--color-water-mid), var(--color-bg-dark));
-		filter: url(#water-distortion);
+	}
+	@media (min-width: 768px) {
+		.submenu-bg-layer {
+			filter: url(#water-distortion);
+		}
 	}
 	.submenu-bg-layer::before {
 		content: '';
@@ -223,7 +236,11 @@
 		inset: 0;
 		background: radial-gradient(ellipse at 30% 40%, rgba(22,207,251,0.04), transparent 60%),
 		            radial-gradient(ellipse at 70% 60%, rgba(77,254,252,0.03), transparent 50%);
-		animation: bg-breathe 8s ease-in-out infinite alternate;
+	}
+	@media (min-width: 768px) {
+		.submenu-bg-layer::before {
+			animation: bg-breathe 8s ease-in-out infinite alternate;
+		}
 	}
 	@keyframes bg-breathe {
 		0% { opacity: 0.6; }
@@ -241,7 +258,11 @@
 			radial-gradient(circle at 50% 70%, transparent 25%, rgba(22,207,251,0.03) 30%, transparent 35%),
 			radial-gradient(circle at 85% 80%, transparent 35%, rgba(22,207,251,0.02) 40%, transparent 45%);
 		background-size: 200% 200%;
-		animation: ripple-expand 8s ease-out infinite;
+	}
+	@media (min-width: 768px) {
+		.submenu-bg-layer::after {
+			animation: ripple-expand 8s ease-out infinite;
+		}
 	}
 	@keyframes ripple-expand {
 		0% { background-size: 100% 100%; opacity: 0.8; }
@@ -267,7 +288,12 @@
 		z-index: 2;
 		background: transparent;
 		filter: drop-shadow(0 0 40px rgba(22,207,251,0.07));
-		animation: panel-float 4s ease-in-out infinite, panel-glow 3s ease-in-out infinite, panel-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+		animation: panel-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+	}
+	@media (min-width: 768px) {
+		.submenu-panel {
+			animation: panel-float 4s ease-in-out infinite, panel-glow 3s ease-in-out infinite, panel-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+		}
 	}
 	@keyframes panel-float {
 		0%, 100% { transform: translateY(0); }
@@ -384,27 +410,39 @@
 	.shape-circle {
 		width: 300px; height: 300px;
 		top: 10%; right: -5%;
-		animation: shape-drift 8s ease-in-out infinite, shape-rotate 20s linear infinite;
 	}
 	.shape-diamond {
 		width: 160px; height: 160px;
 		bottom: 15%; left: 5%;
-		animation: shape-drift 6s ease-in-out infinite reverse, shape-rotate 15s linear infinite;
 	}
 	.shape-arc {
 		width: 240px; height: 240px;
 		top: 30%; left: 20%;
-		animation: shape-drift 10s ease-in-out infinite 1s, shape-rotate 25s linear infinite reverse;
 	}
 	.shape-line-h {
 		width: 400px; height: 4px;
 		top: 45%; right: 10%;
-		animation: shape-pulse 4s ease-in-out infinite;
 	}
 	.shape-ring {
 		width: 200px; height: 200px;
 		bottom: 25%; right: 20%;
-		animation: shape-drift 7s ease-in-out infinite 0.5s, shape-rotate 18s linear infinite;
+	}
+	@media (min-width: 768px) {
+		.shape-circle {
+			animation: shape-drift 8s ease-in-out infinite, shape-rotate 20s linear infinite;
+		}
+		.shape-diamond {
+			animation: shape-drift 6s ease-in-out infinite reverse, shape-rotate 15s linear infinite;
+		}
+		.shape-arc {
+			animation: shape-drift 10s ease-in-out infinite 1s, shape-rotate 25s linear infinite reverse;
+		}
+		.shape-line-h {
+			animation: shape-pulse 4s ease-in-out infinite;
+		}
+		.shape-ring {
+			animation: shape-drift 7s ease-in-out infinite 0.5s, shape-rotate 18s linear infinite;
+		}
 	}
 
 	@keyframes shape-drift {

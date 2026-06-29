@@ -217,6 +217,8 @@
 		src="/background.mp4"
 		class="fixed h-full w-full object-cover object-left -z-10"
 	></video>
+	<!-- mobile dark overlay -->
+	<div class="fixed inset-0 bg-black/40 md:bg-transparent -z-10 pointer-events-none"></div>
 
 	<!-- Submenu Overlay -->
 	{#if currentView === "submenu" && activeSubmenu}
@@ -232,7 +234,7 @@
 	{/if}
 
 	<!-- Main Menu Options -->
-	<div class="flex flex-col justify-center h-full relative transition-all duration-500
+	<div class="flex flex-col justify-center h-full relative md:transition-all md:duration-500
 	            md:left-[42rem] 3xl:left-[55rem]
 	            md:-space-y-32 -space-y-8
 	            md:items-start items-center
