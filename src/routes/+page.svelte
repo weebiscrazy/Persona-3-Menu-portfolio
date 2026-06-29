@@ -41,7 +41,7 @@
 	let currentOptionElement = $state<HTMLButtonElement>();
 	let settingsOptionElement = $state<HTMLDivElement>();
 	let currentSettingIndex = $state(0);
-	let isMobile = $state(false);
+	let isMobile = $state(typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches);
 
 	// Submenu state
 	let currentView = $state<ViewState>("main");
@@ -164,7 +164,6 @@
 		document.addEventListener("keydown", handleMainKeydown);
 
 		const mq = window.matchMedia("(max-width: 767px)");
-		isMobile = mq.matches;
 		mq.addEventListener("change", (e) => { isMobile = e.matches; });
 	});
 </script>
