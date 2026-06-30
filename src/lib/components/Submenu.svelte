@@ -117,6 +117,17 @@
 	>
 		<div class="submenu-bg-layer"></div>
 		<Particles {isMobile} />
+
+		<!-- Mobile nav buttons -->
+		<button onclick={close} class="md:hidden absolute top-3 left-3 z-20 size-10 rounded-full bg-fg/10 flex items-center justify-center text-fg text-xl font-bold backdrop-blur-sm">
+			✕
+		</button>
+		<button onclick={() => { if (activeTab > 0) { activeTab--; contentKey++; } }} class="md:hidden absolute top-1/2 -translate-y-1/2 left-2 z-20 size-12 rounded-full bg-fg/10 flex items-center justify-center text-fg text-3xl backdrop-blur-sm">
+			←
+		</button>
+		<button onclick={() => { if (activeTab < tabs.length - 1) { activeTab++; contentKey++; } }} class="md:hidden absolute top-1/2 -translate-y-1/2 right-2 z-20 size-12 rounded-full bg-fg/10 flex items-center justify-center text-fg text-3xl backdrop-blur-sm">
+			→
+		</button>
 		<header class="submenu-header flex items-center justify-between p-4 md:p-8 border-b border-fg/10 flex-shrink-0">
 			<h1 class="font-skip text-2xl md:text-4xl tracking-tight text-fg" style="text-shadow: var(--text-shadow-border)">{title}</h1>
 			<div class="flex gap-1 md:gap-2 overflow-x-auto" role="tablist" aria-label="Submenu tabs">
@@ -176,20 +187,10 @@
 			{/key}
 		</div>
 
-		<footer class="submenu-footer flex items-center justify-center gap-2 md:gap-8 p-2 md:p-5 border-t border-fg/10 flex-shrink-0">
-			<!-- Mobile tap buttons -->
-			<div class="flex md:hidden items-center gap-2 w-full">
-				<button onclick={() => { if (activeTab > 0) { activeTab--; contentKey++; } }} class="px-4 py-2 bg-fg/10 rounded-md text-fg text-lg font-new-rodin">← Prev</button>
-				<button onclick={() => { if (activeTab < tabs.length - 1) { activeTab++; contentKey++; } }} class="px-4 py-2 bg-fg/10 rounded-md text-fg text-lg font-new-rodin">Next →</button>
-				<div class="grow"></div>
-				<button onclick={close} class="px-6 py-2 bg-pink/20 rounded-md text-pink text-lg font-new-rodin font-bold">Close</button>
-			</div>
-			<!-- Desktop keyboard hints -->
-			<div class="hidden md:flex items-center gap-8">
-				<Control key="← →">Tabs</Control>
-				<span class="hidden md:inline"><Control key="↑ ↓">Scroll</Control></span>
-				<Control key="B">Back</Control>
-			</div>
+		<footer class="submenu-footer items-center justify-center gap-8 p-3 md:p-5 border-t border-fg/10 flex-shrink-0 hidden md:flex">
+			<Control key="← →">Tabs</Control>
+			<span class="hidden md:inline"><Control key="↑ ↓">Scroll</Control></span>
+			<Control key="B">Back</Control>
 		</footer>
 	</div>
 </div>
