@@ -93,7 +93,7 @@
 	</button>
 
 	<!-- Desktop: SVG button -->
-	<div class="hidden md:block relative pointer-events-none">
+	<div class="hidden md:block relative pointer-events-none w-[950px] max-w-[950px] h-auto">
 		<button
 			class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-16 outline-none pointer-events-auto"
 			onmouseover={onSelect}
@@ -109,7 +109,7 @@
 			height="200"
 			viewBox="0 0 950 200"
 			xmlns="http://www.w3.org/2000/svg"
-			class="outline-none pointer-events-none w-[950px] max-w-[950px] h-auto"
+			class="outline-none pointer-events-none w-full h-auto"
 			transform-origin="25% center"
 		>
 			<defs>
