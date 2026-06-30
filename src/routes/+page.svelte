@@ -115,6 +115,10 @@
 		isStarted = true;
 		backgroundVideo.play();
 
+		if (typeof document.documentElement.requestFullscreen === "function") {
+			document.documentElement.requestFullscreen().catch(() => {});
+		}
+
 		if (isMusicEnabled) {
 			const randomIndex = Math.floor(Math.random() * musicTracks.length);
 			new Howl({
@@ -238,7 +242,7 @@
 	<!-- Main Menu Options -->
 	<div class="flex flex-col justify-center h-full relative md:transition-all md:duration-500
 	            md:left-[42rem] 3xl:left-[55rem]
-	            md:-space-y-32 -space-y-8
+	            space-y-4 md:-space-y-32
 	            md:items-start items-center
 	            w-full md:w-auto px-4 md:px-0">
 		{#each options as option, i}
