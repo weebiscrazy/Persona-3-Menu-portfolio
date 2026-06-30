@@ -24,8 +24,6 @@
 
 	let closing = $state(false);
 	let contentKey = $state(0);
-	let touchStartX = 0;
-	let touchStartY = 0;
 	let isMobile = $state(false);
 
 	onMount(() => {
@@ -49,31 +47,6 @@
 		}
 	}
 
-	function handleTouchStart(e: TouchEvent) {
-		touchStartX = e.touches[0].clientX;
-		touchStartY = e.touches[0].clientY;
-	}
-
-	function handleTouchEnd(e: TouchEvent) {
-		if (closing) return;
-		const dx = e.changedTouches[0].clientX - touchStartX;
-		const dy = e.changedTouches[0].clientY - touchStartY;
-		const absDx = Math.abs(dx);
-		const absDy = Math.abs(dy);
-
-		if (absDy > absDx && dy > 50) {
-			close();
-		} else if (absDx > absDy && absDx > 40) {
-			if (dx > 0 && activeTab > 0) {
-				activeTab--;
-				contentKey++;
-			} else if (dx < 0 && activeTab < tabs.length - 1) {
-				activeTab++;
-				contentKey++;
-			}
-		}
-	}
-
 	function close() {
 		if (closing) return;
 		closing = true;
@@ -91,10 +64,8 @@
 <div
 	role="dialog"
 	aria-label={title}
-	class="submenu-overlay fixed inset-0 z-50 flex items-center justify-center touch-pan-y"
+	class="submenu-overlay fixed inset-0 z-50 flex items-center justify-center"
 	onkeydown={handleKeydown}
-	ontouchstart={handleTouchStart}
-	ontouchend={handleTouchEnd}
 	tabindex="-1"
 	class:submenu-closing={closing}
 >
@@ -112,22 +83,22 @@
 	<div class="submenu-noise"></div>
 	<div class="submenu-vignette"></div>
 
+	<!-- Mobile nav buttons (outside panel to avoid clip-path clipping) -->
+	<button onclick={close} class="md:hidden fixed top-3 left-3 z-[60] size-10 rounded-full bg-bg/80 flex items-center justify-center text-fg text-xl font-bold backdrop-blur-sm border border-fg/20">
+		✕
+	</button>
+	<button onclick={() => { if (activeTab > 0) { activeTab--; contentKey++; } }} class="md:hidden fixed top-1/2 -translate-y-1/2 left-1 z-[60] size-12 rounded-full bg-bg/80 flex items-center justify-center text-fg text-3xl backdrop-blur-sm border border-fg/20">
+		←
+	</button>
+	<button onclick={() => { if (activeTab < tabs.length - 1) { activeTab++; contentKey++; } }} class="md:hidden fixed top-1/2 -translate-y-1/2 right-1 z-[60] size-12 rounded-full bg-bg/80 flex items-center justify-center text-fg text-3xl backdrop-blur-sm border border-fg/20">
+		→
+	</button>
+
 	<div class="submenu-panel w-[95vw] h-[92vh] md:w-[90vw] md:h-[90vh] max-w-7xl flex flex-col overflow-hidden"
 		style="clip-path: polygon(0% 3%, 2% 0%, 98% 0.5%, 100% 2%, 100% 98%, 97% 100%, 3% 99%, 0% 96%)"
 	>
 		<div class="submenu-bg-layer"></div>
 		<Particles {isMobile} />
-
-		<!-- Mobile nav buttons -->
-		<button onclick={close} class="md:hidden absolute top-3 left-3 z-20 size-10 rounded-full bg-fg/10 flex items-center justify-center text-fg text-xl font-bold backdrop-blur-sm">
-			✕
-		</button>
-		<button onclick={() => { if (activeTab > 0) { activeTab--; contentKey++; } }} class="md:hidden absolute top-1/2 -translate-y-1/2 left-2 z-20 size-12 rounded-full bg-fg/10 flex items-center justify-center text-fg text-3xl backdrop-blur-sm">
-			←
-		</button>
-		<button onclick={() => { if (activeTab < tabs.length - 1) { activeTab++; contentKey++; } }} class="md:hidden absolute top-1/2 -translate-y-1/2 right-2 z-20 size-12 rounded-full bg-fg/10 flex items-center justify-center text-fg text-3xl backdrop-blur-sm">
-			→
-		</button>
 		<header class="submenu-header flex items-center justify-between p-4 md:p-8 border-b border-fg/10 flex-shrink-0">
 			<h1 class="font-skip text-2xl md:text-4xl tracking-tight text-fg" style="text-shadow: var(--text-shadow-border)">{title}</h1>
 			<div class="flex gap-1 md:gap-2 overflow-x-auto" role="tablist" aria-label="Submenu tabs">
