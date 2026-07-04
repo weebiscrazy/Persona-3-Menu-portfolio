@@ -93,7 +93,6 @@
 		<button onclick={() => { if (activeTab < tabs.length - 1) { activeTab++; contentKey++; } }} class="md:hidden fixed top-1/2 -translate-y-1/2 right-1 z-[60] size-12 rounded-full bg-bg/80 flex items-center justify-center text-fg text-3xl backdrop-blur-sm border border-fg/20">
 			→
 		</button>
-	</div>
 
 	<!-- Corner accent brackets (P3R-style) -->
 	<div class="corner-brackets">
