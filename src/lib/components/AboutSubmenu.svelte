@@ -1,19 +1,21 @@
 <script lang="ts">
 	import { onMount } from "svelte";
-	import { fade } from "svelte/transition";
-	import Submenu from "./Submenu.svelte";
+	import Control from "./Control.svelte";
 	import { profileData } from "$lib/portfolio";
 	import { cn } from "$lib/utils";
 
 	let activeTab = $state(0);
-	let phase = $state<"eye" | "aoa" | "shatter" | "content">("eye");
+	let phase = $state<"eye" | "aoa" | "content">("eye");
 	let closing = $state(false);
+	let assetsLoaded = $state(false);
 
 	const tabs = [
 		{ name: "Profile", index: 0, arcanaNumber: "0" },
 		{ name: "Stats", index: 1, arcanaNumber: "XI" },
 		{ name: "Bio", index: 2, arcanaNumber: "IX" }
 	];
+
+	const AOA_BG = "#15c2fc";
 
 	function skipToContent(): boolean {
 		if (phase === "content") return false;
@@ -24,632 +26,544 @@
 	function handleClose() {
 		if (closing) return;
 		closing = true;
-		(window as any).closeSubmenu?.();
+		setTimeout(() => (window as any).closeSubmenu?.(), 400);
+	}
+
+	function handleKeydown(e: KeyboardEvent) {
+		if (closing) return;
+		if (e.key === "ArrowRight" && activeTab < tabs.length - 1) {
+			activeTab++;
+			e.preventDefault();
+		} else if (e.key === "ArrowLeft" && activeTab > 0) {
+			activeTab--;
+			e.preventDefault();
+		} else if (e.key === "Escape" || e.key === "b" || e.key === "B") {
+			e.preventDefault();
+			if (phase !== "content") {
+				skipToContent();
+			} else {
+				handleClose();
+			}
+		}
+	}
+
+	function handleTabClick(index: number) {
+		if (index === activeTab) return;
+		activeTab = index;
 	}
 
 	onMount(() => {
-		// Phase 1: Eye cut-in (0.4s)
-		const t1 = setTimeout(() => {
-			if (phase === "content") return;
-			phase = "aoa";
-		}, 400);
+		// Preload images before starting sequence
+		const preloadSrcs = [
+			"/T_UI_Camp_Status_Character_Glass_0001.png",
+			"/T_Btl_AlloutFinish_Pc01_A1out.png",
+			"/T_Btl_AlloutFinishText_Pc01out.png",
+			"/T_UI_Camp_Status_Character_0001.png"
+		];
+		let loaded = 0;
+		preloadSrcs.forEach(src => {
+			const img = new Image();
+			img.onload = () => { loaded++; if (loaded === preloadSrcs.length) startSequence(); };
+			img.onerror = () => { loaded++; if (loaded === preloadSrcs.length) startSequence(); };
+			img.src = src;
+		});
+		// Fallback timeout
+		setTimeout(() => { if (!assetsLoaded) startSequence(); }, 3000);
 
-		// Phase 2: AOA slam (0.8s)
-		const t2 = setTimeout(() => {
-			if (phase === "content") return;
-			phase = "shatter";
-		}, 1200);
+		function startSequence() {
+			if (assetsLoaded) return;
+			assetsLoaded = true;
 
-		// Phase 3: Shatter reveals content (0.6s)
-		const t3 = setTimeout(() => {
-			if (phase === "content") return;
-			phase = "content";
-		}, 1800);
+			// Eye phase (0.9s)
+			setTimeout(() => {
+				if (phase === "content") return;
+				phase = "aoa";
+			}, 900);
 
-		return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+			// AOA phase (1.6s) → content
+			setTimeout(() => {
+				if (phase === "content") return;
+				phase = "content";
+			}, 2500);
+		}
 	});
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	class="aoa-container"
+	class="about-root fixed inset-0 z-50"
+	role="dialog"
+	aria-label="About"
+	onkeydown={handleKeydown}
 	tabindex="-1"
-	class:aoa-closing={closing}
+	class:about-closing={closing}
 >
-	<!-- ===== AOA INTRO SEQUENCE ===== -->
-	{#if phase !== "content"}
-		<div
-			class="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden aoa-layer"
-			class:aoa-phase-eye={phase === "eye"}
-			class:aoa-phase-slam={phase === "aoa"}
-			class:aoa-phase-shatter={phase === "shatter"}
-			transition:fade={{ duration: 400 }}
-		>
-			<!-- Screen flash -->
-			<div class="absolute inset-0 aoa-flash"></div>
+	<!-- Loading state until assets are preloaded -->
+	{#if !assetsLoaded}
+		<div class="absolute inset-0 bg-bg aoa-loading"></div>
 
-			<!-- Phase 1: Eye cut-in -->
-			{#if phase === "eye"}
-				<div class="absolute inset-0 aoa-shake flex items-center justify-center">
-					<img
-						src="/T_UI_Camp_Status_Character_Glass_0001.png"
-						alt="eye cut-in"
-						class="aoa-eye-img"
-					/>
-				</div>
-
-			<!-- Phase 2: AOA art slam -->
-			{:else if phase === "aoa"}
-				<img
-					src="/T_Btl_AlloutFinish_Pc01_A1out.png"
-					alt="all-out attack"
-					class="absolute inset-0 w-full h-full object-cover aoa-art"
-				/>
-				<img
-					src="/T_Btl_AlloutFinishText_Pc01out.png"
-					alt="name plate"
-					class="aoa-nameplate"
-				/>
-				<!-- Glass overlay softens the edges like the P3R frosted frame -->
-				<div class="absolute inset-0 pointer-events-none aoa-glass-edge"></div>
-
-			<!-- Phase 3: Shatter -->
-			{:else if phase === "shatter"}
-				<img
-					src="/T_Btl_AlloutFinish_Pc01_A1out.png"
-					alt="all-out attack"
-					class="absolute inset-0 w-full h-full object-cover aoa-shatter-img"
-				/>
+	<!-- Phase 1: Eye cut-in from above -->
+	{:else if phase === "eye"}
+		<div class="absolute inset-0 z-10 aoa-bg-dim">
+			<div class="absolute inset-0 aoa-bg-dim-overlay"></div>
+		</div>
+		<div class="absolute inset-0 z-20 flex items-center justify-center aoa-eye-wrap">
+			<div class="aoa-eye-frame">
 				<img
 					src="/T_UI_Camp_Status_Character_Glass_0001.png"
-					alt="glass shatter"
-					class="aoa-glass-shatter"
+					alt="eye cut-in"
+					class="aoa-eye-img"
 				/>
-				<div class="absolute inset-0 pointer-events-none aoa-glass-overlay"></div>
-			{/if}
-
-			<!-- Skip hint -->
-			<div class="absolute bottom-6 right-6 text-fg/30 font-new-rodin text-sm tracking-wider aoa-skip-hint">
-				Press B to skip
+				<div class="aoa-eye-border"></div>
+				<div class="aoa-eye-corner aoa-corner-tl"></div>
+				<div class="aoa-eye-corner aoa-corner-tr"></div>
+				<div class="aoa-eye-corner aoa-corner-bl"></div>
+				<div class="aoa-eye-corner aoa-corner-br"></div>
+				<span class="aoa-exclamation aoa-ex-left">!!</span>
+				<span class="aoa-exclamation aoa-ex-right">!!</span>
+				<div class="aoa-impact-lines"></div>
 			</div>
 		</div>
-	{/if}
 
-	<!-- ===== SUBMENU ===== -->
-	<Submenu
-		title="ABOUT"
-		{tabs}
-		onBack={handleClose}
-		bind:activeTab
-		skipTransition={true}
-		onIntroBack={skipToContent}
-		tarotCards={["/arcana/fool.png", "/arcana/strength.png", "/arcana/hermit.png"]}
-	>
-		{#snippet children(currentTab)}
-			<div class="about-layout min-h-full">
-				<!-- Desktop: Makoto portrait left column -->
-				<div class="hidden md:flex about-portrait-col">
+	<!-- Phase 2: AOA art slam -->
+	{:else if phase === "aoa"}
+		<div class="absolute inset-0 aoa-art-layer" style="background: {AOA_BG};">
+			<img
+				src="/T_Btl_AlloutFinish_Pc01_A1out.png"
+				alt="all-out attack"
+				class="absolute inset-0 w-full h-full aoa-art-img"
+			/>
+			<img
+				src="/T_Btl_AlloutFinishText_Pc01out.png"
+				alt=""
+				class="aoa-nameplate"
+			/>
+			<div class="absolute inset-0 aoa-art-vignette"></div>
+		</div>
+
+	<!-- Phase 3: Content on AOA background -->
+	{:else}
+		<div class="absolute inset-0 aoa-content-bg" style="background: {AOA_BG};">
+			<img
+				src="/T_Btl_AlloutFinish_Pc01_A1out.png"
+				alt=""
+				class="absolute inset-0 w-full h-full object-cover aoa-bg-img"
+			/>
+			<div class="absolute inset-0 aoa-bg-vignette"></div>
+		</div>
+
+		<div class="relative z-10 h-full flex flex-col about-content-panel">
+			<!-- Header -->
+			<header class="about-header">
+				<h1 class="about-title">ABOUT</h1>
+				<div class="flex gap-2" role="tablist">
+					{#each tabs as tab, i}
+						<button
+							class={cn("about-tab-btn", i === activeTab ? "about-tab-active" : "about-tab-inactive")}
+							role="tab"
+							aria-selected={i === activeTab}
+							onclick={() => handleTabClick(i)}
+						>{tab.name}</button>
+					{/each}
+				</div>
+			</header>
+
+			<!-- Body -->
+			<div class="flex-1 flex flex-col md:flex-row gap-6 about-body">
+				<!-- Portrait side -->
+				<div class="about-portrait-side">
 					<div class="about-portrait-inner">
 						<img
 							src="/T_UI_Camp_Status_Character_0001.png"
-							alt="portrait"
-							class="about-portrait-img"
-						/>
-						<div class="about-portrait-glass"></div>
-						<img
-							src="/T_UI_Camp_Status_Character_Shadow_0001.png"
 							alt=""
-							class="about-portrait-shadow"
+							class="about-camp-img"
 						/>
+						<div class="about-camp-glass"></div>
 					</div>
 				</div>
 
-				<!-- Right: Info + tabs content -->
-				<div class="about-info-col">
-					<!-- Name plate header -->
-					<div class="about-nameplate-row">
-						<img
-							src="/T_Btl_AlloutFinishText_Pc01out.png"
-							alt="name plate"
-							class="about-nameplate"
-						/>
+				<!-- Info side -->
+				<div class="about-info-side">
+					<img src="/T_Btl_AlloutFinishText_Pc01out.png" alt="" class="about-info-nameplate" />
+
+					<div>
+						<h2 class="about-info-title">{profileData.title}</h2>
+						<p class="about-info-tagline">"{profileData.tagline}"</p>
 					</div>
 
-					<!-- Title & tagline -->
-					<div class="about-headline">
-						<h2 class="about-title">{profileData.title}</h2>
-						<p class="about-tagline">"{profileData.tagline}"</p>
-					</div>
-
-					<!-- Stats row (always visible) -->
-					<div class="about-stats-row">
+					<div class="about-stats-grid">
 						{#each profileData.stats as stat}
-							<div class="about-stat-card">
-								<span class="about-stat-value">{stat.value}</span>
-								<span class="about-stat-label">{stat.label}</span>
+							<div class="about-stat-item">
+								<span class="about-stat-val">{stat.value}</span>
+								<span class="about-stat-lbl">{stat.label}</span>
 							</div>
 						{/each}
 					</div>
 
-					<!-- Social links -->
 					<div class="about-social-row">
 						{#each profileData.socialLinks as link}
-							<a
-								href={link.url}
-								target="_blank"
-								rel="noopener noreferrer"
-								class="about-social-link"
-								style="color: {link.color}"
-								aria-label={link.platform}
-							>
+							<a href={link.url} target="_blank" rel="noopener noreferrer" class="about-social-link" style="color: {link.color}" aria-label={link.platform}>
 								<iconify-icon icon={link.icon} class="about-social-icon"></iconify-icon>
 							</a>
 						{/each}
 					</div>
 
-					<!-- Divider -->
-					<div class="about-divider"></div>
+					<div class="about-content-divider"></div>
 
-					<!-- Sub-tab content -->
-					{#if currentTab === 0}
-						<!-- Profile -->
-						<div class="about-bio-text stagger-item">
-							<p class="text-muted font-new-rodin leading-relaxed">{profileData.bio}</p>
-						</div>
-					{:else if currentTab === 1}
-						<!-- Stats detail -->
-						<div class="grid grid-cols-1 md:grid-cols-2 gap-4 stagger-item">
-							{#each profileData.stats as stat, i}
-								<div
-									class={cn(
-										"relative p-6 rounded-xl bg-fg/5 border border-fg/10",
-										"hover:border-pink/50 transition-all duration-300",
-										"hover:shadow-[0_0_30px_rgba(253,119,217,0.15)]"
-									)}
-								>
-									<div class="flex flex-col items-center gap-1">
-										<span class="font-skip text-4xl text-pink" style="text-shadow: var(--text-shadow-border)">{stat.value}</span>
-										<span class="font-new-rodin text-muted">{stat.label}</span>
+					{#key activeTab}
+						<div class="about-sub-content">
+							{#if activeTab === 0}
+								<p class="about-bio-p">{profileData.bio}</p>
+							{:else if activeTab === 1}
+								<div class="grid grid-cols-2 gap-3">
+									{#each profileData.stats as stat}
+										<div class="about-stat-detail">
+											<span class="about-stat-dv">{stat.value}</span>
+											<span class="about-stat-dl">{stat.label}</span>
+										</div>
+									{/each}
+								</div>
+							{:else}
+								<div class="about-bio-wrap">
+									<p class="about-bio-p">{profileData.bio}</p>
+									<div class="about-bio-sep">━━━</div>
+									<div class="about-focus-box">
+										<h3 class="about-focus-h">Current Focus</h3>
+										<ul class="about-focus-list">
+											<li class="about-focus-li"><iconify-icon icon="mdi:rocket-launch" class="about-fi-icon text-pink"></iconify-icon> Building portfolio sites with game-inspired UX</li>
+											<li class="about-focus-li"><iconify-icon icon="mdi:code-braces" class="about-fi-icon text-button-1"></iconify-icon> Learning Rust for systems programming</li>
+											<li class="about-focus-li"><iconify-icon icon="mdi:gamepad-variant" class="about-fi-icon text-button-2"></iconify-icon> Experimenting with Godot 4 for game jams</li>
+										</ul>
 									</div>
 								</div>
-							{/each}
+							{/if}
 						</div>
-					{:else}
-						<!-- Bio -->
-						<div class="about-bio-full stagger-item">
-							<p class="about-bio-paragraph">{profileData.bio}</p>
-							<div class="about-bio-separator">━━━</div>
-							<div class="about-focus-card">
-								<h3 class="about-focus-title">Current Focus</h3>
-								<ul class="about-focus-list">
-									<li class="about-focus-item">
-										<iconify-icon icon="mdi:rocket-launch" class="about-focus-icon text-pink"></iconify-icon>
-										Building portfolio sites with game-inspired UX
-									</li>
-									<li class="about-focus-item">
-										<iconify-icon icon="mdi:code-braces" class="about-focus-icon text-button-1"></iconify-icon>
-										Learning Rust for systems programming
-									</li>
-									<li class="about-focus-item">
-										<iconify-icon icon="mdi:gamepad-variant" class="about-focus-icon text-button-2"></iconify-icon>
-										Experimenting with Godot 4 for game jams
-									</li>
-								</ul>
-							</div>
-						</div>
-					{/if}
+					{/key}
 				</div>
 			</div>
-		{/snippet}
-	</Submenu>
+
+			<footer class="about-footer">
+				<Control key="← →">Tabs</Control>
+				<Control key="B">Back</Control>
+			</footer>
+		</div>
+	{/if}
 </div>
 
 <style>
-	/* === Container === */
-	.aoa-container {
+	/* === Root === */
+	.about-root { background: transparent; outline: none; }
+	.about-closing { animation: about-fade-out 0.35s ease-in forwards; }
+	@keyframes about-fade-out { from { opacity: 1; } to { opacity: 0; } }
+
+	/* === Loading === */
+	.aoa-loading { animation: load-fade 0.3s ease-out 2.5s forwards; }
+	@keyframes load-fade { to { opacity: 0; } }
+
+	/* ===== PHASE: EYE ===== */
+	.aoa-bg-dim-overlay {
+		animation: dim-in 0.4s ease-out forwards;
+	}
+	@keyframes dim-in {
+		from { background: rgba(0,34,90,0); }
+		to { background: rgba(0,34,90,0.7); }
+	}
+
+	.aoa-eye-wrap {
+		animation: eye-drop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+	}
+	@keyframes eye-drop {
+		from { transform: translateY(-100vh); opacity: 0; }
+		to { transform: translateY(0); opacity: 1; }
+	}
+
+	.aoa-eye-frame {
 		position: relative;
+		width: min(85vw, 800px);
+		aspect-ratio: 2 / 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.aoa-eye-img {
 		width: 100%;
 		height: 100%;
-	}
-	.aoa-closing {
-		animation: aoa-close 0.35s ease-in forwards;
-	}
-	@keyframes aoa-close {
-		from { opacity: 1; }
-		to { opacity: 0; }
-	}
-
-	/* ===== AOA LAYER ===== */
-	.aoa-layer {
-		background: #000;
-	}
-
-	/* === White Flash === */
-	.aoa-flash {
-		background: #fff;
-		opacity: 0;
-		pointer-events: none;
-	}
-	.aoa-phase-eye .aoa-flash {
-		animation: flash-bang 0.4s ease-out forwards;
-	}
-	.aoa-phase-slam .aoa-flash {
-		animation: flash-subtle 0.15s ease-out forwards;
-	}
-	@keyframes flash-bang {
-		0% { opacity: 0.9; }
-		60% { opacity: 0.3; }
-		100% { opacity: 0; }
-	}
-	@keyframes flash-subtle {
-		0% { opacity: 0.5; }
-		100% { opacity: 0; }
-	}
-
-	/* === Screen Shake === */
-	.aoa-shake {
-		animation: screen-shake 0.35s ease-out;
-	}
-	@keyframes screen-shake {
-		0% { transform: translate(0, 0); }
-		10% { transform: translate(-8px, 4px); }
-		20% { transform: translate(6px, -6px); }
-		30% { transform: translate(-4px, 2px); }
-		40% { transform: translate(3px, -3px); }
-		50% { transform: translate(-2px, 1px); }
-		60% { transform: translate(1px, -1px); }
-		100% { transform: translate(0, 0); }
-	}
-
-	/* === Eye Cut-In === */
-	.aoa-eye-img {
-		width: min(90vw, 900px);
-		height: auto;
-		aspect-ratio: 2 / 1;
 		object-fit: contain;
-		animation: eye-zoom-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+		position: relative;
+		z-index: 2;
+		animation: eye-zoom 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+		filter: drop-shadow(0 0 40px rgba(21,194,252,0.3));
 	}
-	@keyframes eye-zoom-in {
-		from { opacity: 0; transform: scale(0.6); filter: brightness(3); }
+	@keyframes eye-zoom {
+		from { opacity: 0; transform: scale(0.7); filter: brightness(2); }
 		to { opacity: 1; transform: scale(1); filter: brightness(1); }
 	}
 
-	/* === AOA Art Slam === */
-	.aoa-art {
-		animation: aoa-slam-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+	.aoa-eye-border {
+		position: absolute; inset: -8px; z-index: 3; pointer-events: none;
+		border: 2px solid rgba(21,194,252,0.5);
+		clip-path: polygon(0% 5%, 3% 0%, 97% 2%, 100% 4%, 100% 96%, 96% 100%, 4% 98%, 0% 95%);
+		animation: border-flick 0.6s ease-out forwards;
 	}
-	@keyframes aoa-slam-in {
-		from { opacity: 0; transform: scale(1.4); filter: brightness(2); }
+	@keyframes border-flick {
+		0% { border-color: rgba(255,255,255,0.9); opacity: 0; }
+		30% { border-color: rgba(21,194,252,0.8); opacity: 1; }
+		60% { border-color: rgba(255,255,255,0.6); }
+		100% { border-color: rgba(21,194,252,0.3); opacity: 0.8; }
+	}
+
+	.aoa-eye-corner {
+		position: absolute; width: 28px; height: 28px; z-index: 4; pointer-events: none;
+		border-color: #15c2fc; opacity: 0.8;
+	}
+	.aoa-corner-tl { top: -14px; left: -14px; border-top: 3px solid; border-left: 3px solid; }
+	.aoa-corner-tr { top: -14px; right: -14px; border-top: 3px solid; border-right: 3px solid; }
+	.aoa-corner-bl { bottom: -14px; left: -14px; border-bottom: 3px solid; border-left: 3px solid; }
+	.aoa-corner-br { bottom: -14px; right: -14px; border-bottom: 3px solid; border-right: 3px solid; }
+
+	.aoa-exclamation {
+		position: absolute; font-family: var(--font-skip); font-size: 2.5rem;
+		color: #fff; z-index: 5; pointer-events: none; line-height: 1;
+		text-shadow: 0 0 20px rgba(21,194,252,0.8), 0 0 40px rgba(21,194,252,0.4);
+		animation: ex-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+	}
+	.aoa-ex-left { top: -16px; left: 12%; }
+	.aoa-ex-right { bottom: -16px; right: 12%; }
+	@keyframes ex-pop {
+		from { opacity: 0; transform: scale(0.3) rotate(-10deg); }
+		to { opacity: 1; transform: scale(1) rotate(0deg); }
+	}
+
+	.aoa-impact-lines {
+		position: absolute; inset: -30px; z-index: 1; pointer-events: none; opacity: 0;
+		background:
+			linear-gradient(90deg, transparent 39%, rgba(255,255,255,0.06) 40%, transparent 41%) 0 0 / 100% 100%,
+			linear-gradient(0deg, transparent 39%, rgba(255,255,255,0.06) 40%, transparent 41%) 0 0 / 100% 100%,
+			linear-gradient(45deg, transparent 39%, rgba(255,255,255,0.04) 40%, transparent 41%) 0 0 / 100% 100%,
+			linear-gradient(135deg, transparent 39%, rgba(255,255,255,0.04) 40%, transparent 41%) 0 0 / 100% 100%;
+		mask-image: radial-gradient(ellipse at center, black 25%, transparent 60%);
+		-webkit-mask-image: radial-gradient(ellipse at center, black 25%, transparent 60%);
+		animation: impact-in 0.2s ease-out 0.05s both;
+	}
+	@keyframes impact-in { from { opacity: 0; } to { opacity: 0.5; } }
+
+	/* ===== PHASE: AOA ===== */
+	.aoa-art-layer { animation: aoa-bg-in 0.3s ease-out both; }
+	@keyframes aoa-bg-in { from { opacity: 0; } to { opacity: 1; } }
+
+	.aoa-art-img {
+		object-fit: cover;
+		object-position: center 30%;
+		animation: aoa-slam 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+	}
+	@keyframes aoa-slam {
+		from { opacity: 0; transform: scale(1.3); filter: brightness(1.8); }
 		to { opacity: 1; transform: scale(1); filter: brightness(1); }
 	}
 
 	.aoa-nameplate {
-		position: absolute;
-		bottom: 12%;
-		left: 50%;
-		transform: translateX(-50%);
-		height: auto;
-		width: min(60vw, 500px);
-		animation: nameplate-slide 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
-		z-index: 10;
+		position: absolute; bottom: 12%; left: 50%; transform: translateX(-50%);
+		width: min(55vw, 450px); height: auto; z-index: 5;
+		animation: nameplate-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+		filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
 	}
-	@keyframes nameplate-slide {
-		from { opacity: 0; transform: translateX(-50%) translateY(60px); }
+	@keyframes nameplate-in {
+		from { opacity: 0; transform: translateX(-50%) translateY(50px); }
 		to { opacity: 1; transform: translateX(-50%) translateY(0); }
 	}
 
-	.aoa-glass-edge {
-		background: linear-gradient(
-			to bottom,
-			rgba(0, 62, 150, 0.6) 0%,
-			transparent 15%,
-			transparent 85%,
-			rgba(0, 34, 90, 0.8) 100%
-		);
-		z-index: 5;
-	}
-
-	/* === Shatter === */
-	.aoa-shatter-img {
-		animation: shatter-break 0.5s cubic-bezier(0.55, 0, 1, 0.45) both;
+	.aoa-art-vignette {
+		background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.25) 100%);
 		z-index: 2;
 	}
-	@keyframes shatter-break {
-		0% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); transform: scale(1); filter: blur(0); }
-		15% { clip-path: polygon(2% 1%, 98% 3%, 95% 97%, 1% 99%); }
-		30% { clip-path: polygon(5% 2%, 95% 5%, 90% 95%, 3% 93%); filter: blur(0); }
-		50% { clip-path: polygon(8% 0, 92% 8%, 85% 92%, 0 90%); filter: blur(0.5px); }
-		70% { clip-path: polygon(15% -5%, 105% 10%, 75% 105%, -10% 85%); filter: blur(1px); opacity: 0.6; transform: scale(1.08); }
-		100% { clip-path: polygon(30% -20%, 120% 20%, 60% 120%, -30% 70%); filter: blur(3px); opacity: 0; transform: scale(1.2); }
+
+	/* ===== PHASE: CONTENT ===== */
+	.aoa-content-bg { animation: content-bg-in 0.4s ease-out both; }
+	@keyframes content-bg-in { from { opacity: 0; } to { opacity: 1; } }
+
+	.aoa-bg-img {
+		object-fit: cover;
+		object-position: center 30%;
+		opacity: 0.4;
+		filter: blur(2px) brightness(0.6);
+	}
+	.aoa-bg-vignette {
+		background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.35) 100%);
 	}
 
-	.aoa-glass-shatter {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: min(90vw, 900px);
-		height: auto;
-		aspect-ratio: 2 / 1;
-		object-fit: contain;
-		z-index: 3;
-		animation: glass-crack 0.5s ease-out forwards;
-		pointer-events: none;
-	}
-	@keyframes glass-crack {
-		0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-		20% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
-		50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.05); }
-		100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-	}
-
-	.aoa-glass-overlay {
-		background:
-			linear-gradient(135deg, rgba(22,207,251,0.08) 0%, transparent 50%),
-			linear-gradient(225deg, rgba(253,119,217,0.06) 0%, transparent 50%);
-		z-index: 4;
-		animation: glass-fade 0.5s ease-out forwards;
-	}
-	@keyframes glass-fade {
-		from { opacity: 0; }
-		30% { opacity: 1; }
-		to { opacity: 0; }
-	}
-
-	.aoa-skip-hint {
-		animation: hint-fade 0.5s ease-out 0.5s both;
-	}
-	@keyframes hint-fade {
-		from { opacity: 0; }
-		to { opacity: 0.3; }
-	}
-
-	/* ===== CONTENT LAYOUT ===== */
-	.about-layout {
-		display: flex;
-		flex-direction: row;
-		gap: 2rem;
-		padding: 0.5rem 0;
-		min-height: 100%;
-	}
-	@media (max-width: 767px) {
-		.about-layout {
-			flex-direction: column;
-			gap: 1rem;
-		}
-	}
-
-	/* === Portrait Column === */
-	.about-portrait-col {
-		flex-shrink: 0;
-		width: 300px;
-		position: relative;
-		align-items: flex-start;
-		animation: content-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
-	}
-	@media (min-width: 1024px) {
-		.about-portrait-col { width: 380px; }
-	}
-	.about-portrait-inner {
-		position: relative;
+	.about-content-panel {
+		padding: 1rem;
+		max-width: 1320px;
+		margin: 0 auto;
 		width: 100%;
-		height: 100%;
-		min-height: 400px;
-		display: flex;
-		align-items: flex-end;
+		animation: panel-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
 	}
-	.about-portrait-img {
-		width: 100%;
-		height: auto;
-		max-height: 65vh;
-		object-fit: contain;
-		object-position: bottom center;
-		position: relative;
-		z-index: 2;
-		filter: drop-shadow(0 0 30px rgba(22,207,251,0.1));
-		animation: portrait-float 4s ease-in-out infinite;
-	}
-	@keyframes portrait-float {
-		0%, 100% { transform: translateY(0); }
-		50% { transform: translateY(-4px); }
-	}
-	.about-portrait-glass {
-		position: absolute;
-		inset: 0;
-		background: linear-gradient(to right, transparent 60%, rgba(0,62,150,0.3) 100%);
-		z-index: 3;
-		pointer-events: none;
-	}
-	.about-portrait-shadow {
-		position: absolute;
-		bottom: 0;
-		left: 10%;
-		width: 80%;
-		height: auto;
-		opacity: 0.15;
-		z-index: 1;
-		pointer-events: none;
-	}
-
-	/* === Info Column === */
-	.about-info-col {
-		flex: 1;
-		min-width: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
-		animation: content-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
-	}
-	@keyframes content-in {
-		from { opacity: 0; transform: translateY(15px); }
+	@keyframes panel-in {
+		from { opacity: 0; transform: translateY(20px); }
 		to { opacity: 1; transform: translateY(0); }
 	}
 
-	/* Name plate */
-	.about-nameplate-row {
-		display: flex;
-		align-items: center;
-		margin-bottom: 0.25rem;
-	}
-	.about-nameplate {
-		height: 48px;
-		width: auto;
-		object-fit: contain;
-	}
-	@media (min-width: 768px) {
-		.about-nameplate { height: 60px; }
-	}
-
-	/* Headline */
-	.about-headline {
-		margin-bottom: 0.5rem;
+	/* === Header === */
+	.about-header {
+		display: flex; align-items: center; justify-content: space-between;
+		padding: 0.5rem 0; flex-shrink: 0;
 	}
 	.about-title {
-		font-family: var(--font-new-rodin);
-		font-size: 1.5rem;
-		color: var(--color-button-1);
-		font-weight: 500;
+		font-family: var(--font-skip); font-size: 1.75rem; color: #fff;
+		text-shadow: 0 2px 12px rgba(0,0,0,0.5), var(--text-shadow-border);
 	}
+	.about-tab-btn {
+		padding: 0.35rem 1rem; border-radius: 0.375rem;
+		font-family: var(--font-new-rodin); font-size: 0.9rem;
+		transition: all 0.2s; cursor: pointer; border: none; outline: none;
+	}
+	.about-tab-active {
+		background: rgba(255,255,255,0.2); color: #fff; font-weight: 700;
+		backdrop-filter: blur(8px); box-shadow: 0 0 20px rgba(21,194,252,0.2);
+	}
+	.about-tab-inactive { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.5); }
+	.about-tab-inactive:hover { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.8); }
+
+	/* === Body === */
+	.about-body { flex: 1; min-height: 0; padding: 0.5rem 0; gap: 1.5rem; }
+
+	/* Portrait */
+	.about-portrait-side { display: none; }
 	@media (min-width: 768px) {
-		.about-title { font-size: 1.75rem; }
+		.about-portrait-side { display: flex; flex-shrink: 0; width: 260px; align-items: flex-end; }
 	}
-	.about-tagline {
-		font-family: var(--font-new-rodin);
-		color: var(--color-muted);
-		font-style: italic;
-		margin-top: 0.25rem;
-		font-size: 0.95rem;
+	@media (min-width: 1024px) { .about-portrait-side { width: 320px; } }
+
+	.about-portrait-inner {
+		position: relative; width: 100%; height: 100%; min-height: 300px;
+		display: flex; align-items: flex-end;
+	}
+	.about-camp-img {
+		width: 100%; height: auto; max-height: 55vh;
+		object-fit: contain; object-position: bottom center;
+		position: relative; z-index: 2;
+		filter: drop-shadow(0 0 30px rgba(21,194,252,0.12)) brightness(0.9);
+		animation: port-float 4s ease-in-out infinite;
+	}
+	@keyframes port-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+	.about-camp-glass {
+		position: absolute; inset: 0;
+		background: linear-gradient(to right, transparent 55%, rgba(0,0,0,0.12) 100%);
+		z-index: 3; pointer-events: none;
 	}
 
-	/* Stats row */
-	.about-stats-row {
-		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		gap: 0.5rem;
-		margin-bottom: 0.5rem;
+	/* Info side */
+	.about-info-side {
+		flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.5rem;
+		padding: 0.75rem 1rem; border-radius: 0.75rem;
+		background: rgba(0,0,0,0.25); backdrop-filter: blur(8px);
+		border: 1px solid rgba(255,255,255,0.06);
+		box-shadow: 0 8px 32px rgba(0,0,0,0.2);
 	}
-	@media (max-width: 767px) {
-		.about-stats-row {
-			grid-template-columns: repeat(2, 1fr);
-		}
+	.about-info-nameplate {
+		height: 36px; width: auto; object-fit: contain;
+		filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
 	}
-	.about-stat-card {
-		padding: 0.75rem 0.5rem;
-		border-radius: 0.5rem;
-		background: rgba(255,255,255,0.05);
-		border: 1px solid rgba(255,255,255,0.08);
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.15rem;
-		transition: border-color 0.2s, box-shadow 0.2s;
+	@media (min-width: 768px) { .about-info-nameplate { height: 46px; } }
+
+	.about-info-title {
+		font-family: var(--font-new-rodin); font-size: 1.2rem;
+		color: #15c2fc; font-weight: 600;
+		text-shadow: 0 0 20px rgba(21,194,252,0.25);
 	}
-	.about-stat-card:hover {
-		border-color: var(--color-pink);
-		box-shadow: 0 0 20px rgba(253,119,217,0.1);
+	.about-info-tagline {
+		font-family: var(--font-new-rodin); color: rgba(255,255,255,0.45);
+		font-style: italic; font-size: 0.85rem; margin-top: 0.1rem;
 	}
-	.about-stat-value {
-		font-family: var(--font-skip);
-		font-size: 1.75rem;
-		color: var(--color-pink);
-		text-shadow: var(--text-shadow-border);
-		line-height: 1;
+
+	/* Stats */
+	.about-stats-grid {
+		display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.35rem;
 	}
-	.about-stat-label {
-		font-family: var(--font-new-rodin);
-		font-size: 0.75rem;
-		color: var(--color-muted);
+	@media (max-width: 767px) { .about-stats-grid { grid-template-columns: repeat(2, 1fr); } }
+	.about-stat-item {
+		padding: 0.4rem 0.2rem; border-radius: 0.375rem;
+		background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.05);
+		display: flex; flex-direction: column; align-items: center; gap: 0.05rem;
+		transition: border-color 0.2s;
+	}
+	.about-stat-item:hover { border-color: rgba(21,194,252,0.25); }
+	.about-stat-val {
+		font-family: var(--font-skip); font-size: 1.3rem; color: #15c2fc; line-height: 1;
+		text-shadow: 0 0 12px rgba(21,194,252,0.25);
+	}
+	.about-stat-lbl {
+		font-family: var(--font-new-rodin); font-size: 0.6rem; color: rgba(255,255,255,0.4);
 		text-align: center;
 	}
 
 	/* Social */
-	.about-social-row {
-		display: flex;
-		gap: 0.75rem;
-		margin-bottom: 0.5rem;
-	}
+	.about-social-row { display: flex; gap: 0.4rem; }
 	.about-social-link {
-		width: 2.5rem;
-		height: 2.5rem;
-		border-radius: 9999px;
-		background: rgba(255,255,255,0.08);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: all 0.2s;
+		width: 2rem; height: 2rem; border-radius: 9999px;
+		background: rgba(255,255,255,0.06); display: flex;
+		align-items: center; justify-content: center; transition: all 0.2s;
 	}
-	.about-social-link:hover {
-		background: rgba(255,255,255,0.15);
-		transform: scale(1.1);
-		box-shadow: 0 0 15px rgba(253,119,217,0.3);
-	}
-	.about-social-icon {
-		font-size: 1.25rem;
-	}
+	.about-social-link:hover { background: rgba(255,255,255,0.12); transform: scale(1.1); }
+	.about-social-icon { font-size: 1rem; }
 
 	/* Divider */
-	.about-divider {
+	.about-content-divider {
 		height: 1px;
-		background: linear-gradient(90deg, transparent, rgba(253,119,217,0.3), transparent);
-		margin: 0.25rem 0 0.75rem;
+		background: linear-gradient(90deg, transparent, rgba(21,194,252,0.15), transparent);
+		margin: 0.1rem 0 0.35rem;
 	}
 
-	/* === Sub-tab content === */
-	:global(.stagger-item) {
-		opacity: 0;
-		animation: content-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+	/* Sub-content */
+	.about-sub-content {
+		flex: 1; overflow-y: auto; max-height: 28vh; padding-right: 0.25rem;
+	}
+	.about-sub-content::-webkit-scrollbar { width: 3px; }
+	.about-sub-content::-webkit-scrollbar-track { background: transparent; }
+	.about-sub-content::-webkit-scrollbar-thumb { background: rgba(21,194,252,0.3); border-radius: 2px; }
+
+	.about-bio-p {
+		font-family: var(--font-new-rodin); color: rgba(255,255,255,0.7);
+		line-height: 1.6; font-size: 0.9rem;
 	}
 
-	/* Bio text */
-	.about-bio-text p {
-		font-size: 1rem;
-		line-height: 1.7;
+	.about-stat-detail {
+		padding: 0.6rem; border-radius: 0.5rem;
+		background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.05);
+		display: flex; flex-direction: column; align-items: center; gap: 0.1rem;
+		transition: border-color 0.2s;
+	}
+	.about-stat-detail:hover { border-color: rgba(21,194,252,0.3); }
+	.about-stat-dv {
+		font-family: var(--font-skip); font-size: 1.75rem; color: #15c2fc;
+		text-shadow: 0 0 15px rgba(21,194,252,0.25);
+	}
+	.about-stat-dl {
+		font-family: var(--font-new-rodin); color: rgba(255,255,255,0.5); font-size: 0.8rem;
 	}
 
-	/* Bio full */
-	.about-bio-paragraph {
-		font-size: 1rem;
-		line-height: 1.7;
-		color: var(--color-muted);
-		white-space: pre-wrap;
+	.about-bio-wrap p { font-family: var(--font-new-rodin); color: rgba(255,255,255,0.7); line-height: 1.6; font-size: 0.9rem; white-space: pre-wrap; }
+	.about-bio-sep { text-align: center; color: rgba(255,255,255,0.05); margin: 0.75rem 0; font-size: 0.7rem; }
+
+	.about-focus-box {
+		padding: 0.75rem; border-radius: 0.5rem;
+		background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
 	}
-	.about-bio-separator {
-		text-align: center;
-		color: rgba(255,255,255,0.08);
-		font-size: 0.875rem;
-		margin: 1.5rem 0;
+	.about-focus-h {
+		font-family: var(--font-skip); font-size: 1.1rem; color: #15c2fc;
+		margin-bottom: 0.5rem; text-shadow: 0 0 12px rgba(21,194,252,0.15);
 	}
-	.about-focus-card {
-		padding: 1.25rem;
-		border-radius: 0.75rem;
-		background: rgba(255,255,255,0.04);
-		border: 1px solid rgba(255,255,255,0.08);
+	.about-focus-list { display: flex; flex-direction: column; gap: 0.4rem; list-style: none; padding: 0; margin: 0; }
+	.about-focus-li {
+		display: flex; align-items: center; gap: 0.5rem;
+		color: rgba(255,255,255,0.55); font-family: var(--font-new-rodin); font-size: 0.8rem;
 	}
-	.about-focus-title {
-		font-family: var(--font-skip);
-		font-size: 1.5rem;
-		color: var(--color-pink);
-		margin-bottom: 1rem;
-		text-shadow: var(--text-shadow-border);
-	}
-	.about-focus-list {
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
-		list-style: none;
-		padding: 0;
-		margin: 0;
-	}
-	.about-focus-item {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		color: var(--color-muted);
-		font-family: var(--font-new-rodin);
-		font-size: 0.95rem;
-	}
-	.about-focus-icon {
-		font-size: 1.25rem;
-		flex-shrink: 0;
+	.about-fi-icon { font-size: 1rem; flex-shrink: 0; }
+
+	/* Footer */
+	.about-footer {
+		display: flex; align-items: center; justify-content: center;
+		gap: 1.5rem; padding: 0.5rem 0; flex-shrink: 0;
 	}
 </style>

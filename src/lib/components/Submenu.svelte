@@ -13,8 +13,6 @@
 		onBack,
 		children,
 		tarotCards = [],
-		skipTransition = false,
-		onIntroBack
 	}: {
 		title: string;
 		tabs: SubmenuTab[];
@@ -22,8 +20,6 @@
 		onBack: () => void;
 		children: Snippet<[number]>;
 		tarotCards?: string[];
-		skipTransition?: boolean;
-		onIntroBack?: () => void;
 	} = $props();
 
 	let closing = $state(false);
@@ -47,12 +43,7 @@
 			e.preventDefault();
 		} else if (e.key === "Escape" || e.key === "b" || e.key === "B") {
 			e.preventDefault();
-			if (onIntroBack) {
-				const handled = onIntroBack();
-				if (!handled) close();
-			} else {
-				close();
-			}
+			close();
 		}
 	}
 
@@ -77,7 +68,6 @@
 	onkeydown={handleKeydown}
 	tabindex="-1"
 	class:submenu-closing={closing}
-	class:submenu-skip-transition={skipTransition}
 >
 	{#if !isMobile}
 		<svg aria-hidden="true" style="position:absolute;width:0;height:0;pointer-events:none;z-index:0">
@@ -190,19 +180,6 @@
 		background: rgba(0, 62, 150, 0.96);
 		clip-path: circle(0% at center);
 		animation: circle-expand 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-	}
-	.submenu-skip-transition {
-		clip-path: none !important;
-		animation: none !important;
-	}
-	.submenu-skip-transition .submenu-panel,
-	.submenu-skip-transition .submenu-header,
-	.submenu-skip-transition .submenu-footer,
-	.submenu-skip-transition .submenu-accent-line,
-	.submenu-skip-transition .submenu-content-wrapper,
-	.submenu-skip-transition .submenu-bg-text {
-		animation: none !important;
-		opacity: 1 !important;
 	}
 	.submenu-closing {
 		animation: circle-contract 0.35s ease-in forwards;
