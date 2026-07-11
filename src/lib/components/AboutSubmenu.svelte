@@ -395,7 +395,8 @@
 	}
 	.about-tab-active {
 		background: rgba(255,255,255,0.2); color: #fff; font-weight: 700;
-		backdrop-filter: blur(8px); box-shadow: 0 0 20px rgba(21,194,252,0.2);
+		backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+		box-shadow: 0 0 20px rgba(21,194,252,0.2);
 	}
 	.about-tab-inactive { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.5); }
 	.about-tab-inactive:hover { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.8); }
@@ -432,7 +433,8 @@
 	.about-info-side {
 		flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.5rem;
 		padding: 0.75rem 1rem; border-radius: 0.75rem;
-		background: rgba(0,0,0,0.55); backdrop-filter: blur(12px);
+		background: rgba(0,0,0,0.65); backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
 		border: 1px solid rgba(255,255,255,0.08);
 		box-shadow: 0 8px 32px rgba(0,0,0,0.2);
 	}

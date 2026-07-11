@@ -74,7 +74,7 @@
 			<defs>
 				<filter id="water-distortion">
 					<feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="3" result="noise"/>
-					<feDisplacementMap in="SourceGraphic" in2="noise" scale="35" xChannelSelector="R" yChannelSelector="G"/>
+					<feDisplacementMap in="SourceGraphic" in2="noise" scale="18" xChannelSelector="R" yChannelSelector="G"/>
 				</filter>
 			</defs>
 		</svg>
