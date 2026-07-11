@@ -232,11 +232,13 @@
 		outline: none;
 	}
 	.about-closing {
-		animation: about-contract 0.35s ease-in forwards;
+		opacity: 0;
+		transition: opacity 0.25s ease-out;
 	}
-	@keyframes about-contract {
-		from { clip-path: circle(150% at center); }
-		to { clip-path: circle(0% at center); }
+	.about-closing .about-info-side,
+	.about-closing .about-tab-active {
+		backdrop-filter: none;
+		-webkit-backdrop-filter: none;
 	}
 
 	/* ===== PHASE: EYE ===== */
