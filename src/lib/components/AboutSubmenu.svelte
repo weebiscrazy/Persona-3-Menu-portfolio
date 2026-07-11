@@ -230,17 +230,14 @@
 	.about-root {
 		background: transparent;
 		outline: none;
-		isolation: isolate;
-		will-change: opacity;
 	}
 	.about-closing {
-		animation: about-fade-out 0.35s ease-in forwards;
+		animation: about-contract 0.35s ease-in forwards;
 	}
-	.about-closing .about-info-side,
-	.about-closing .about-tab-active {
-		backdrop-filter: none;
+	@keyframes about-contract {
+		from { clip-path: circle(150% at center); }
+		to { clip-path: circle(0% at center); }
 	}
-	@keyframes about-fade-out { from { opacity: 1; } to { opacity: 0; } }
 
 	/* ===== PHASE: EYE ===== */
 	.aoa-bg-dim-overlay {
