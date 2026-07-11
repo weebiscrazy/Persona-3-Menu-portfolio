@@ -83,19 +83,24 @@
 	{#if phase === "eye"}
 		<div class="absolute inset-0 z-10 friends-bg-dim">
 			<div class="absolute inset-0 friends-bg-dim-overlay"></div>
+			<div class="friends-storm-clouds" aria-hidden="true"></div>
 		</div>
 		<div class="absolute inset-0 z-20 flex items-center justify-center">
 			<div class="friends-lightning-flash" aria-hidden="true"></div>
 			<div class="friends-lightning-bolts" aria-hidden="true">
-				<svg viewBox="0 0 200 200" class="friends-bolt-svg">
-					<polyline class="friends-bolt-1" points="120,10 80,80 110,80 70,150" fill="none" stroke="#FFD700" stroke-width="3" stroke-linejoin="round" />
-					<polyline class="friends-bolt-2" points="60,30 100,90 75,90 50,140" fill="none" stroke="#FFD700" stroke-width="2" stroke-linejoin="round" />
-					<polyline class="friends-bolt-3" points="140,40 95,95 120,95 90,160" fill="none" stroke="#FFD700" stroke-width="2" stroke-linejoin="round" />
+				<svg viewBox="0 0 300 300" class="friends-bolt-svg">
+					<polyline class="friends-bolt-1" points="150,0 100,100 140,90 80,200" fill="none" stroke="#FFD700" stroke-width="3" stroke-linejoin="round" />
+					<polyline class="friends-bolt-2" points="60,20 90,110 70,105 30,190" fill="none" stroke="#FFE44D" stroke-width="2" stroke-linejoin="round" />
+					<polyline class="friends-bolt-3" points="240,30 190,120 220,115 170,210" fill="none" stroke="#FFD700" stroke-width="2" stroke-linejoin="round" />
+					<polyline class="friends-bolt-4" points="180,10 160,80 185,75 140,170" fill="none" stroke="#FFC125" stroke-width="1.5" stroke-linejoin="round" />
+					<polyline class="friends-bolt-5" points="100,40 130,105 110,100 80,180" fill="none" stroke="#FFE44D" stroke-width="1.5" stroke-linejoin="round" />
 				</svg>
 			</div>
+			{#each Array(20) as _, i}
+				<div class="friends-spark" style="--sp-x: {5 + (i * 12) % 90}%; --sp-y: {10 + (i * 8) % 80}%; --sp-d: {0.1 + (i % 10) * 0.05}s; --sp-s: {3 + (i % 5) * 2}px; --sp-angle: {i * 37}deg"></div>
+			{/each}
 			<div class="friends-eye-wrap">
 				<div class="friends-eye-frame">
-					<div class="friends-scanline" aria-hidden="true"></div>
 					<img
 						src="/T_UI_Camp_Status_Character_Glass_0004.png"
 						alt="eye cut-in"
@@ -283,86 +288,123 @@
 	.friends-closing .friends-ally-card,
 	.friends-closing .friends-tab-active { backdrop-filter: none; -webkit-backdrop-filter: none; }
 
-	/* ===== PHASE: EYE ===== */
-	.friends-bg-dim-overlay { animation: dim-in 0.4s ease-out forwards; }
-	@keyframes dim-in {
-		from { background: rgba(60,50,40,0); }
-		to { background: rgba(60,50,40,0.7); }
+	/* ===== PHASE: EYE — Thunder God's Wrath ===== */
+	/* Storm-darkened sky */
+	.friends-bg-dim-overlay {
+		animation: storm-dim 0.6s ease-out forwards;
+	}
+	@keyframes storm-dim {
+		0% { background: rgba(20,10,5,0); }
+		35% { background: rgba(40,25,10,0.5); }
+		100% { background: rgba(15,8,3,0.85); }
 	}
 
-	.friends-lightning-flash {
-		position: absolute; inset: 0; z-index: 0; pointer-events: none;
-		background: rgba(255,215,0,0.15);
-		animation: flash-strobe 0.4s ease-out forwards;
+	/* Rolling storm clouds */
+	.friends-storm-clouds {
+		position: absolute; inset: 0; z-index: 1; pointer-events: none;
+		overflow: hidden;
+		background:
+			radial-gradient(ellipse at 20% 30%, rgba(60,50,40,0.3) 0%, transparent 50%),
+			radial-gradient(ellipse at 80% 20%, rgba(40,30,20,0.25) 0%, transparent 45%),
+			radial-gradient(ellipse at 50% 70%, rgba(50,40,30,0.2) 0%, transparent 55%);
+		animation: clouds-roll 3s ease-in-out infinite;
 	}
-	@keyframes flash-strobe {
-		0% { opacity: 1; }
-		15% { opacity: 0.2; }
-		30% { opacity: 0.8; }
-		60% { opacity: 0; }
+	@keyframes clouds-roll {
+		0% { transform: translateX(-5%) scale(1); opacity: 0.5; }
+		50% { transform: translateX(5%) scale(1.05); opacity: 0.8; }
+		100% { transform: translateX(-5%) scale(1); opacity: 0.5; }
+	}
+
+	/* Lightning flash strobe */
+	.friends-lightning-flash {
+		position: absolute; inset: 0; z-index: 2; pointer-events: none;
+		background: rgba(255,215,0,0.2);
+		animation: thunder-flash 0.5s ease-out forwards;
+	}
+	@keyframes thunder-flash {
+		0% { opacity: 1; background: rgba(255,255,255,0.6); }
+		8% { opacity: 0.2; background: rgba(255,215,0,0.3); }
+		15% { opacity: 0.9; background: rgba(255,255,255,0.5); }
+		25% { opacity: 0.1; background: rgba(255,215,0,0.15); }
+		35% { opacity: 0.5; background: rgba(255,255,255,0.3); }
+		50% { opacity: 0; }
 		100% { opacity: 0; }
 	}
+
+	/* Lightning bolts — 5 branching strikes */
 	.friends-lightning-bolts {
-		position: absolute; inset: 0; z-index: 1; pointer-events: none;
+		position: absolute; inset: 0; z-index: 3; pointer-events: none;
 		display: flex; align-items: center; justify-content: center;
 	}
-	.friends-bolt-svg { width: min(90vw, 700px); height: 100%; opacity: 0; animation: bolt-zap 0.5s ease-out 0.05s forwards; }
-	.friends-bolt-1 { animation: bolt-strike 0.3s ease-out 0.05s both; }
-	.friends-bolt-2 { animation: bolt-strike 0.3s ease-out 0.1s both; }
-	.friends-bolt-3 { animation: bolt-strike 0.3s ease-out 0.15s both; }
+	.friends-bolt-svg {
+		width: min(95vw, 800px); height: 100%; opacity: 0;
+		animation: bolt-zap 0.6s ease-out 0.03s forwards;
+		filter: drop-shadow(0 0 20px rgba(255,215,0,0.6)) drop-shadow(0 0 60px rgba(255,215,0,0.3));
+	}
+	.friends-bolt-1 { animation: bolt-strike 0.25s ease-out 0.03s both; }
+	.friends-bolt-2 { animation: bolt-strike 0.25s ease-out 0.07s both; }
+	.friends-bolt-3 { animation: bolt-strike 0.25s ease-out 0.11s both; }
+	.friends-bolt-4 { animation: bolt-strike 0.25s ease-out 0.15s both; }
+	.friends-bolt-5 { animation: bolt-strike 0.25s ease-out 0.19s both; }
 	@keyframes bolt-strike {
-		from { opacity: 0; stroke-dasharray: 400; stroke-dashoffset: 400; }
+		from { opacity: 0; stroke-dasharray: 600; stroke-dashoffset: 600; }
 		to { opacity: 1; stroke-dashoffset: 0; }
 	}
 	@keyframes bolt-zap {
-		0% { opacity: 1; filter: brightness(2); }
-		60% { opacity: 0.6; }
-		100% { opacity: 0; filter: brightness(0.5); }
+		0% { opacity: 1; filter: brightness(3); }
+		40% { opacity: 0.8; filter: brightness(1.5); }
+		100% { opacity: 0; filter: brightness(0.3); }
 	}
 
-	.friends-scanline {
-		position: absolute; left: -10%; width: 120%; height: 3px;
-		background: linear-gradient(90deg, transparent, rgba(255,215,0,0.8), rgba(255,255,255,0.9), rgba(255,215,0,0.8), transparent);
-		z-index: 10; pointer-events: none;
-		animation: scan-sweep 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards;
-		box-shadow: 0 0 20px rgba(255,215,0,0.6), 0 0 60px rgba(255,215,0,0.3);
+	/* Golden sparks burst */
+	.friends-spark {
+		position: absolute; z-index: 3; pointer-events: none;
+		left: var(--sp-x); top: var(--sp-y);
+		width: var(--sp-s); height: var(--sp-s);
+		border-radius: 50%;
+		background: radial-gradient(circle, rgba(255,255,255,0.9), rgba(255,215,0,0.4), transparent);
+		box-shadow: 0 0 6px rgba(255,215,0,0.6);
+		animation: spark-burst 0.7s ease-out calc(var(--sp-d)) forwards;
 	}
-	@keyframes scan-sweep {
-		0% { top: -5%; opacity: 0; }
-		10% { opacity: 1; }
-		90% { opacity: 1; }
-		100% { top: 105%; opacity: 0; }
+	@keyframes spark-burst {
+		0% { transform: translate(0, 0) scale(0); opacity: 1; }
+		30% { opacity: 0.8; transform: translate(calc(cos(var(--sp-angle)) * 40px), calc(sin(var(--sp-angle)) * 40px)) scale(1.2); }
+		100% { transform: translate(calc(cos(var(--sp-angle)) * 120px), calc(sin(var(--sp-angle)) * 120px)) scale(0.2); opacity: 0; }
 	}
 
+	/* Eye glitch — electric displacement */
 	.friends-eye-glitch {
 		position: absolute; inset: 0; z-index: 6; pointer-events: none;
 		overflow: hidden; opacity: 0;
-		animation: glitch-overlay 0.5s ease-out 0.1s forwards;
+		animation: thunder-glitch 0.55s ease-out 0.08s forwards;
 	}
-	@keyframes glitch-overlay {
+	@keyframes thunder-glitch {
 		0% { opacity: 0; }
-		5% { opacity: 0.3; background: linear-gradient(0deg, transparent 0%, rgba(255,215,0,0.15) 20%, transparent 40%, rgba(255,215,0,0.1) 60%, transparent 80%); transform: translateX(-4px); }
-		10% { opacity: 0; transform: translateX(4px); }
-		15% { opacity: 0.2; background: linear-gradient(0deg, transparent 10%, rgba(255,255,255,0.12) 30%, transparent 50%, rgba(255,215,0,0.08) 70%, transparent 90%); transform: translateX(-2px); }
-		20% { opacity: 0; transform: translateX(0); }
-		30% { opacity: 0.1; background: linear-gradient(0deg, transparent 5%, rgba(255,255,255,0.08) 25%, transparent 45%, rgba(255,215,0,0.12) 65%, transparent 85%); transform: translateX(3px); }
-		40% { opacity: 0; transform: translateX(0); }
+		3% { opacity: 0.35; background: linear-gradient(0deg, transparent 0%, rgba(255,215,0,0.2) 12%, transparent 28%, rgba(255,215,0,0.15) 45%, transparent 62%, rgba(255,255,255,0.1) 78%, transparent); transform: translateX(-7px) skewX(-1.5deg); }
+		7% { opacity: 0; transform: translateX(6px) skewX(1deg); }
+		11% { opacity: 0.25; background: linear-gradient(0deg, transparent 6%, rgba(255,255,255,0.15) 20%, transparent 35%, rgba(255,215,0,0.12) 52%, transparent 68%, rgba(255,215,0,0.1) 84%, transparent); transform: translateX(-4px) skewX(1deg); }
+		15% { opacity: 0; transform: translateX(0); }
+		22% { opacity: 0.15; background: linear-gradient(0deg, transparent 4%, rgba(255,215,0,0.18) 16%, transparent 32%, rgba(255,255,255,0.08) 50%, transparent 66%, rgba(255,215,0,0.1) 82%, transparent); transform: translateX(5px) skewX(-0.8deg); }
+		30% { opacity: 0; transform: translateX(0); }
 		100% { opacity: 0; }
 	}
 
+	/* Eye wrap — tears through reality */
 	.friends-eye-wrap {
-		animation: crack-reveal 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both,
-				   eye-breathe 2.5s ease-in-out 0.6s infinite;
-		position: relative; z-index: 2;
+		animation: thunder-reveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+				   thunder-breathe 2.5s ease-in-out 0.6s infinite;
+		position: relative; z-index: 5;
 	}
-	@keyframes crack-reveal {
-		from { opacity: 0; transform: scale(0.5) translateY(40px); clip-path: inset(0 0 100% 0); }
-		50% { opacity: 1; transform: scale(1.05) translateY(-5px); clip-path: inset(0 0 0 0); }
-		to { opacity: 1; transform: scale(1) translateY(0); clip-path: inset(0 0 0 0); }
+	@keyframes thunder-reveal {
+		0% { opacity: 0; transform: scale(1.5) rotate(-10deg); clip-path: inset(50% 50% 50% 50% round 50%); filter: brightness(3) blur(8px); }
+		25% { opacity: 0.6; transform: scale(0.9) rotate(4deg); clip-path: inset(10% 5% 15% 5% round 20%); filter: brightness(1.8) blur(3px); }
+		50% { opacity: 1; transform: scale(1.05) rotate(-2deg); clip-path: inset(2% 1% 3% 1% round 5%); filter: brightness(1.2) blur(1px); }
+		75% { transform: scale(0.98) rotate(0.5deg); filter: brightness(0.9); }
+		100% { opacity: 1; transform: scale(1) rotate(0deg); clip-path: inset(0); filter: brightness(1) blur(0); }
 	}
-	@keyframes eye-breathe {
-		0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(255,215,0,0)); }
-		50% { transform: scale(1.02); filter: drop-shadow(0 0 30px rgba(255,215,0,0.3)); }
+	@keyframes thunder-breathe {
+		0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(255,215,0,0)) brightness(1); }
+		50% { transform: scale(1.015); filter: drop-shadow(0 0 40px rgba(255,215,0,0.25)) drop-shadow(0 0 80px rgba(255,215,0,0.1)) brightness(1.08); }
 	}
 
 	.friends-eye-frame {
@@ -374,47 +416,62 @@
 
 	.friends-eye-img {
 		width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2;
-		animation: eye-zoom 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-		filter: drop-shadow(0 0 50px rgba(255,215,0,0.4)) drop-shadow(0 0 100px rgba(255,215,0,0.2));
+		animation: thunder-zoom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+		filter: drop-shadow(0 0 60px rgba(255,215,0,0.4)) drop-shadow(0 0 120px rgba(255,215,0,0.2));
 	}
-	@keyframes eye-zoom {
-		from { opacity: 0; transform: scale(0.7); filter: brightness(2); }
-		to { opacity: 1; transform: scale(1); filter: brightness(1); }
+	@keyframes thunder-zoom {
+		0% { opacity: 0; transform: scale(0.4) rotate(-8deg); filter: brightness(3) saturate(0.3) contrast(2); }
+		45% { opacity: 0.9; transform: scale(1.08) rotate(2deg); filter: brightness(1.5) saturate(1.2) contrast(1.1); }
+		100% { opacity: 1; transform: scale(1) rotate(0deg); filter: brightness(1) saturate(1) contrast(1); }
 	}
 
+	/* Frame border — golden lightning energy */
 	.friends-eye-border {
-		position: absolute; inset: -8px; z-index: 3; pointer-events: none;
-		border: 2px solid rgba(120,113,108,0.5);
+		position: absolute; inset: -10px; z-index: 3; pointer-events: none;
+		border: 2px solid rgba(255,215,0,0.4);
 		clip-path: polygon(0% 5%, 3% 0%, 97% 2%, 100% 4%, 100% 96%, 96% 100%, 4% 98%, 0% 95%);
-		animation: border-flick 0.6s ease-out forwards;
+		animation: thunder-border 0.7s ease-out forwards;
 	}
-	@keyframes border-flick {
-		0% { border-color: rgba(255,255,255,0.9); opacity: 0; }
-		30% { border-color: rgba(120,113,108,0.8); opacity: 1; }
-		60% { border-color: rgba(255,255,255,0.6); }
-		100% { border-color: rgba(120,113,108,0.3); opacity: 0.8; }
+	@keyframes thunder-border {
+		0% { border-color: rgba(255,255,255,0); opacity: 0; border-width: 4px; transform: scale(0.85); }
+		15% { border-color: rgba(255,215,0,1); opacity: 1; border-width: 3px; transform: scale(1.03); box-shadow: 0 0 50px rgba(255,215,0,0.5), inset 0 0 50px rgba(255,215,0,0.12); }
+		40% { border-color: rgba(255,255,255,0.8); border-width: 2px; }
+		100% { border-color: rgba(255,215,0,0.5); opacity: 0.9; border-width: 1.5px; transform: scale(1); box-shadow: 0 0 20px rgba(255,215,0,0.15); }
 	}
 
+	/* Corner brackets — electric gold pulse */
 	.friends-eye-corner {
-		position: absolute; width: 28px; height: 28px; z-index: 4; pointer-events: none;
-		border-color: #78716C; opacity: 0.8;
+		position: absolute; width: 30px; height: 30px; z-index: 4; pointer-events: none;
+		border-color: #FFD700; opacity: 0.9;
+		animation: thunder-corner-pulse 1.5s ease-in-out infinite;
 	}
-	.friends-corner-tl { top: -14px; left: -14px; border-top: 3px solid; border-left: 3px solid; }
-	.friends-corner-tr { top: -14px; right: -14px; border-top: 3px solid; border-right: 3px solid; }
-	.friends-corner-bl { bottom: -14px; left: -14px; border-bottom: 3px solid; border-left: 3px solid; }
-	.friends-corner-br { bottom: -14px; right: -14px; border-bottom: 3px solid; border-right: 3px solid; }
+	.friends-corner-tl { top: -15px; left: -15px; border-top: 3px solid; border-left: 3px solid; }
+	.friends-corner-tr { top: -15px; right: -15px; border-top: 3px solid; border-right: 3px solid; }
+	.friends-corner-bl { bottom: -15px; left: -15px; border-bottom: 3px solid; border-left: 3px solid; }
+	.friends-corner-br { bottom: -15px; right: -15px; border-bottom: 3px solid; border-right: 3px solid; }
+	@keyframes thunder-corner-pulse {
+		0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 4px rgba(255,215,0,0.3)); }
+		50% { opacity: 1; filter: drop-shadow(0 0 15px rgba(255,215,0,0.7)) drop-shadow(0 0 30px rgba(255,215,0,0.2)); }
+	}
 
+	/* "!!" — thunder energy marks */
 	.friends-exclamation {
-		position: absolute; font-family: var(--font-skip); font-size: 2.5rem;
+		position: absolute; font-family: var(--font-skip); font-size: 2.8rem;
 		color: #fff; z-index: 5; pointer-events: none; line-height: 1;
-		text-shadow: 0 0 20px rgba(120,113,108,0.8), 0 0 40px rgba(120,113,108,0.4);
-		animation: ex-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+		text-shadow: 0 0 30px rgba(255,215,0,0.9), 0 0 60px rgba(255,215,0,0.5), 0 0 100px rgba(255,215,0,0.2);
+		animation: thunder-ex-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both,
+				   thunder-ex-glow 2s ease-in-out 0.5s infinite;
 	}
-	.friends-ex-left { top: -16px; left: 12%; }
-	.friends-ex-right { bottom: -16px; right: 12%; }
-	@keyframes ex-pop {
-		from { opacity: 0; transform: scale(0.3) rotate(-10deg); }
-		to { opacity: 1; transform: scale(1) rotate(0deg); }
+	.friends-ex-left { top: -18px; left: 10%; }
+	.friends-ex-right { bottom: -18px; right: 10%; }
+	@keyframes thunder-ex-pop {
+		0% { opacity: 0; transform: scale(0.2) rotate(-15deg) translateY(10px); filter: blur(4px); }
+		60% { opacity: 1; transform: scale(1.2) rotate(3deg) translateY(-3px); filter: blur(0); }
+		100% { opacity: 1; transform: scale(1) rotate(0deg) translateY(0); filter: blur(0); }
+	}
+	@keyframes thunder-ex-glow {
+		0%, 100% { text-shadow: 0 0 30px rgba(255,215,0,0.9), 0 0 60px rgba(255,215,0,0.5); }
+		50% { text-shadow: 0 0 50px rgba(255,215,0,1), 0 0 100px rgba(255,215,0,0.7), 0 0 150px rgba(255,215,0,0.3); }
 	}
 
 	/* ===== PHASE: AOA ===== */

@@ -84,20 +84,24 @@
 	onkeydown={handleKeydown}
 	tabindex="-1"
 >
-	<!-- Phase 1: Eye cut-in -->
+	<!-- Phase 1: Eye cut-in — Cherry Blossom Storm -->
 	{#if phase === "eye"}
 		<div class="absolute inset-0 z-10 social-bg-dim">
 			<div class="absolute inset-0 social-bg-dim-overlay"></div>
+			<div class="social-petal-glow" aria-hidden="true"></div>
 		</div>
 		<div class="absolute inset-0 z-20 flex items-center justify-center">
 			<div class="social-petal-vortex" aria-hidden="true">
-				{#each Array(12) as _, i}
-					<div class="social-spiral-petal" style="--angle: {i * 30}deg; animation-delay: {i * 0.04}s"></div>
+				{#each Array(30) as _, i}
+					<div class="social-spiral-petal" style="--angle: {i * 12}deg; --p-delay: {i * 0.025}s; --p-scale: {0.6 + (i % 5) * 0.15}; --p-dist: {120 + (i % 8) * 25}px"></div>
 				{/each}
 			</div>
+			{#each Array(12) as _, i}
+				<div class="social-floating-petal" style="--f-x: {5 + (i * 8) % 90}%; --f-d: {0.5 + (i % 6) * 0.2}s; --f-r: {i * 37}deg; --f-s: {12 + (i % 4) * 6}px"></div>
+			{/each}
 			<div class="social-eye-wrap">
 				<div class="social-eye-frame">
-					<div class="social-scanline" aria-hidden="true"></div>
+					<div class="social-petal-shimmer" aria-hidden="true"></div>
 					<img
 						src="/T_UI_Camp_Status_Character_Glass_0002.png"
 						alt="eye cut-in"
@@ -265,35 +269,88 @@
 		-webkit-backdrop-filter: none;
 	}
 
-	/* ===== PHASE: EYE ===== */
+	/* ===== PHASE: EYE — Cherry Blossom Storm ===== */
+	/* Soft sakura twilight */
 	.social-bg-dim-overlay {
-		animation: dim-in 0.4s ease-out forwards;
+		animation: sakura-dim 0.7s ease-out forwards;
 	}
-	@keyframes dim-in {
-		from { background: rgba(120,20,60,0); }
-		to { background: rgba(120,20,60,0.7); }
+	@keyframes sakura-dim {
+		0% { background: rgba(80,10,40,0); }
+		40% { background: rgba(120,20,60,0.4); }
+		100% { background: rgba(80,10,40,0.75); }
 	}
 
+	/* Soft pink ambient glow */
+	.social-petal-glow {
+		position: absolute; inset: 0; z-index: 1; pointer-events: none;
+		background: radial-gradient(ellipse at 50% 40%, rgba(232,88,140,0.08) 0%, transparent 60%);
+		animation: glow-pulse 2s ease-in-out infinite;
+	}
+	@keyframes glow-pulse {
+		0%, 100% { opacity: 0.4; transform: scale(1); }
+		50% { opacity: 0.8; transform: scale(1.1); }
+	}
+
+	/* Petal vortex — 30 petals spiral outward */
 	.social-petal-vortex {
 		position: absolute; width: min(90vw, 900px); aspect-ratio: 1;
 		left: 50%; top: 50%; transform: translate(-50%, -50%);
 		pointer-events: none; z-index: 1;
 	}
 	.social-spiral-petal {
-		position: absolute; width: 40px; height: 20px;
-		left: 50%; top: 50%; margin-left: -20px; margin-top: -10px;
-		background: radial-gradient(ellipse, rgba(232,88,140,0.7) 0%, transparent 70%);
+		position: absolute; width: 36px; height: 18px;
+		left: 50%; top: 50%; margin-left: -18px; margin-top: -9px;
+		background: radial-gradient(ellipse, rgba(232,88,140,0.6) 0%, rgba(253,119,217,0.3) 40%, transparent 70%);
 		border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-		transform: rotate(var(--angle)) translateY(-180px);
+		transform: rotate(var(--angle)) translateY(-120px);
 		opacity: 0;
-		animation: petal-spiral 0.7s ease-out forwards;
+		filter: blur(0.5px);
+		animation: petal-burst 0.9s ease-out calc(var(--p-delay)) forwards;
 	}
-	@keyframes petal-spiral {
-		0% { opacity: 0; transform: rotate(var(--angle)) translateY(-60px) scale(0.3); }
-		40% { opacity: 0.8; }
-		100% { opacity: 0; transform: rotate(calc(var(--angle) + 180deg)) translateY(-220px) scale(1); }
+	@keyframes petal-burst {
+		0% { opacity: 0; transform: rotate(var(--angle)) translateY(0) scale(0.2); filter: blur(3px); }
+		30% { opacity: 0.9; transform: rotate(calc(var(--angle) + 60deg)) translateY(calc(var(--p-dist) * -0.6)) scale(var(--p-scale)); filter: blur(0); }
+		100% { opacity: 0; transform: rotate(calc(var(--angle) + 240deg)) translateY(calc(var(--p-dist) * -1)) scale(calc(var(--p-scale) * 0.4)); filter: blur(2px); }
 	}
 
+	/* Floating persistent petals */
+	.social-floating-petal {
+		position: absolute; z-index: 1; pointer-events: none;
+		width: var(--f-s); height: calc(var(--f-s) * 0.5);
+		left: var(--f-x); bottom: -20px;
+		background: radial-gradient(ellipse, rgba(253,119,217,0.4) 0%, rgba(232,88,140,0.15) 60%, transparent 80%);
+		border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+		transform: rotate(var(--f-r));
+		animation: petal-drift 3.5s ease-in var(--f-d) infinite;
+	}
+	@keyframes petal-drift {
+		0% { transform: translateY(0) rotate(var(--f-r)) scale(0.3); opacity: 0; }
+		10% { opacity: 0.5; transform: translateY(-30px) rotate(calc(var(--f-r) + 20deg)) scale(1); }
+		80% { opacity: 0.3; }
+		100% { transform: translateY(-105vh) rotate(calc(var(--f-r) + 120deg)) scale(0.6); opacity: 0; }
+	}
+
+	/* Petal shimmer overlay */
+	.social-petal-shimmer {
+		position: absolute; inset: 0; z-index: 4; pointer-events: none;
+		background: linear-gradient(135deg,
+			transparent 25%,
+			rgba(253,119,217,0.05) 35%,
+			rgba(255,255,255,0.04) 40%,
+			rgba(232,88,140,0.03) 45%,
+			transparent 55%
+		);
+		background-size: 300% 300%;
+		animation: petal-shimmer 3s ease-in-out infinite;
+		mix-blend-mode: overlay;
+	}
+	@keyframes petal-shimmer {
+		0% { background-position: 0% 50%; opacity: 0.2; }
+		50% { background-position: 100% 50%; opacity: 0.6; }
+		100% { background-position: 0% 50%; opacity: 0.2; }
+	}
+
+	/* Scanline sweep */
 	.social-scanline {
 		position: absolute; left: -10%; width: 120%; height: 3px;
 		background: linear-gradient(90deg, transparent, rgba(232,88,140,0.8), rgba(255,255,255,0.9), rgba(232,88,140,0.8), transparent);
@@ -308,35 +365,38 @@
 		100% { top: 105%; opacity: 0; }
 	}
 
+	/* Glitch — soft petal-like displacement */
 	.social-eye-glitch {
 		position: absolute; inset: 0; z-index: 6; pointer-events: none;
 		overflow: hidden; opacity: 0;
-		animation: glitch-overlay 0.5s ease-out 0.1s forwards;
+		animation: petal-glitch 0.6s ease-out 0.1s forwards;
 	}
-	@keyframes glitch-overlay {
+	@keyframes petal-glitch {
 		0% { opacity: 0; }
-		5% { opacity: 0.3; background: linear-gradient(0deg, transparent 0%, rgba(232,88,140,0.15) 20%, transparent 40%, rgba(232,88,140,0.1) 60%, transparent 80%); transform: translateX(-4px); }
-		10% { opacity: 0; transform: translateX(4px); }
-		15% { opacity: 0.2; background: linear-gradient(0deg, transparent 10%, rgba(255,255,255,0.12) 30%, transparent 50%, rgba(232,88,140,0.08) 70%, transparent 90%); transform: translateX(-2px); }
-		20% { opacity: 0; transform: translateX(0); }
-		30% { opacity: 0.1; background: linear-gradient(0deg, transparent 5%, rgba(255,255,255,0.08) 25%, transparent 45%, rgba(232,88,140,0.12) 65%, transparent 85%); transform: translateX(3px); }
-		40% { opacity: 0; transform: translateX(0); }
+		4% { opacity: 0.3; background: linear-gradient(0deg, transparent 0%, rgba(253,119,217,0.18) 15%, transparent 30%, rgba(232,88,140,0.12) 50%, transparent 70%, rgba(253,119,217,0.1) 85%, transparent); transform: translateX(-5px) skewX(0.5deg); }
+		9% { opacity: 0; transform: translateX(4px) skewX(-0.5deg); }
+		14% { opacity: 0.2; background: linear-gradient(0deg, transparent 8%, rgba(255,255,255,0.1) 22%, transparent 38%, rgba(232,88,140,0.08) 55%, transparent 75%, rgba(253,119,217,0.07) 90%, transparent); transform: translateX(-2px); }
+		19% { opacity: 0; transform: translateX(0); }
+		28% { opacity: 0.1; background: linear-gradient(0deg, transparent 5%, rgba(253,119,217,0.12) 18%, transparent 35%, rgba(255,255,255,0.06) 52%, transparent 70%, rgba(232,88,140,0.08) 85%, transparent); transform: translateX(3px); }
+		38% { opacity: 0; transform: translateX(0); }
 		100% { opacity: 0; }
 	}
 
+	/* Eye wrap — graceful flower bloom */
 	.social-eye-wrap {
-		animation: bloom-reveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both,
-				   eye-breathe 2.5s ease-in-out 0.6s infinite;
+		animation: blossom-reveal 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+				   blossom-breathe 2.5s ease-in-out 0.7s infinite;
 		position: relative; z-index: 2;
 	}
-	@keyframes bloom-reveal {
-		from { opacity: 0; transform: scale(0.2) rotate(-5deg); }
-		40% { opacity: 1; transform: scale(1.08) rotate(1deg); }
-		to { opacity: 1; transform: scale(1) rotate(0deg); }
+	@keyframes blossom-reveal {
+		0% { opacity: 0; transform: scale(0.15) rotate(-12deg) translateY(30px); filter: blur(6px) saturate(2); }
+		35% { opacity: 0.7; transform: scale(1.1) rotate(2deg) translateY(-5px); filter: blur(1px) saturate(1.4); }
+		65% { opacity: 1; transform: scale(0.97) rotate(-1deg) translateY(2px); filter: blur(0) saturate(0.9); }
+		100% { opacity: 1; transform: scale(1) rotate(0deg) translateY(0); filter: blur(0) saturate(1); }
 	}
-	@keyframes eye-breathe {
-		0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(232,88,140,0)); }
-		50% { transform: scale(1.02); filter: drop-shadow(0 0 30px rgba(232,88,140,0.3)); }
+	@keyframes blossom-breathe {
+		0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 0px rgba(232,88,140,0)); }
+		50% { transform: scale(1.015) rotate(0.5deg); filter: drop-shadow(0 0 40px rgba(232,88,140,0.2)) drop-shadow(0 0 80px rgba(253,119,217,0.1)); }
 	}
 
 	.social-eye-frame {
@@ -350,47 +410,62 @@
 
 	.social-eye-img {
 		width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2;
-		animation: eye-zoom 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-		filter: drop-shadow(0 0 40px rgba(232,88,140,0.3));
+		animation: bloom-zoom 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+		filter: drop-shadow(0 0 60px rgba(232,88,140,0.3)) drop-shadow(0 0 120px rgba(253,119,217,0.15));
 	}
-	@keyframes eye-zoom {
-		from { opacity: 0; transform: scale(0.7); filter: brightness(2); }
-		to { opacity: 1; transform: scale(1); filter: brightness(1); }
+	@keyframes bloom-zoom {
+		0% { opacity: 0; transform: scale(0.6) rotate(-5deg); filter: brightness(2.5) saturate(0.5) hue-rotate(-20deg); }
+		50% { opacity: 0.8; transform: scale(1.06) rotate(1deg); filter: brightness(1.3) saturate(1.2) hue-rotate(5deg); }
+		100% { opacity: 1; transform: scale(1) rotate(0deg); filter: brightness(1) saturate(1) hue-rotate(0deg); }
 	}
 
+	/* Frame border — sakura pink energy */
 	.social-eye-border {
-		position: absolute; inset: -8px; z-index: 3; pointer-events: none;
-		border: 2px solid rgba(232,88,140,0.5);
+		position: absolute; inset: -10px; z-index: 3; pointer-events: none;
+		border: 2px solid rgba(232,88,140,0.4);
 		clip-path: polygon(0% 5%, 3% 0%, 97% 2%, 100% 4%, 100% 96%, 96% 100%, 4% 98%, 0% 95%);
-		animation: border-flick 0.6s ease-out forwards;
+		animation: blossom-border 0.8s ease-out forwards;
 	}
-	@keyframes border-flick {
-		0% { border-color: rgba(255,255,255,0.9); opacity: 0; }
-		30% { border-color: rgba(232,88,140,0.8); opacity: 1; }
-		60% { border-color: rgba(255,255,255,0.6); }
-		100% { border-color: rgba(232,88,140,0.3); opacity: 0.8; }
+	@keyframes blossom-border {
+		0% { border-color: rgba(255,255,255,0); opacity: 0; border-width: 3px; transform: scale(0.9); }
+		20% { border-color: rgba(253,119,217,1); opacity: 1; border-width: 3px; transform: scale(1.02); box-shadow: 0 0 40px rgba(232,88,140,0.3), inset 0 0 40px rgba(232,88,140,0.08); }
+		50% { border-color: rgba(255,255,255,0.6); border-width: 2px; }
+		100% { border-color: rgba(232,88,140,0.4); opacity: 0.9; border-width: 1.5px; transform: scale(1); box-shadow: 0 0 15px rgba(232,88,140,0.1); }
 	}
 
+	/* Corner brackets — pink pulse */
 	.social-eye-corner {
-		position: absolute; width: 28px; height: 28px; z-index: 4; pointer-events: none;
-		border-color: #e8588c; opacity: 0.8;
+		position: absolute; width: 30px; height: 30px; z-index: 4; pointer-events: none;
+		border-color: #e8588c; opacity: 0.9;
+		animation: petal-corner-pulse 1.5s ease-in-out infinite;
 	}
-	.social-corner-tl { top: -14px; left: -14px; border-top: 3px solid; border-left: 3px solid; }
-	.social-corner-tr { top: -14px; right: -14px; border-top: 3px solid; border-right: 3px solid; }
-	.social-corner-bl { bottom: -14px; left: -14px; border-bottom: 3px solid; border-left: 3px solid; }
-	.social-corner-br { bottom: -14px; right: -14px; border-bottom: 3px solid; border-right: 3px solid; }
+	.social-corner-tl { top: -15px; left: -15px; border-top: 3px solid; border-left: 3px solid; }
+	.social-corner-tr { top: -15px; right: -15px; border-top: 3px solid; border-right: 3px solid; }
+	.social-corner-bl { bottom: -15px; left: -15px; border-bottom: 3px solid; border-left: 3px solid; }
+	.social-corner-br { bottom: -15px; right: -15px; border-bottom: 3px solid; border-right: 3px solid; }
+	@keyframes petal-corner-pulse {
+		0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 4px rgba(232,88,140,0.3)); }
+		50% { opacity: 1; filter: drop-shadow(0 0 12px rgba(232,88,140,0.6)); }
+	}
 
+	/* "!!" — sakura energy marks */
 	.social-exclamation {
-		position: absolute; font-family: var(--font-skip); font-size: 2.5rem;
+		position: absolute; font-family: var(--font-skip); font-size: 2.8rem;
 		color: #fff; z-index: 5; pointer-events: none; line-height: 1;
-		text-shadow: 0 0 20px rgba(232,88,140,0.8), 0 0 40px rgba(232,88,140,0.4);
-		animation: ex-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+		text-shadow: 0 0 30px rgba(232,88,140,0.9), 0 0 60px rgba(253,119,217,0.5), 0 0 100px rgba(232,88,140,0.2);
+		animation: petal-ex-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both,
+				   petal-ex-glow 2s ease-in-out 0.5s infinite;
 	}
-	.social-ex-left { top: -16px; left: 12%; }
-	.social-ex-right { bottom: -16px; right: 12%; }
-	@keyframes ex-pop {
-		from { opacity: 0; transform: scale(0.3) rotate(-10deg); }
-		to { opacity: 1; transform: scale(1) rotate(0deg); }
+	.social-ex-left { top: -18px; left: 10%; }
+	.social-ex-right { bottom: -18px; right: 10%; }
+	@keyframes petal-ex-pop {
+		0% { opacity: 0; transform: scale(0.2) rotate(-15deg) translateY(10px); filter: blur(4px); }
+		60% { opacity: 1; transform: scale(1.2) rotate(3deg) translateY(-3px); filter: blur(0); }
+		100% { opacity: 1; transform: scale(1) rotate(0deg) translateY(0); filter: blur(0); }
+	}
+	@keyframes petal-ex-glow {
+		0%, 100% { text-shadow: 0 0 30px rgba(232,88,140,0.9), 0 0 60px rgba(253,119,217,0.5); }
+		50% { text-shadow: 0 0 50px rgba(232,88,140,1), 0 0 100px rgba(253,119,217,0.7), 0 0 150px rgba(232,88,140,0.3); }
 	}
 
 	/* ===== PHASE: AOA ===== */

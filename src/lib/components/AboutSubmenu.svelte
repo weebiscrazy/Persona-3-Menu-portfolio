@@ -84,18 +84,22 @@
 	onkeydown={handleKeydown}
 	tabindex="-1"
 >
-	<!-- Phase 1: Eye cut-in from above -->
+	<!-- Phase 1: Eye cut-in — Abyssal Emergence -->
 	{#if phase === "eye"}
 		<div class="absolute inset-0 z-10 aoa-bg-dim">
 			<div class="absolute inset-0 aoa-bg-dim-overlay"></div>
+			<div class="aoa-god-rays" aria-hidden="true"></div>
 		</div>
 		<div class="absolute inset-0 z-20 flex items-center justify-center">
-			{#each [0, 1, 2] as i}
-				<div class="aoa-ripple-ring" style="animation-delay: {i * 0.15}s"></div>
+			{#each [0, 1, 2, 3, 4, 5] as i}
+				<div class="aoa-ripple-ring" style="--ring-delay: {i * 0.12}s"></div>
+			{/each}
+			{#each Array(10) as _, i}
+				<div class="aoa-bubble" style="--b-x: {10 + (i * 9) % 80}%; --b-d: {0.3 + (i % 7) * 0.15}s; --b-s: {6 + (i % 4) * 4}px; --b-drift: {(-20 + (i * 7) % 40)}px"></div>
 			{/each}
 			<div class="aoa-eye-wrap">
 				<div class="aoa-eye-frame">
-					<div class="aoa-scanline" aria-hidden="true"></div>
+					<div class="aoa-water-shimmer" aria-hidden="true"></div>
 					<img
 						src="/T_UI_Camp_Status_Character_Glass_0001.png"
 						alt="eye cut-in"
@@ -252,26 +256,89 @@
 		-webkit-backdrop-filter: none;
 	}
 
-	/* ===== PHASE: EYE ===== */
+	/* ===== PHASE: EYE — Abyssal Emergence ===== */
+	/* Deep ocean void with pulsing life */
 	.aoa-bg-dim-overlay {
-		animation: dim-in 0.4s ease-out forwards;
+		animation: abyss-dim 0.7s ease-out forwards;
 	}
-	@keyframes dim-in {
-		from { background: rgba(0,34,90,0); }
-		to { background: rgba(0,34,90,0.7); }
+	@keyframes abyss-dim {
+		0% { background: rgba(0,10,40,0); }
+		40% { background: rgba(0,20,70,0.5); }
+		100% { background: rgba(0,10,40,0.85); }
 	}
 
+	/* God rays — light shafts from the surface */
+	.aoa-god-rays {
+		position: absolute; inset: 0; z-index: 1; pointer-events: none;
+		overflow: hidden;
+		background:
+			linear-gradient(105deg, transparent 25%, rgba(21,194,252,0.04) 30%, transparent 35%),
+			linear-gradient(115deg, transparent 50%, rgba(21,194,252,0.03) 55%, transparent 60%),
+			linear-gradient(95deg, transparent 10%, rgba(21,194,252,0.05) 15%, transparent 20%);
+		animation: rays-sweep 2.5s ease-in-out infinite;
+	}
+	@keyframes rays-sweep {
+		0% { transform: translateX(-20%) scaleY(0.8); opacity: 0.3; }
+		50% { transform: translateX(10%) scaleY(1.1); opacity: 0.7; }
+		100% { transform: translateX(-20%) scaleY(0.8); opacity: 0.3; }
+	}
+
+	/* Ripple rings — 6 concentric waves */
 	.aoa-ripple-ring {
-		position: absolute; width: 100%; aspect-ratio: 1; border-radius: 50%;
-		border: 2px solid rgba(21,194,252,0.4); pointer-events: none; z-index: 1;
+		position: absolute; border-radius: 50%; pointer-events: none; z-index: 1;
 		left: 50%; top: 50%; transform: translate(-50%, -50%);
-		animation: ring-expand 0.8s ease-out forwards;
+		width: 10%; aspect-ratio: 1;
+		border: 1.5px solid rgba(21,194,252,0.5);
+		box-shadow: 0 0 15px rgba(21,194,252,0.15), inset 0 0 15px rgba(21,194,252,0.05);
+		animation: abyss-ring 1s ease-out calc(var(--ring-delay)) forwards;
 	}
-	@keyframes ring-expand {
-		from { width: 20%; opacity: 0.8; }
-		to { width: 300%; opacity: 0; }
+	@keyframes abyss-ring {
+		0% { width: 10%; opacity: 0.9; border-width: 2px; filter: blur(0); }
+		70% { opacity: 0.4; border-width: 1px; filter: blur(1px); }
+		100% { width: 300%; opacity: 0; border-width: 0.5px; filter: blur(3px); }
 	}
 
+	/* Floating bubbles */
+	.aoa-bubble {
+		position: absolute; z-index: 1; pointer-events: none;
+		border-radius: 50%;
+		width: var(--b-s); height: var(--b-s);
+		bottom: -20px;
+		left: var(--b-x);
+		background: radial-gradient(circle at 30% 30%, rgba(21,194,252,0.3), rgba(21,194,252,0.05));
+		border: 1px solid rgba(21,194,252,0.2);
+		box-shadow: inset -1px -1px 3px rgba(0,0,0,0.2), 0 0 8px rgba(21,194,252,0.1);
+		animation: bubble-rise 2.5s ease-in var(--b-d) infinite;
+	}
+	@keyframes bubble-rise {
+		0% { transform: translateY(0) translateX(0) scale(0.3); opacity: 0; }
+		8% { opacity: 0.6; transform: translateY(-20px) translateX(calc(var(--b-drift) * -0.2)) scale(1); }
+		80% { opacity: 0.4; }
+		100% { transform: translateY(-110vh) translateX(var(--b-drift)) scale(0.6); opacity: 0; }
+	}
+
+	/* Water shimmer overlay */
+	.aoa-water-shimmer {
+		position: absolute; inset: 0; z-index: 4; pointer-events: none;
+		overflow: hidden;
+		background: linear-gradient(-45deg,
+			transparent 30%,
+			rgba(21,194,252,0.06) 40%,
+			rgba(255,255,255,0.05) 45%,
+			rgba(21,194,252,0.04) 50%,
+			transparent 60%
+		);
+		background-size: 200% 200%;
+		animation: shimmer-flow 2s ease-in-out infinite;
+		mix-blend-mode: overlay;
+	}
+	@keyframes shimmer-flow {
+		0% { background-position: 200% 0%; opacity: 0.3; }
+		50% { background-position: -50% 100%; opacity: 0.8; }
+		100% { background-position: 200% 0%; opacity: 0.3; }
+	}
+
+	/* Scanline sweep */
 	.aoa-scanline {
 		position: absolute; left: -10%; width: 120%; height: 3px;
 		background: linear-gradient(90deg, transparent, rgba(21,194,252,0.8), rgba(255,255,255,0.9), rgba(21,194,252,0.8), transparent);
@@ -286,35 +353,39 @@
 		100% { top: 105%; opacity: 0; }
 	}
 
+	/* Digital glitch overlay */
 	.aoa-eye-glitch {
 		position: absolute; inset: 0; z-index: 6; pointer-events: none;
 		overflow: hidden; opacity: 0;
-		animation: glitch-overlay 0.5s ease-out 0.1s forwards;
+		animation: abyss-glitch 0.6s ease-out 0.1s forwards;
 	}
-	@keyframes glitch-overlay {
+	@keyframes abyss-glitch {
 		0% { opacity: 0; }
-		5% { opacity: 0.3; background: linear-gradient(0deg, transparent 0%, rgba(21,194,252,0.15) 20%, transparent 40%, rgba(21,194,252,0.1) 60%, transparent 80%); transform: translateX(-4px); }
-		10% { opacity: 0; transform: translateX(4px); }
-		15% { opacity: 0.2; background: linear-gradient(0deg, transparent 10%, rgba(255,255,255,0.12) 30%, transparent 50%, rgba(21,194,252,0.08) 70%, transparent 90%); transform: translateX(-2px); }
-		20% { opacity: 0; transform: translateX(0); }
-		30% { opacity: 0.1; background: linear-gradient(0deg, transparent 5%, rgba(255,255,255,0.08) 25%, transparent 45%, rgba(21,194,252,0.12) 65%, transparent 85%); transform: translateX(3px); }
-		40% { opacity: 0; transform: translateX(0); }
+		4% { opacity: 0.35; background: linear-gradient(0deg, transparent 0%, rgba(21,194,252,0.2) 15%, transparent 30%, rgba(21,194,252,0.15) 50%, transparent 70%, rgba(21,194,252,0.1) 85%, transparent); transform: translateX(-6px) skewX(-1deg); }
+		8% { opacity: 0; transform: translateX(5px) skewX(1deg); }
+		12% { opacity: 0.25; background: linear-gradient(0deg, transparent 8%, rgba(255,255,255,0.12) 25%, transparent 40%, rgba(21,194,252,0.1) 60%, transparent 80%, rgba(255,255,255,0.08) 92%, transparent); transform: translateX(-3px); }
+		16% { opacity: 0; transform: translateX(0); }
+		25% { opacity: 0.12; background: linear-gradient(0deg, transparent 5%, rgba(21,194,252,0.15) 20%, transparent 38%, rgba(255,255,255,0.08) 55%, transparent 72%, rgba(21,194,252,0.1) 88%, transparent); transform: translateX(4px) skewX(-0.5deg); }
+		35% { opacity: 0; transform: translateX(0); }
 		100% { opacity: 0; }
 	}
 
+	/* Eye wrap — emerges from watery depths with breath */
 	.aoa-eye-wrap {
-		animation: ripple-reveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both,
-				   eye-breathe 2.5s ease-in-out 0.6s infinite;
+		animation: abyss-rise 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+				   water-breathe 2.5s ease-in-out 0.7s infinite;
 		position: relative; z-index: 2;
+		filter: drop-shadow(0 0 30px rgba(21,194,252,0.2));
 	}
-	@keyframes ripple-reveal {
-		from { opacity: 0; transform: scale(0.3); }
-		30% { opacity: 1; transform: scale(1.05); }
-		to { opacity: 1; transform: scale(1); }
+	@keyframes abyss-rise {
+		0% { opacity: 0; transform: scale(0.2) translateY(60px); filter: blur(8px) brightness(0.3); }
+		30% { opacity: 0.6; transform: scale(1.08) translateY(-8px); filter: blur(2px) brightness(1.2); }
+		60% { opacity: 1; transform: scale(0.97) translateY(4px); filter: blur(1px) brightness(0.9); }
+		100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0) brightness(1); }
 	}
-	@keyframes eye-breathe {
-		0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(21,194,252,0)); }
-		50% { transform: scale(1.02); filter: drop-shadow(0 0 30px rgba(21,194,252,0.3)); }
+	@keyframes water-breathe {
+		0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(21,194,252,0)) brightness(1); }
+		50% { transform: scale(1.015); filter: drop-shadow(0 0 40px rgba(21,194,252,0.25)) brightness(1.05); }
 	}
 
 	.aoa-eye-frame {
@@ -327,52 +398,63 @@
 	}
 
 	.aoa-eye-img {
-		width: 100%;
-		height: 100%;
-		object-fit: contain;
-		position: relative;
-		z-index: 2;
-		animation: eye-zoom 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-		filter: drop-shadow(0 0 50px rgba(21,194,252,0.4)) drop-shadow(0 0 100px rgba(21,194,252,0.2));
+		width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2;
+		animation: abyss-zoom 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+		filter: drop-shadow(0 0 60px rgba(21,194,252,0.35)) drop-shadow(0 0 120px rgba(21,194,252,0.15));
 	}
-	@keyframes eye-zoom {
-		from { opacity: 0; transform: scale(0.7); filter: brightness(2); }
-		to { opacity: 1; transform: scale(1); filter: brightness(1); }
+	@keyframes abyss-zoom {
+		0% { opacity: 0; transform: scale(0.5) rotate(-2deg); filter: brightness(2.5) hue-rotate(30deg); }
+		50% { opacity: 0.7; transform: scale(1.05) rotate(0.5deg); filter: brightness(1.4) hue-rotate(-10deg); }
+		100% { opacity: 1; transform: scale(1) rotate(0deg); filter: brightness(1) hue-rotate(0deg); }
 	}
 
+	/* Frame border — cyan energy pulse */
 	.aoa-eye-border {
-		position: absolute; inset: -8px; z-index: 3; pointer-events: none;
-		border: 2px solid rgba(21,194,252,0.5);
+		position: absolute; inset: -10px; z-index: 3; pointer-events: none;
+		border: 2px solid rgba(21,194,252,0.4);
 		clip-path: polygon(0% 5%, 3% 0%, 97% 2%, 100% 4%, 100% 96%, 96% 100%, 4% 98%, 0% 95%);
-		animation: border-flick 0.6s ease-out forwards;
+		animation: abyss-border 0.8s ease-out forwards;
 	}
-	@keyframes border-flick {
-		0% { border-color: rgba(255,255,255,0.9); opacity: 0; }
-		30% { border-color: rgba(21,194,252,0.8); opacity: 1; }
-		60% { border-color: rgba(255,255,255,0.6); }
-		100% { border-color: rgba(21,194,252,0.3); opacity: 0.8; }
+	@keyframes abyss-border {
+		0% { border-color: rgba(255,255,255,0); opacity: 0; border-width: 3px; transform: scale(0.9); }
+		20% { border-color: rgba(21,194,252,1); opacity: 1; border-width: 3px; transform: scale(1.02); box-shadow: 0 0 40px rgba(21,194,252,0.4), inset 0 0 40px rgba(21,194,252,0.1); }
+		50% { border-color: rgba(255,255,255,0.7); border-width: 2px; }
+		100% { border-color: rgba(21,194,252,0.4); opacity: 0.9; border-width: 1.5px; transform: scale(1); box-shadow: 0 0 15px rgba(21,194,252,0.1); }
 	}
 
+	/* Corner brackets — pulsing cyan */
 	.aoa-eye-corner {
-		position: absolute; width: 28px; height: 28px; z-index: 4; pointer-events: none;
-		border-color: #15c2fc; opacity: 0.8;
+		position: absolute; width: 30px; height: 30px; z-index: 4; pointer-events: none;
+		border-color: #15c2fc; opacity: 0.9;
+		animation: corner-pulse 1.5s ease-in-out infinite;
 	}
-	.aoa-corner-tl { top: -14px; left: -14px; border-top: 3px solid; border-left: 3px solid; }
-	.aoa-corner-tr { top: -14px; right: -14px; border-top: 3px solid; border-right: 3px solid; }
-	.aoa-corner-bl { bottom: -14px; left: -14px; border-bottom: 3px solid; border-left: 3px solid; }
-	.aoa-corner-br { bottom: -14px; right: -14px; border-bottom: 3px solid; border-right: 3px solid; }
+	.aoa-corner-tl { top: -15px; left: -15px; border-top: 3px solid; border-left: 3px solid; }
+	.aoa-corner-tr { top: -15px; right: -15px; border-top: 3px solid; border-right: 3px solid; }
+	.aoa-corner-bl { bottom: -15px; left: -15px; border-bottom: 3px solid; border-left: 3px solid; }
+	.aoa-corner-br { bottom: -15px; right: -15px; border-bottom: 3px solid; border-right: 3px solid; }
+	@keyframes corner-pulse {
+		0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 4px rgba(21,194,252,0.3)); }
+		50% { opacity: 1; filter: drop-shadow(0 0 12px rgba(21,194,252,0.6)); }
+	}
 
+	/* "!!" — watery energy marks */
 	.aoa-exclamation {
-		position: absolute; font-family: var(--font-skip); font-size: 2.5rem;
+		position: absolute; font-family: var(--font-skip); font-size: 2.8rem;
 		color: #fff; z-index: 5; pointer-events: none; line-height: 1;
-		text-shadow: 0 0 20px rgba(21,194,252,0.8), 0 0 40px rgba(21,194,252,0.4);
-		animation: ex-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+		text-shadow: 0 0 30px rgba(21,194,252,0.9), 0 0 60px rgba(21,194,252,0.5), 0 0 100px rgba(21,194,252,0.2);
+		animation: water-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both,
+				   water-glow 2s ease-in-out 0.5s infinite;
 	}
-	.aoa-ex-left { top: -16px; left: 12%; }
-	.aoa-ex-right { bottom: -16px; right: 12%; }
-	@keyframes ex-pop {
-		from { opacity: 0; transform: scale(0.3) rotate(-10deg); }
-		to { opacity: 1; transform: scale(1) rotate(0deg); }
+	.aoa-ex-left { top: -18px; left: 10%; }
+	.aoa-ex-right { bottom: -18px; right: 10%; }
+	@keyframes water-pop {
+		0% { opacity: 0; transform: scale(0.2) rotate(-15deg) translateY(10px); filter: blur(4px); }
+		60% { opacity: 1; transform: scale(1.2) rotate(3deg) translateY(-3px); filter: blur(0); }
+		100% { opacity: 1; transform: scale(1) rotate(0deg) translateY(0); filter: blur(0); }
+	}
+	@keyframes water-glow {
+		0%, 100% { text-shadow: 0 0 30px rgba(21,194,252,0.9), 0 0 60px rgba(21,194,252,0.5); }
+		50% { text-shadow: 0 0 50px rgba(21,194,252,1), 0 0 100px rgba(21,194,252,0.7), 0 0 150px rgba(21,194,252,0.3); }
 	}
 
 	/* ===== PHASE: AOA ===== */

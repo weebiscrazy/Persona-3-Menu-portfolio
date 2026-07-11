@@ -17,48 +17,48 @@
 
 	const PRESETS: Record<ParticleType, ParticleConfig> = {
 		electric: {
-			count: 80,
+			count: 250,
 			color: "#FFD700",
 			secondaryColor: "#FFFFFF",
-			speedRange: [2, 6],
-			sizeRange: [2, 6],
+			speedRange: [2, 8],
+			sizeRange: [3, 12],
 			spawnArea: "edges",
 			gravity: 0,
 			wind: 0.05,
-			emissionRate: 0.6
+			emissionRate: 3.0
 		},
 		data: {
-			count: 100,
+			count: 300,
 			color: "#EAB308",
 			secondaryColor: "#FDE047",
-			speedRange: [1, 3],
-			sizeRange: [10, 22],
+			speedRange: [1, 4],
+			sizeRange: [15, 35],
 			spawnArea: "top",
 			gravity: 0.012,
 			wind: 0.02,
-			emissionRate: 0.7
+			emissionRate: 3.5
 		},
 		petals: {
-			count: 50,
+			count: 200,
 			color: "#FD77D9",
 			secondaryColor: "#F472B6",
-			speedRange: [0.5, 1.5],
-			sizeRange: [8, 18],
+			speedRange: [0.5, 2],
+			sizeRange: [12, 28],
 			spawnArea: "top",
 			gravity: 0.006,
 			wind: 0.04,
-			emissionRate: 0.25
+			emissionRate: 1.5
 		},
 		water: {
-			count: 80,
+			count: 250,
 			color: "#16CFFB",
 			secondaryColor: "#7DE6FD",
-			speedRange: [1, 3],
-			sizeRange: [3, 8],
+			speedRange: [1, 4],
+			sizeRange: [5, 14],
 			spawnArea: "full",
 			gravity: 0.015,
 			wind: 0.012,
-			emissionRate: 0.6
+			emissionRate: 3.0
 		}
 	};
 
@@ -205,7 +205,7 @@
 				ctx.lineCap = "round";
 				ctx.lineJoin = "round";
 				ctx.shadowColor = p.color;
-				ctx.shadowBlur = p.size * 6;
+				ctx.shadowBlur = p.size * 14;
 				ctx.beginPath();
 				const segments = 5 + Math.floor(p.size);
 				ctx.moveTo(-p.size * 3, 0);
@@ -233,7 +233,7 @@
 			case "circle": // Data/hex - glowing hexagons & squares
 				ctx.fillStyle = p.color;
 				ctx.shadowColor = p.color;
-				ctx.shadowBlur = p.size * 2;
+				ctx.shadowBlur = p.size * 6;
 				if (Math.random() < 0.4) {
 					// Hexagon
 					ctx.beginPath();
@@ -261,7 +261,7 @@
 			case "petal": // Rose petal - organic teardrop shape
 				ctx.fillStyle = p.color;
 				ctx.shadowColor = p.color;
-				ctx.shadowBlur = p.size * 2;
+				ctx.shadowBlur = p.size * 5;
 				ctx.beginPath();
 				ctx.moveTo(0, -p.size);
 				ctx.bezierCurveTo(
@@ -288,7 +288,7 @@
 			case "drop": // Water droplet - with ripple
 				ctx.fillStyle = p.color;
 				ctx.shadowColor = p.color;
-				ctx.shadowBlur = p.size * 2;
+				ctx.shadowBlur = p.size * 5;
 				ctx.beginPath();
 				ctx.moveTo(0, -p.size);
 				ctx.bezierCurveTo(
@@ -337,7 +337,7 @@
 		// Emission
 		accumulator += dt;
 		const emitInterval = 1 / config.emissionRate;
-		while (accumulator >= emitInterval && particles.length < config.count * 1.5) {
+		while (accumulator >= emitInterval && particles.length < config.count * 5) {
 			particles.push(spawnParticle());
 			accumulator -= emitInterval;
 		}

@@ -87,9 +87,12 @@
 	{#if phase === "eye"}
 		<div class="absolute inset-0 z-10 persona-bg-dim">
 			<div class="absolute inset-0 persona-bg-dim-overlay"></div>
+			<div class="persona-digital-grid" aria-hidden="true"></div>
 		</div>
-		<div class="persona-digital-grid" aria-hidden="true"></div>
 		<div class="persona-amber-flash" aria-hidden="true"></div>
+		{#each Array(25) as _, i}
+			<div class="persona-data-char" style="--dc-x: {2 + (i * 4) % 96}%; --dc-d: {0.1 + (i % 10) * 0.15}s; --dc-s: {10 + (i % 5) * 4}px; --dc-c: '{['0','1','ダ','マ','ス','ク','Ψ','Ω','データ','◈','⬡','▣'][i % 12]}'"></div>
+		{/each}
 		<div class="absolute inset-0 z-20 flex items-center justify-center">
 			<div class="persona-eye-wrap">
 				<div class="persona-eye-frame">
@@ -100,8 +103,8 @@
 						alt="eye cut-in"
 						class="persona-eye-img"
 					/>
-					{#each Array(20) as _, i}
-						<div class="persona-glitch-square" style="left: {2 + (i * 17) % 90}%; top: {3 + (i * 13) % 90}%; animation-delay: {0.4 + (i % 15) * 0.04}s"></div>
+					{#each Array(35) as _, i}
+						<div class="persona-glitch-square" style="--gs-left: {2 + (i * 11) % 92}%; --gs-top: {3 + (i * 9) % 90}%; --gs-delay: {0.3 + (i % 20) * 0.04}s; --gs-color: {i % 3 === 0 ? 'rgba(234,179,8,0.4)' : i % 3 === 1 ? 'rgba(255,255,255,0.15)' : 'rgba(234,179,8,0.2)'}; --gs-size: {6 + (i % 6) * 4}px"></div>
 					{/each}
 					<div class="persona-eye-glitch" aria-hidden="true"></div>
 					<div class="persona-eye-border"></div>
@@ -266,13 +269,67 @@ style="animation-delay: {0.3 + i * 0.12}s"
 	.persona-closing .persona-fact-card,
 	.persona-closing .persona-tab-active { backdrop-filter: none; -webkit-backdrop-filter: none; }
 
-	/* ===== PHASE: EYE ===== */
-	.persona-bg-dim-overlay { animation: dim-in 0.3s ease-out forwards; }
-	@keyframes dim-in {
-		from { background: rgba(30,15,0,0); }
-		to { background: rgba(30,15,0,0.7); }
+	/* ===== PHASE: EYE — Digital Awakening ===== */
+	/* Dark digital void */
+	.persona-bg-dim-overlay {
+		animation: matrix-dim 0.6s ease-out forwards;
+	}
+	@keyframes matrix-dim {
+		0% { background: rgba(15,8,0,0); }
+		35% { background: rgba(25,12,0,0.4); }
+		100% { background: rgba(10,5,0,0.85); }
 	}
 
+	/* Digital grid — pulsing amber wireframe */
+	.persona-digital-grid {
+		position: absolute; inset: 0; z-index: 1; pointer-events: none;
+		overflow: hidden;
+		background-image:
+			linear-gradient(rgba(234,179,8,0.04) 1px, transparent 1px),
+			linear-gradient(90deg, rgba(234,179,8,0.04) 1px, transparent 1px);
+		background-size: 40px 40px;
+		animation: grid-pulse 1.5s ease-in-out infinite;
+	}
+	@keyframes grid-pulse {
+		0%, 100% { opacity: 0.4; background-size: 40px 40px; }
+		50% { opacity: 0.8; background-size: 42px 42px; }
+	}
+
+	/* Amber flash — digital camera */
+	.persona-amber-flash {
+		position: absolute; inset: 0; z-index: 2; pointer-events: none;
+		background: rgba(234,179,8,0.15);
+		animation: digital-flash 0.4s ease-out forwards;
+	}
+	@keyframes digital-flash {
+		0% { opacity: 1; background: rgba(255,255,255,0.5); }
+		10% { opacity: 0.3; background: rgba(234,179,8,0.25); }
+		20% { opacity: 0.7; background: rgba(255,255,255,0.35); }
+		35% { opacity: 0.1; }
+		50% { opacity: 0.3; background: rgba(234,179,8,0.15); }
+		100% { opacity: 0; }
+	}
+
+	/* Data rain — matrix-style characters */
+	.persona-data-char {
+		position: absolute; z-index: 2; pointer-events: none;
+		left: var(--dc-x); top: -30px;
+		font-family: monospace; font-size: var(--dc-s);
+		color: rgba(234,179,8,0.4);
+		text-shadow: 0 0 8px rgba(234,179,8,0.3);
+		animation: data-fall 2s ease-in var(--dc-d) infinite;
+	}
+	.persona-data-char::before {
+		content: '0';
+	}
+	@keyframes data-fall {
+		0% { transform: translateY(-20px) scale(0.5); opacity: 0; }
+		5% { opacity: 1; }
+		90% { opacity: 0.2; }
+		100% { transform: translateY(110vh) scale(1.2); opacity: 0; }
+	}
+
+	/* Scanline sweep */
 	.persona-scanline-sweep {
 		position: absolute; left: -10%; width: 120%; height: 3px;
 		background: linear-gradient(90deg, transparent, rgba(234,179,8,0.8), rgba(255,255,255,0.9), rgba(234,179,8,0.8), transparent);
@@ -287,34 +344,50 @@ style="animation-delay: {0.3 + i * 0.12}s"
 		100% { top: 105%; opacity: 0; }
 	}
 
+	/* Persistent scanlines */
+	.persona-scanlines-heavy {
+		position: absolute; inset: 0; z-index: 3; pointer-events: none;
+		background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(234,179,8,0.07) 2px, rgba(234,179,8,0.07) 4px);
+		animation: scan-reveal 0.6s ease-out forwards;
+	}
+	@keyframes scan-reveal {
+		0% { clip-path: inset(0 0 100% 0); }
+		100% { clip-path: inset(0 0 0% 0); }
+	}
+
+	/* Digital glitch overlay — aggressive data corruption */
 	.persona-eye-glitch {
 		position: absolute; inset: 0; z-index: 7; pointer-events: none;
 		overflow: hidden; opacity: 0;
-		animation: glitch-overlay 0.5s ease-out 0.1s forwards;
+		animation: digital-glitch 0.6s ease-out 0.08s forwards;
 	}
-	@keyframes glitch-overlay {
+	@keyframes digital-glitch {
 		0% { opacity: 0; }
-		5% { opacity: 0.3; background: linear-gradient(0deg, transparent 0%, rgba(234,179,8,0.15) 20%, transparent 40%, rgba(234,179,8,0.1) 60%, transparent 80%); transform: translateX(-4px); }
-		10% { opacity: 0; transform: translateX(4px); }
-		15% { opacity: 0.2; background: linear-gradient(0deg, transparent 10%, rgba(255,255,255,0.12) 30%, transparent 50%, rgba(234,179,8,0.08) 70%, transparent 90%); transform: translateX(-2px); }
-		20% { opacity: 0; transform: translateX(0); }
-		30% { opacity: 0.1; background: linear-gradient(0deg, transparent 5%, rgba(255,255,255,0.08) 25%, transparent 45%, rgba(234,179,8,0.12) 65%, transparent 85%); transform: translateX(3px); }
-		40% { opacity: 0; transform: translateX(0); }
+		3% { opacity: 0.4; background: linear-gradient(0deg, transparent 0%, rgba(234,179,8,0.2) 10%, transparent 22%, rgba(255,255,255,0.12) 35%, transparent 48%, rgba(234,179,8,0.15) 60%, transparent 75%, rgba(255,255,255,0.08) 88%, transparent); transform: translateX(-8px) skewX(-2deg); }
+		7% { opacity: 0; transform: translateX(7px) skewX(2deg); }
+		11% { opacity: 0.3; background: linear-gradient(0deg, transparent 5%, rgba(255,255,255,0.15) 18%, transparent 32%, rgba(234,179,8,0.12) 48%, transparent 62%, rgba(255,255,255,0.1) 78%, transparent 92%); transform: translateX(-5px) skewX(1.5deg); }
+		15% { opacity: 0; transform: translateX(0); }
+		20% { opacity: 0.25; background: linear-gradient(0deg, transparent 3%, rgba(234,179,8,0.18) 14%, transparent 28%, rgba(255,255,255,0.08) 42%, transparent 56%, rgba(234,179,8,0.12) 70%, transparent 84%, rgba(255,255,255,0.06) 95%); transform: translateX(6px) skewX(-1deg); }
+		28% { opacity: 0; transform: translateX(0); }
 		100% { opacity: 0; }
 	}
 
+	/* Eye wrap — digital assembly from fragments */
 	.persona-eye-wrap {
-		animation: scan-reveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both,
-				   eye-breathe 2.5s ease-in-out 0.6s infinite;
+		animation: digital-assemble 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+				   digital-breathe 2.5s ease-in-out 0.7s infinite;
 		z-index: 5;
 	}
-	@keyframes scan-reveal {
-		from { transform: scale(0.5); filter: blur(10px); opacity: 0; }
-		to { transform: scale(1); filter: blur(0); opacity: 1; }
+	@keyframes digital-assemble {
+		0% { opacity: 0; transform: scale(1.8) rotate(15deg); clip-path: polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%); filter: brightness(3) saturate(0) blur(12px); }
+		20% { opacity: 0.4; transform: scale(0.85) rotate(-5deg); clip-path: polygon(45% 55%, 55% 45%, 60% 55%, 40% 60%); filter: brightness(2) saturate(0.5) blur(6px); }
+		40% { opacity: 0.7; transform: scale(1.06) rotate(3deg); clip-path: polygon(20% 80%, 80% 20%, 90% 60%, 15% 70%); filter: brightness(1.5) saturate(0.8) blur(3px); }
+		65% { opacity: 0.9; transform: scale(0.98) rotate(-1deg); clip-path: polygon(5% 95%, 95% 5%, 98% 55%, 8% 65%); filter: brightness(1.1) saturate(1) blur(1px); }
+		100% { opacity: 1; transform: scale(1) rotate(0deg); clip-path: polygon(0% 100%, 100% 0%, 100% 100%, 0% 0%); filter: brightness(1) saturate(1) blur(0); }
 	}
-	@keyframes eye-breathe {
-		0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(234,179,8,0)); }
-		50% { transform: scale(1.02); filter: drop-shadow(0 0 30px rgba(234,179,8,0.3)); }
+	@keyframes digital-breathe {
+		0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(234,179,8,0)) brightness(1); }
+		50% { transform: scale(1.01); filter: drop-shadow(0 0 35px rgba(234,179,8,0.2)) drop-shadow(0 0 70px rgba(234,179,8,0.08)) brightness(1.04); }
 	}
 
 	.persona-eye-frame {
@@ -326,69 +399,78 @@ style="animation-delay: {0.3 + i * 0.12}s"
 
 	.persona-eye-img {
 		width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2;
-		animation: eye-zoom 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-		filter: drop-shadow(0 0 50px rgba(234,179,8,0.4)) drop-shadow(0 0 100px rgba(234,179,8,0.2));
+		animation: digital-zoom 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+		filter: drop-shadow(0 0 70px rgba(234,179,8,0.35)) drop-shadow(0 0 140px rgba(234,179,8,0.15));
 	}
-	@keyframes eye-zoom {
-		from { opacity: 0; transform: scale(0.7); filter: brightness(2); }
-		to { opacity: 1; transform: scale(1); filter: brightness(1); }
-	}
-
-	.persona-scanlines {
-		position: absolute; inset: 0; z-index: 3; pointer-events: none;
-		background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(234,179,8,0.06) 2px, rgba(234,179,8,0.06) 4px);
-		animation: scan-sweep 0.6s ease-out forwards;
-	}
-	@keyframes scan-sweep {
-		0% { clip-path: inset(0 0 100% 0); }
-		100% { clip-path: inset(0 0 0% 0); }
+	@keyframes digital-zoom {
+		0% { opacity: 0; transform: scale(0.3) rotate(-10deg); filter: brightness(3) saturate(0) contrast(3) hue-rotate(-40deg); }
+		35% { opacity: 0.6; transform: scale(1.1) rotate(4deg); filter: brightness(1.6) saturate(0.6) contrast(1.5) hue-rotate(15deg); }
+		70% { opacity: 0.9; transform: scale(0.97) rotate(-1deg); filter: brightness(1.1) saturate(0.9) contrast(1.1) hue-rotate(-5deg); }
+		100% { opacity: 1; transform: scale(1) rotate(0deg); filter: brightness(1) saturate(1) contrast(1) hue-rotate(0deg); }
 	}
 
+	/* Glitch hexagons — 35 fragments in amber/white/gold */
 	.persona-glitch-square {
-		position: absolute; width: 10px; height: 10px; z-index: 6; pointer-events: none;
-		background: rgba(234,179,8,0.3);
+		position: absolute; z-index: 6; pointer-events: none;
+		left: var(--gs-left); top: var(--gs-top);
+		width: var(--gs-size); height: var(--gs-size);
+		background: var(--gs-color);
 		clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-		animation: glitch-pop 0.15s ease-out forwards;
+		animation: hex-pop 0.2s ease-out var(--gs-delay) forwards;
 	}
-	@keyframes glitch-pop {
-		0% { opacity: 0; transform: scale(0); }
-		50% { opacity: 1; transform: scale(1.3); }
-		100% { opacity: 0; transform: scale(0.5); }
+	@keyframes hex-pop {
+		0% { opacity: 0; transform: scale(0) rotate(0deg); }
+		40% { opacity: 1; transform: scale(1.4) rotate(30deg); filter: brightness(1.5); }
+		100% { opacity: 0; transform: scale(0.3) rotate(60deg); filter: brightness(0.5); }
 	}
 
+	/* Frame border — amber LED glow */
 	.persona-eye-border {
-		position: absolute; inset: -8px; z-index: 3; pointer-events: none;
-		border: 2px solid rgba(234,179,8,0.5);
+		position: absolute; inset: -10px; z-index: 3; pointer-events: none;
+		border: 2px solid rgba(234,179,8,0.4);
 		clip-path: polygon(0% 5%, 3% 0%, 97% 2%, 100% 4%, 100% 96%, 96% 100%, 4% 98%, 0% 95%);
-		animation: border-flick 0.6s ease-out forwards;
+		animation: digital-border 0.7s ease-out forwards;
 	}
-	@keyframes border-flick {
-		0% { border-color: rgba(255,255,255,0.9); opacity: 0; }
-		30% { border-color: rgba(234,179,8,0.8); opacity: 1; }
-		60% { border-color: rgba(255,255,255,0.6); }
-		100% { border-color: rgba(234,179,8,0.3); opacity: 0.8; }
+	@keyframes digital-border {
+		0% { border-color: rgba(255,255,255,0); opacity: 0; border-width: 3px; transform: scale(0.85); }
+		18% { border-color: rgba(234,179,8,1); opacity: 1; border-width: 3px; transform: scale(1.03); box-shadow: 0 0 50px rgba(234,179,8,0.4), inset 0 0 50px rgba(234,179,8,0.1); }
+		45% { border-color: rgba(255,255,255,0.7); border-width: 2px; }
+		100% { border-color: rgba(234,179,8,0.5); opacity: 0.9; border-width: 1.5px; transform: scale(1); box-shadow: 0 0 20px rgba(234,179,8,0.15); }
 	}
 
+	/* Corner brackets — digital amber LED */
 	.persona-eye-corner {
-		position: absolute; width: 28px; height: 28px; z-index: 4; pointer-events: none;
-		border-color: #EAB308; opacity: 0.8;
+		position: absolute; width: 30px; height: 30px; z-index: 4; pointer-events: none;
+		border-color: #EAB308; opacity: 0.9;
+		animation: digital-corner-pulse 1.5s ease-in-out infinite;
 	}
-	.persona-corner-tl { top: -14px; left: -14px; border-top: 3px solid; border-left: 3px solid; }
-	.persona-corner-tr { top: -14px; right: -14px; border-top: 3px solid; border-right: 3px solid; }
-	.persona-corner-bl { bottom: -14px; left: -14px; border-bottom: 3px solid; border-left: 3px solid; }
-	.persona-corner-br { bottom: -14px; right: -14px; border-bottom: 3px solid; border-right: 3px solid; }
+	.persona-corner-tl { top: -15px; left: -15px; border-top: 3px solid; border-left: 3px solid; }
+	.persona-corner-tr { top: -15px; right: -15px; border-top: 3px solid; border-right: 3px solid; }
+	.persona-corner-bl { bottom: -15px; left: -15px; border-bottom: 3px solid; border-left: 3px solid; }
+	.persona-corner-br { bottom: -15px; right: -15px; border-bottom: 3px solid; border-right: 3px solid; }
+	@keyframes digital-corner-pulse {
+		0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 4px rgba(234,179,8,0.3)); }
+		50% { opacity: 1; filter: drop-shadow(0 0 15px rgba(234,179,8,0.7)) drop-shadow(0 0 30px rgba(234,179,8,0.2)); }
+	}
 
+	/* "!!" — digital pixel glow */
 	.persona-exclamation {
-		position: absolute; font-family: var(--font-skip); font-size: 2.5rem;
+		position: absolute; font-family: var(--font-skip); font-size: 2.8rem;
 		color: #fff; z-index: 5; pointer-events: none; line-height: 1;
-		text-shadow: 0 0 30px rgba(234,179,8,0.8), 0 0 60px rgba(234,179,8,0.4);
-		animation: ex-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+		text-shadow: 0 0 30px rgba(234,179,8,0.9), 0 0 60px rgba(234,179,8,0.5), 0 0 100px rgba(234,179,8,0.2);
+		animation: digital-ex-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both,
+				   digital-ex-glow 2s ease-in-out 0.5s infinite;
 	}
-	.persona-ex-left { top: -16px; left: 12%; }
-	.persona-ex-right { bottom: -16px; right: 12%; }
-	@keyframes ex-pop {
-		from { opacity: 0; transform: scale(0.3) rotate(-10deg); }
-		to { opacity: 1; transform: scale(1) rotate(0deg); }
+	.persona-ex-left { top: -18px; left: 10%; }
+	.persona-ex-right { bottom: -18px; right: 10%; }
+	@keyframes digital-ex-pop {
+		0% { opacity: 0; transform: scale(0.2) rotate(-15deg) translateY(10px); filter: blur(4px); }
+		60% { opacity: 1; transform: scale(1.2) rotate(3deg) translateY(-3px); filter: blur(0); }
+		100% { opacity: 1; transform: scale(1) rotate(0deg) translateY(0); filter: blur(0); }
+	}
+	@keyframes digital-ex-glow {
+		0%, 100% { text-shadow: 0 0 30px rgba(234,179,8,0.9), 0 0 60px rgba(234,179,8,0.5); }
+		50% { text-shadow: 0 0 50px rgba(234,179,8,1), 0 0 100px rgba(234,179,8,0.7), 0 0 150px rgba(234,179,8,0.3); }
 	}
 
 	/* ===== PHASE: AOA ===== */
