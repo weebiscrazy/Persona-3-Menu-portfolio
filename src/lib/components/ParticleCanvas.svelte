@@ -17,48 +17,48 @@
 
 	const PRESETS: Record<ParticleType, ParticleConfig> = {
 		electric: {
-			count: 25,
-			color: "#78716C",
+			count: 40,
+			color: "#B8B0A8",
 			secondaryColor: "#FFD700",
-			speedRange: [0.8, 2.5],
-			sizeRange: [1, 3],
+			speedRange: [1.5, 4],
+			sizeRange: [1.5, 4],
 			spawnArea: "edges",
 			gravity: 0,
-			wind: 0.02,
-			emissionRate: 0.15
+			wind: 0.03,
+			emissionRate: 0.3
 		},
 		data: {
-			count: 30,
+			count: 50,
 			color: "#4ADE80",
-			secondaryColor: "#10B981",
-			speedRange: [0.3, 1.2],
-			sizeRange: [2, 6],
+			secondaryColor: "#22C55E",
+			speedRange: [0.5, 2],
+			sizeRange: [8, 16],
 			spawnArea: "top",
-			gravity: 0.005,
-			wind: 0.008,
-			emissionRate: 0.2
+			gravity: 0.008,
+			wind: 0.01,
+			emissionRate: 0.35
 		},
 		petals: {
-			count: 20,
+			count: 25,
 			color: "#FD77D9",
 			secondaryColor: "#F472B6",
-			speedRange: [0.2, 0.8],
-			sizeRange: [4, 10],
+			speedRange: [0.3, 1],
+			sizeRange: [6, 14],
 			spawnArea: "top",
-			gravity: 0.003,
-			wind: 0.015,
-			emissionRate: 0.08
+			gravity: 0.004,
+			wind: 0.02,
+			emissionRate: 0.1
 		},
 		water: {
-			count: 35,
+			count: 45,
 			color: "#16CFFB",
 			secondaryColor: "#7DE6FD",
-			speedRange: [0.5, 1.8],
-			sizeRange: [1, 4],
+			speedRange: [0.8, 2.5],
+			sizeRange: [2, 6],
 			spawnArea: "full",
-			gravity: 0.008,
-			wind: 0.005,
-			emissionRate: 0.25
+			gravity: 0.01,
+			wind: 0.008,
+			emissionRate: 0.4
 		}
 	};
 
@@ -199,56 +199,120 @@
 		ctx.globalAlpha = p.opacity * (1 - p.life / p.maxLife);
 
 		switch (p.type) {
-			case "line": // Electric spark - jagged line
+			case "line": // Electric spark - jagged lightning bolt
 				ctx.strokeStyle = p.color;
 				ctx.lineWidth = p.size;
 				ctx.lineCap = "round";
+				ctx.lineJoin = "round";
+				ctx.shadowColor = p.color;
+				ctx.shadowBlur = p.size * 3;
 				ctx.beginPath();
-				const segments = 4 + Math.floor(p.size);
-				ctx.moveTo(-p.size * 2, 0);
+				const segments = 5 + Math.floor(p.size);
+				ctx.moveTo(-p.size * 3, 0);
 				for (let i = 1; i <= segments; i++) {
-					const px = (-p.size * 2) + (i / segments) * p.size * 4;
-					const py = (Math.random() - 0.5) * p.size * 3;
+					const px = (-p.size * 3) + (i / segments) * p.size * 6;
+					const py = (Math.random() - 0.5) * p.size * 4;
+					ctx.lineTo(px, py);
+				}
+				ctx.stroke();
+				// Core bright line
+				ctx.shadowBlur = 0;
+				ctx.strokeStyle = "#fff";
+				ctx.lineWidth = Math.max(1, p.size * 0.3);
+				ctx.globalAlpha *= 0.8;
+				ctx.beginPath();
+				ctx.moveTo(-p.size * 3, 0);
+				for (let i = 1; i <= segments; i++) {
+					const px = (-p.size * 3) + (i / segments) * p.size * 6;
+					const py = (Math.random() - 0.5) * p.size * 2;
 					ctx.lineTo(px, py);
 				}
 				ctx.stroke();
 				break;
 
-			case "circle": // Data/hex - small squares or dots
+			case "circle": // Data/hex - glowing hexagons & squares
 				ctx.fillStyle = p.color;
-				if (Math.random() < 0.5) {
-					ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
-				} else {
+				ctx.shadowColor = p.color;
+				ctx.shadowBlur = p.size;
+				if (Math.random() < 0.4) {
+					// Hexagon
 					ctx.beginPath();
-					ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+					for (let i = 0; i < 6; i++) {
+						const angle = (i / 6) * Math.PI * 2 - Math.PI / 6;
+						ctx.lineTo(Math.cos(angle) * p.size, Math.sin(angle) * p.size);
+					}
+					ctx.closePath();
+					ctx.fill();
+				} else {
+					// Square with rounded corners
+					const r = p.size * 0.2;
+					ctx.beginPath();
+					ctx.roundRect(-p.size, -p.size, p.size * 2, p.size * 2, r);
 					ctx.fill();
 				}
-				break;
-
-			case "petal": // Rose petal - ellipse with slight curve
-				ctx.fillStyle = p.color;
-				ctx.beginPath();
-				ctx.ellipse(0, 0, p.size, p.size * 0.5, 0, 0, Math.PI * 2);
-				ctx.fill();
-				// Inner detail
-				ctx.globalAlpha *= 0.4;
-				ctx.beginPath();
-				ctx.ellipse(0, 0, p.size * 0.4, p.size * 0.2, 0, 0, Math.PI * 2);
-				ctx.fill();
-				break;
-
-			case "drop": // Water droplet
-				ctx.fillStyle = p.color;
-				ctx.beginPath();
-				ctx.moveTo(0, -p.size);
-				ctx.quadraticCurveTo(p.size * 0.8, 0, 0, p.size * 0.5);
-				ctx.quadraticCurveTo(-p.size * 0.8, 0, 0, -p.size);
-				ctx.fill();
-				// Highlight
-				ctx.globalAlpha *= 0.6;
+				// Inner glow
+				ctx.globalAlpha *= 0.5;
 				ctx.fillStyle = "#fff";
 				ctx.beginPath();
-				ctx.ellipse(-p.size * 0.2, -p.size * 0.3, p.size * 0.3, p.size * 0.15, 0, 0, Math.PI * 2);
+				ctx.arc(0, 0, p.size * 0.3, 0, Math.PI * 2);
+				ctx.fill();
+				break;
+
+			case "petal": // Rose petal - organic teardrop shape
+				ctx.fillStyle = p.color;
+				ctx.shadowColor = p.color;
+				ctx.shadowBlur = p.size * 0.8;
+				ctx.beginPath();
+				ctx.moveTo(0, -p.size);
+				ctx.bezierCurveTo(
+					p.size * 0.7, -p.size * 0.3,
+					p.size * 0.8, p.size * 0.4,
+					0, p.size * 0.8
+				);
+				ctx.bezierCurveTo(
+					-p.size * 0.8, p.size * 0.4,
+					-p.size * 0.7, -p.size * 0.3,
+					0, -p.size
+				);
+				ctx.fill();
+				// Vein detail
+				ctx.globalAlpha *= 0.35;
+				ctx.strokeStyle = p.secondaryColor;
+				ctx.lineWidth = Math.max(1, p.size * 0.15);
+				ctx.beginPath();
+				ctx.moveTo(0, -p.size * 0.9);
+				ctx.quadraticCurveTo(0, 0, 0, p.size * 0.6);
+				ctx.stroke();
+				break;
+
+			case "drop": // Water droplet - with ripple
+				ctx.fillStyle = p.color;
+				ctx.shadowColor = p.color;
+				ctx.shadowBlur = p.size;
+				ctx.beginPath();
+				ctx.moveTo(0, -p.size);
+				ctx.bezierCurveTo(
+					p.size * 0.7, -p.size * 0.2,
+					p.size * 0.8, p.size * 0.5,
+					0, p.size * 0.7
+				);
+				ctx.bezierCurveTo(
+					-p.size * 0.8, p.size * 0.5,
+					-p.size * 0.7, -p.size * 0.2,
+					0, -p.size
+				);
+				ctx.fill();
+				// Specular highlight
+				ctx.globalAlpha *= 0.7;
+				ctx.fillStyle = "#fff";
+				ctx.beginPath();
+				ctx.ellipse(-p.size * 0.25, -p.size * 0.4, p.size * 0.35, p.size * 0.15, -0.3, 0, Math.PI * 2);
+				ctx.fill();
+				// Inner caustic
+				ctx.globalAlpha *= 0.4;
+				ctx.fillStyle = "#7DE6FD";
+				ctx.beginPath();
+				ctx.arc(0, p.size * 0.1, p.size * 0.25, 0, Math.PI * 2);
 				ctx.fill();
 				break;
 		}
