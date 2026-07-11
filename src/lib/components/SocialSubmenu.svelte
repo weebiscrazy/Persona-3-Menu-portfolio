@@ -93,7 +93,7 @@
 		<div class="absolute inset-0 z-20 flex items-center justify-center">
 			<div class="social-petal-vortex" aria-hidden="true">
 				{#each Array(30) as _, i}
-					<div class="social-spiral-petal" style="--angle: {i * 12}deg; --p-delay: {i * 0.025}s; --p-scale: {0.7 + (i % 5) * 0.15}; --p-dist: {160 + (i % 8) * 30}px"></div>
+					<div class="social-spiral-petal" style="--angle: {i * 12}deg; --p-delay: {i * 0.025}s; --p-scale: {0.8 + (i % 5) * 0.15}; --p-dist: {250 + (i % 8) * 40}px"></div>
 				{/each}
 			</div>
 			{#each Array(12) as _, i}
@@ -291,31 +291,31 @@
 		50% { opacity: 0.8; transform: scale(1.1); }
 	}
 
-	/* Petal vortex — 30 petals spiral outward (above eye, z-index 3) */
+	/* Petal vortex — 30 petals spiral outward (behind eye, visible at edges) */
 	.social-petal-vortex {
 		position: absolute; width: min(90vw, 900px); aspect-ratio: 1;
 		left: 50%; top: 50%; transform: translate(-50%, -50%);
-		pointer-events: none; z-index: 3;
+		pointer-events: none; z-index: 1;
 	}
 	.social-spiral-petal {
 		position: absolute; width: 54px; height: 27px;
 		left: 50%; top: 50%; margin-left: -27px; margin-top: -13.5px;
 		background: radial-gradient(ellipse, rgba(232,88,140,0.7) 0%, rgba(253,119,217,0.4) 40%, transparent 70%);
 		border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-		transform: rotate(var(--angle)) translateY(-120px);
+		transform: rotate(var(--angle)) translateY(-180px);
 		opacity: 0;
 		filter: blur(0.5px);
 		animation: petal-burst 0.9s ease-out calc(var(--p-delay)) forwards;
 	}
 	@keyframes petal-burst {
 		0% { opacity: 0; transform: rotate(var(--angle)) translateY(0) scale(0.2); filter: blur(3px); }
-		30% { opacity: 1; transform: rotate(calc(var(--angle) + 60deg)) translateY(calc(var(--p-dist) * -0.6)) scale(var(--p-scale)); filter: blur(0); }
-		100% { opacity: 0.6; transform: rotate(calc(var(--angle) + 240deg)) translateY(calc(var(--p-dist) * -1)) scale(calc(var(--p-scale) * 0.5)); filter: blur(1px); }
+		30% { opacity: 1; transform: rotate(calc(var(--angle) + 60deg)) translateY(calc(var(--p-dist) * -0.5)) scale(var(--p-scale)); filter: blur(0); }
+		100% { opacity: 0.5; transform: rotate(calc(var(--angle) + 240deg)) translateY(calc(var(--p-dist) * -1)) scale(calc(var(--p-scale) * 0.5)); filter: blur(1.5px); }
 	}
 
-	/* Floating persistent petals (above eye, z-index 3) */
+	/* Floating persistent petals (behind eye, visible at edges) */
 	.social-floating-petal {
-		position: absolute; z-index: 3; pointer-events: none;
+		position: absolute; z-index: 1; pointer-events: none;
 		width: var(--f-s); height: calc(var(--f-s) * 0.5);
 		left: var(--f-x); bottom: -20px;
 		background: radial-gradient(ellipse, rgba(253,119,217,0.5) 0%, rgba(232,88,140,0.2) 60%, transparent 80%);
