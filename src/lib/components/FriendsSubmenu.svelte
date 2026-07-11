@@ -84,21 +84,30 @@
 		<div class="absolute inset-0 z-10 friends-bg-dim">
 			<div class="absolute inset-0 friends-bg-dim-overlay"></div>
 		</div>
-		<div class="absolute inset-0 z-20 flex items-center justify-center friends-eye-wrap">
-			<div class="friends-eye-frame">
-				<img
-					src="/T_UI_Camp_Status_Character_Glass_0004.png"
-					alt="eye cut-in"
-					class="friends-eye-img"
-				/>
-				<div class="friends-eye-border"></div>
-				<div class="friends-eye-corner friends-corner-tl"></div>
-				<div class="friends-eye-corner friends-corner-tr"></div>
-				<div class="friends-eye-corner friends-corner-bl"></div>
-				<div class="friends-eye-corner friends-corner-br"></div>
-				<span class="friends-exclamation friends-ex-left">!!</span>
-				<span class="friends-exclamation friends-ex-right">!!</span>
-				<div class="friends-impact-lines"></div>
+		<div class="absolute inset-0 z-20 flex items-center justify-center">
+			<div class="friends-lightning-flash" aria-hidden="true"></div>
+			<div class="friends-lightning-bolts" aria-hidden="true">
+				<svg viewBox="0 0 200 200" class="friends-bolt-svg">
+					<polyline class="friends-bolt-1" points="120,10 80,80 110,80 70,150" fill="none" stroke="#FFD700" stroke-width="3" stroke-linejoin="round" />
+					<polyline class="friends-bolt-2" points="60,30 100,90 75,90 50,140" fill="none" stroke="#FFD700" stroke-width="2" stroke-linejoin="round" />
+					<polyline class="friends-bolt-3" points="140,40 95,95 120,95 90,160" fill="none" stroke="#FFD700" stroke-width="2" stroke-linejoin="round" />
+				</svg>
+			</div>
+			<div class="friends-eye-wrap">
+				<div class="friends-eye-frame">
+					<img
+						src="/T_UI_Camp_Status_Character_Glass_0004.png"
+						alt="eye cut-in"
+						class="friends-eye-img"
+					/>
+					<div class="friends-eye-border"></div>
+					<div class="friends-eye-corner friends-corner-tl"></div>
+					<div class="friends-eye-corner friends-corner-tr"></div>
+					<div class="friends-eye-corner friends-corner-bl"></div>
+					<div class="friends-eye-corner friends-corner-br"></div>
+					<span class="friends-exclamation friends-ex-left">!!</span>
+					<span class="friends-exclamation friends-ex-right">!!</span>
+				</div>
 			</div>
 		</div>
 
@@ -279,10 +288,44 @@
 		to { background: rgba(60,50,40,0.7); }
 	}
 
-	.friends-eye-wrap { animation: eye-drop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
-	@keyframes eye-drop {
-		from { transform: translateY(-100vh); opacity: 0; }
-		to { transform: translateY(0); opacity: 1; }
+	.friends-lightning-flash {
+		position: absolute; inset: 0; z-index: 0; pointer-events: none;
+		background: rgba(255,215,0,0.15);
+		animation: flash-strobe 0.4s ease-out forwards;
+	}
+	@keyframes flash-strobe {
+		0% { opacity: 1; }
+		15% { opacity: 0.2; }
+		30% { opacity: 0.8; }
+		60% { opacity: 0; }
+		100% { opacity: 0; }
+	}
+	.friends-lightning-bolts {
+		position: absolute; inset: 0; z-index: 1; pointer-events: none;
+		display: flex; align-items: center; justify-content: center;
+	}
+	.friends-bolt-svg { width: min(90vw, 700px); height: 100%; opacity: 0; animation: bolt-zap 0.5s ease-out 0.05s forwards; }
+	.friends-bolt-1 { animation: bolt-strike 0.3s ease-out 0.05s both; }
+	.friends-bolt-2 { animation: bolt-strike 0.3s ease-out 0.1s both; }
+	.friends-bolt-3 { animation: bolt-strike 0.3s ease-out 0.15s both; }
+	@keyframes bolt-strike {
+		from { opacity: 0; stroke-dasharray: 400; stroke-dashoffset: 400; }
+		to { opacity: 1; stroke-dashoffset: 0; }
+	}
+	@keyframes bolt-zap {
+		0% { opacity: 1; filter: brightness(2); }
+		60% { opacity: 0.6; }
+		100% { opacity: 0; filter: brightness(0.5); }
+	}
+
+	.friends-eye-wrap {
+		animation: crack-reveal 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+		position: relative; z-index: 2;
+	}
+	@keyframes crack-reveal {
+		from { opacity: 0; transform: scale(0.5) translateY(40px); clip-path: inset(0 0 100% 0); }
+		50% { opacity: 1; transform: scale(1.05) translateY(-5px); clip-path: inset(0 0 0 0); }
+		to { opacity: 1; transform: scale(1) translateY(0); clip-path: inset(0 0 0 0); }
 	}
 
 	.friends-eye-frame {
@@ -295,7 +338,7 @@
 	.friends-eye-img {
 		width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2;
 		animation: eye-zoom 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-		filter: drop-shadow(0 0 40px rgba(120,113,108,0.3));
+		filter: drop-shadow(0 0 50px rgba(255,215,0,0.4)) drop-shadow(0 0 100px rgba(255,215,0,0.2));
 	}
 	@keyframes eye-zoom {
 		from { opacity: 0; transform: scale(0.7); filter: brightness(2); }
@@ -336,19 +379,6 @@
 		from { opacity: 0; transform: scale(0.3) rotate(-10deg); }
 		to { opacity: 1; transform: scale(1) rotate(0deg); }
 	}
-
-	.friends-impact-lines {
-		position: absolute; inset: -30px; z-index: 1; pointer-events: none; opacity: 0;
-		background:
-			linear-gradient(90deg, transparent 39%, rgba(255,255,255,0.06) 40%, transparent 41%) 0 0 / 100% 100%,
-			linear-gradient(0deg, transparent 39%, rgba(255,255,255,0.06) 40%, transparent 41%) 0 0 / 100% 100%,
-			linear-gradient(45deg, transparent 39%, rgba(255,255,255,0.04) 40%, transparent 41%) 0 0 / 100% 100%,
-			linear-gradient(135deg, transparent 39%, rgba(255,255,255,0.04) 40%, transparent 41%) 0 0 / 100% 100%;
-		mask-image: radial-gradient(ellipse at center, black 25%, transparent 60%);
-		-webkit-mask-image: radial-gradient(ellipse at center, black 25%, transparent 60%);
-		animation: impact-in 0.2s ease-out 0.05s both;
-	}
-	@keyframes impact-in { from { opacity: 0; } to { opacity: 0.5; } }
 
 	/* ===== PHASE: AOA ===== */
 	.friends-art-layer { animation: aoa-bg-in 0.3s ease-out both; }

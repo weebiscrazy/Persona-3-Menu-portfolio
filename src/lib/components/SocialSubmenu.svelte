@@ -89,21 +89,27 @@
 		<div class="absolute inset-0 z-10 social-bg-dim">
 			<div class="absolute inset-0 social-bg-dim-overlay"></div>
 		</div>
-		<div class="absolute inset-0 z-20 flex items-center justify-center social-eye-wrap">
-			<div class="social-eye-frame">
-				<img
-					src="/T_UI_Camp_Status_Character_Glass_0002.png"
-					alt="eye cut-in"
-					class="social-eye-img"
-				/>
-				<div class="social-eye-border"></div>
-				<div class="social-eye-corner social-corner-tl"></div>
-				<div class="social-eye-corner social-corner-tr"></div>
-				<div class="social-eye-corner social-corner-bl"></div>
-				<div class="social-eye-corner social-corner-br"></div>
-				<span class="social-exclamation social-ex-left">!!</span>
-				<span class="social-exclamation social-ex-right">!!</span>
-				<div class="social-impact-lines"></div>
+		<div class="absolute inset-0 z-20 flex items-center justify-center">
+			<div class="social-petal-vortex" aria-hidden="true">
+				{#each Array(12) as _, i}
+					<div class="social-spiral-petal" style="--angle: {i * 30}deg; animation-delay: {i * 0.04}s"></div>
+				{/each}
+			</div>
+			<div class="social-eye-wrap">
+				<div class="social-eye-frame">
+					<img
+						src="/T_UI_Camp_Status_Character_Glass_0002.png"
+						alt="eye cut-in"
+						class="social-eye-img"
+					/>
+					<div class="social-eye-border"></div>
+					<div class="social-eye-corner social-corner-tl"></div>
+					<div class="social-eye-corner social-corner-tr"></div>
+					<div class="social-eye-corner social-corner-bl"></div>
+					<div class="social-eye-corner social-corner-br"></div>
+					<span class="social-exclamation social-ex-left">!!</span>
+					<span class="social-exclamation social-ex-right">!!</span>
+				</div>
 			</div>
 		</div>
 
@@ -266,12 +272,34 @@
 		to { background: rgba(120,20,60,0.7); }
 	}
 
-	.social-eye-wrap {
-		animation: eye-drop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+	.social-petal-vortex {
+		position: absolute; width: min(90vw, 900px); aspect-ratio: 1;
+		left: 50%; top: 50%; transform: translate(-50%, -50%);
+		pointer-events: none; z-index: 1;
 	}
-	@keyframes eye-drop {
-		from { transform: translateY(-100vh); opacity: 0; }
-		to { transform: translateY(0); opacity: 1; }
+	.social-spiral-petal {
+		position: absolute; width: 40px; height: 20px;
+		left: 50%; top: 50%; margin-left: -20px; margin-top: -10px;
+		background: radial-gradient(ellipse, rgba(232,88,140,0.7) 0%, transparent 70%);
+		border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+		transform: rotate(var(--angle)) translateY(-180px);
+		opacity: 0;
+		animation: petal-spiral 0.7s ease-out forwards;
+	}
+	@keyframes petal-spiral {
+		0% { opacity: 0; transform: rotate(var(--angle)) translateY(-60px) scale(0.3); }
+		40% { opacity: 0.8; }
+		100% { opacity: 0; transform: rotate(calc(var(--angle) + 180deg)) translateY(-220px) scale(1); }
+	}
+
+	.social-eye-wrap {
+		animation: bloom-reveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+		position: relative; z-index: 2;
+	}
+	@keyframes bloom-reveal {
+		from { opacity: 0; transform: scale(0.2) rotate(-5deg); }
+		40% { opacity: 1; transform: scale(1.08) rotate(1deg); }
+		to { opacity: 1; transform: scale(1) rotate(0deg); }
 	}
 
 	.social-eye-frame {
@@ -327,19 +355,6 @@
 		from { opacity: 0; transform: scale(0.3) rotate(-10deg); }
 		to { opacity: 1; transform: scale(1) rotate(0deg); }
 	}
-
-	.social-impact-lines {
-		position: absolute; inset: -30px; z-index: 1; pointer-events: none; opacity: 0;
-		background:
-			linear-gradient(90deg, transparent 39%, rgba(255,255,255,0.06) 40%, transparent 41%) 0 0 / 100% 100%,
-			linear-gradient(0deg, transparent 39%, rgba(255,255,255,0.06) 40%, transparent 41%) 0 0 / 100% 100%,
-			linear-gradient(45deg, transparent 39%, rgba(255,255,255,0.04) 40%, transparent 41%) 0 0 / 100% 100%,
-			linear-gradient(135deg, transparent 39%, rgba(255,255,255,0.04) 40%, transparent 41%) 0 0 / 100% 100%;
-		mask-image: radial-gradient(ellipse at center, black 25%, transparent 60%);
-		-webkit-mask-image: radial-gradient(ellipse at center, black 25%, transparent 60%);
-		animation: impact-in 0.2s ease-out 0.05s both;
-	}
-	@keyframes impact-in { from { opacity: 0; } to { opacity: 0.5; } }
 
 	/* ===== PHASE: AOA ===== */
 	.social-art-layer { animation: aoa-bg-in 0.3s ease-out both; }

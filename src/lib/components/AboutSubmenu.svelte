@@ -89,21 +89,25 @@
 		<div class="absolute inset-0 z-10 aoa-bg-dim">
 			<div class="absolute inset-0 aoa-bg-dim-overlay"></div>
 		</div>
-		<div class="absolute inset-0 z-20 flex items-center justify-center aoa-eye-wrap">
-			<div class="aoa-eye-frame">
-				<img
-					src="/T_UI_Camp_Status_Character_Glass_0001.png"
-					alt="eye cut-in"
-					class="aoa-eye-img"
-				/>
-				<div class="aoa-eye-border"></div>
-				<div class="aoa-eye-corner aoa-corner-tl"></div>
-				<div class="aoa-eye-corner aoa-corner-tr"></div>
-				<div class="aoa-eye-corner aoa-corner-bl"></div>
-				<div class="aoa-eye-corner aoa-corner-br"></div>
-				<span class="aoa-exclamation aoa-ex-left">!!</span>
-				<span class="aoa-exclamation aoa-ex-right">!!</span>
-				<div class="aoa-impact-lines"></div>
+		<div class="absolute inset-0 z-20 flex items-center justify-center">
+			{#each [0, 1, 2] as i}
+				<div class="aoa-ripple-ring" style="animation-delay: {i * 0.15}s"></div>
+			{/each}
+			<div class="aoa-eye-wrap">
+				<div class="aoa-eye-frame">
+					<img
+						src="/T_UI_Camp_Status_Character_Glass_0001.png"
+						alt="eye cut-in"
+						class="aoa-eye-img"
+					/>
+					<div class="aoa-eye-border"></div>
+					<div class="aoa-eye-corner aoa-corner-tl"></div>
+					<div class="aoa-eye-corner aoa-corner-tr"></div>
+					<div class="aoa-eye-corner aoa-corner-bl"></div>
+					<div class="aoa-eye-corner aoa-corner-br"></div>
+					<span class="aoa-exclamation aoa-ex-left">!!</span>
+					<span class="aoa-exclamation aoa-ex-right">!!</span>
+				</div>
 			</div>
 		</div>
 
@@ -255,12 +259,25 @@
 		to { background: rgba(0,34,90,0.7); }
 	}
 
-	.aoa-eye-wrap {
-		animation: eye-drop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+	.aoa-ripple-ring {
+		position: absolute; width: 100%; aspect-ratio: 1; border-radius: 50%;
+		border: 2px solid rgba(21,194,252,0.4); pointer-events: none; z-index: 1;
+		left: 50%; top: 50%; transform: translate(-50%, -50%);
+		animation: ring-expand 0.8s ease-out forwards;
 	}
-	@keyframes eye-drop {
-		from { transform: translateY(-100vh); opacity: 0; }
-		to { transform: translateY(0); opacity: 1; }
+	@keyframes ring-expand {
+		from { width: 20%; opacity: 0.8; }
+		to { width: 300%; opacity: 0; }
+	}
+
+	.aoa-eye-wrap {
+		animation: ripple-reveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+		position: relative; z-index: 2;
+	}
+	@keyframes ripple-reveal {
+		from { opacity: 0; transform: scale(0.3); }
+		30% { opacity: 1; transform: scale(1.05); }
+		to { opacity: 1; transform: scale(1); }
 	}
 
 	.aoa-eye-frame {
@@ -279,7 +296,7 @@
 		position: relative;
 		z-index: 2;
 		animation: eye-zoom 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-		filter: drop-shadow(0 0 40px rgba(21,194,252,0.3));
+		filter: drop-shadow(0 0 50px rgba(21,194,252,0.4)) drop-shadow(0 0 100px rgba(21,194,252,0.2));
 	}
 	@keyframes eye-zoom {
 		from { opacity: 0; transform: scale(0.7); filter: brightness(2); }
@@ -320,19 +337,6 @@
 		from { opacity: 0; transform: scale(0.3) rotate(-10deg); }
 		to { opacity: 1; transform: scale(1) rotate(0deg); }
 	}
-
-	.aoa-impact-lines {
-		position: absolute; inset: -30px; z-index: 1; pointer-events: none; opacity: 0;
-		background:
-			linear-gradient(90deg, transparent 39%, rgba(255,255,255,0.06) 40%, transparent 41%) 0 0 / 100% 100%,
-			linear-gradient(0deg, transparent 39%, rgba(255,255,255,0.06) 40%, transparent 41%) 0 0 / 100% 100%,
-			linear-gradient(45deg, transparent 39%, rgba(255,255,255,0.04) 40%, transparent 41%) 0 0 / 100% 100%,
-			linear-gradient(135deg, transparent 39%, rgba(255,255,255,0.04) 40%, transparent 41%) 0 0 / 100% 100%;
-		mask-image: radial-gradient(ellipse at center, black 25%, transparent 60%);
-		-webkit-mask-image: radial-gradient(ellipse at center, black 25%, transparent 60%);
-		animation: impact-in 0.2s ease-out 0.05s both;
-	}
-	@keyframes impact-in { from { opacity: 0; } to { opacity: 0.5; } }
 
 	/* ===== PHASE: AOA ===== */
 	.aoa-art-layer { animation: aoa-bg-in 0.3s ease-out both; }
