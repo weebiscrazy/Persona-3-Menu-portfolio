@@ -151,16 +151,6 @@
 	      {option.name}
 	    </text>
 
-	    {#if option.arcana}
-	      <image
-	        href={option.arcana}
-	        x="620" y="20"
-	        width="70" height="105"
-	        class="arcana-icon"
-	        style="opacity: 0.6; image-rendering: auto;"
-	      />
-	    {/if}
-
     {#if !isMobile && isSelected}
       <g mask={`url(#${selectorMaskId})`}>
         <text

@@ -88,24 +88,30 @@
 		<div class="absolute inset-0 z-10 persona-bg-dim">
 			<div class="absolute inset-0 persona-bg-dim-overlay"></div>
 		</div>
-		<div class="absolute inset-0 z-20 flex items-center justify-center persona-eye-wrap">
-			<div class="persona-eye-frame">
-				<img
-					src="/T_UI_Camp_Status_Character_Glass_0008.png"
-					alt="eye cut-in"
-					class="persona-eye-img"
-				/>
-				<div class="persona-scanlines"></div>
-				{#each Array(15) as _, i}
-					<div class="persona-glitch-square" style="left: {5 + (i * 7) % 85}%; top: {5 + (i * 11) % 85}%; animation-delay: {(i % 10) * 0.03}s"></div>
-				{/each}
-				<div class="persona-eye-border"></div>
-				<div class="persona-eye-corner persona-corner-tl"></div>
-				<div class="persona-eye-corner persona-corner-tr"></div>
-				<div class="persona-eye-corner persona-corner-bl"></div>
-				<div class="persona-eye-corner persona-corner-br"></div>
-				<span class="persona-exclamation persona-ex-left">!!</span>
-				<span class="persona-exclamation persona-ex-right">!!</span>
+		<div class="persona-digital-grid" aria-hidden="true"></div>
+		<div class="persona-amber-flash" aria-hidden="true"></div>
+		<div class="absolute inset-0 z-20 flex items-center justify-center">
+			<div class="persona-eye-wrap">
+				<div class="persona-eye-frame">
+					<div class="persona-scanline-sweep" aria-hidden="true"></div>
+					<div class="persona-scanlines-heavy"></div>
+					<img
+						src="/T_UI_Camp_Status_Character_Glass_0008.png"
+						alt="eye cut-in"
+						class="persona-eye-img"
+					/>
+					{#each Array(20) as _, i}
+						<div class="persona-glitch-square" style="left: {2 + (i * 17) % 90}%; top: {3 + (i * 13) % 90}%; animation-delay: {0.4 + (i % 15) * 0.04}s"></div>
+					{/each}
+					<div class="persona-eye-glitch" aria-hidden="true"></div>
+					<div class="persona-eye-border"></div>
+					<div class="persona-eye-corner persona-corner-tl"></div>
+					<div class="persona-eye-corner persona-corner-tr"></div>
+					<div class="persona-eye-corner persona-corner-bl"></div>
+					<div class="persona-eye-corner persona-corner-br"></div>
+					<span class="persona-exclamation persona-ex-left">!!</span>
+					<span class="persona-exclamation persona-ex-right">!!</span>
+				</div>
 			</div>
 		</div>
 
@@ -267,10 +273,48 @@ style="animation-delay: {0.3 + i * 0.12}s"
 		to { background: rgba(30,15,0,0.7); }
 	}
 
-	.persona-eye-wrap { animation: scan-reveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; z-index: 5; }
+	.persona-scanline-sweep {
+		position: absolute; left: -10%; width: 120%; height: 3px;
+		background: linear-gradient(90deg, transparent, rgba(234,179,8,0.8), rgba(255,255,255,0.9), rgba(234,179,8,0.8), transparent);
+		z-index: 10; pointer-events: none;
+		animation: scan-sweep 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards;
+		box-shadow: 0 0 20px rgba(234,179,8,0.6), 0 0 60px rgba(234,179,8,0.3);
+	}
+	@keyframes scan-sweep {
+		0% { top: -5%; opacity: 0; }
+		10% { opacity: 1; }
+		90% { opacity: 1; }
+		100% { top: 105%; opacity: 0; }
+	}
+
+	.persona-eye-glitch {
+		position: absolute; inset: 0; z-index: 7; pointer-events: none;
+		overflow: hidden; opacity: 0;
+		animation: glitch-overlay 0.5s ease-out 0.1s forwards;
+	}
+	@keyframes glitch-overlay {
+		0% { opacity: 0; }
+		5% { opacity: 0.3; background: linear-gradient(0deg, transparent 0%, rgba(234,179,8,0.15) 20%, transparent 40%, rgba(234,179,8,0.1) 60%, transparent 80%); transform: translateX(-4px); }
+		10% { opacity: 0; transform: translateX(4px); }
+		15% { opacity: 0.2; background: linear-gradient(0deg, transparent 10%, rgba(255,255,255,0.12) 30%, transparent 50%, rgba(234,179,8,0.08) 70%, transparent 90%); transform: translateX(-2px); }
+		20% { opacity: 0; transform: translateX(0); }
+		30% { opacity: 0.1; background: linear-gradient(0deg, transparent 5%, rgba(255,255,255,0.08) 25%, transparent 45%, rgba(234,179,8,0.12) 65%, transparent 85%); transform: translateX(3px); }
+		40% { opacity: 0; transform: translateX(0); }
+		100% { opacity: 0; }
+	}
+
+	.persona-eye-wrap {
+		animation: scan-reveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+				   eye-breathe 2.5s ease-in-out 0.6s infinite;
+		z-index: 5;
+	}
 	@keyframes scan-reveal {
 		from { transform: scale(0.5); filter: blur(10px); opacity: 0; }
 		to { transform: scale(1); filter: blur(0); opacity: 1; }
+	}
+	@keyframes eye-breathe {
+		0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(234,179,8,0)); }
+		50% { transform: scale(1.02); filter: drop-shadow(0 0 30px rgba(234,179,8,0.3)); }
 	}
 
 	.persona-eye-frame {
@@ -348,8 +392,19 @@ style="animation-delay: {0.3 + i * 0.12}s"
 	}
 
 	/* ===== PHASE: AOA ===== */
-	.persona-art-layer { animation: aoa-bg-in 0.3s ease-out both; }
+	.persona-art-layer {
+		animation: aoa-bg-in 0.3s ease-out both;
+		&::before {
+			content: ''; position: absolute; inset: 0; z-index: 10;
+			background: white; pointer-events: none;
+			animation: flash-pop 0.15s ease-out 0.05s forwards;
+		}
+	}
 	@keyframes aoa-bg-in { from { opacity: 0; } to { opacity: 1; } }
+	@keyframes flash-pop {
+		0% { opacity: 0.9; }
+		100% { opacity: 0; }
+	}
 
 	.persona-art-img {
 		object-fit: cover;

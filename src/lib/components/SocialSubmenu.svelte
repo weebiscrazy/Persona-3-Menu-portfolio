@@ -97,11 +97,13 @@
 			</div>
 			<div class="social-eye-wrap">
 				<div class="social-eye-frame">
+					<div class="social-scanline" aria-hidden="true"></div>
 					<img
 						src="/T_UI_Camp_Status_Character_Glass_0002.png"
 						alt="eye cut-in"
 						class="social-eye-img"
 					/>
+					<div class="social-eye-glitch" aria-hidden="true"></div>
 					<div class="social-eye-border"></div>
 					<div class="social-eye-corner social-corner-tl"></div>
 					<div class="social-eye-corner social-corner-tr"></div>
@@ -292,14 +294,49 @@
 		100% { opacity: 0; transform: rotate(calc(var(--angle) + 180deg)) translateY(-220px) scale(1); }
 	}
 
+	.social-scanline {
+		position: absolute; left: -10%; width: 120%; height: 3px;
+		background: linear-gradient(90deg, transparent, rgba(232,88,140,0.8), rgba(255,255,255,0.9), rgba(232,88,140,0.8), transparent);
+		z-index: 10; pointer-events: none;
+		animation: scan-sweep 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards;
+		box-shadow: 0 0 20px rgba(232,88,140,0.6), 0 0 60px rgba(232,88,140,0.3);
+	}
+	@keyframes scan-sweep {
+		0% { top: -5%; opacity: 0; }
+		10% { opacity: 1; }
+		90% { opacity: 1; }
+		100% { top: 105%; opacity: 0; }
+	}
+
+	.social-eye-glitch {
+		position: absolute; inset: 0; z-index: 6; pointer-events: none;
+		overflow: hidden; opacity: 0;
+		animation: glitch-overlay 0.5s ease-out 0.1s forwards;
+	}
+	@keyframes glitch-overlay {
+		0% { opacity: 0; }
+		5% { opacity: 0.3; background: linear-gradient(0deg, transparent 0%, rgba(232,88,140,0.15) 20%, transparent 40%, rgba(232,88,140,0.1) 60%, transparent 80%); transform: translateX(-4px); }
+		10% { opacity: 0; transform: translateX(4px); }
+		15% { opacity: 0.2; background: linear-gradient(0deg, transparent 10%, rgba(255,255,255,0.12) 30%, transparent 50%, rgba(232,88,140,0.08) 70%, transparent 90%); transform: translateX(-2px); }
+		20% { opacity: 0; transform: translateX(0); }
+		30% { opacity: 0.1; background: linear-gradient(0deg, transparent 5%, rgba(255,255,255,0.08) 25%, transparent 45%, rgba(232,88,140,0.12) 65%, transparent 85%); transform: translateX(3px); }
+		40% { opacity: 0; transform: translateX(0); }
+		100% { opacity: 0; }
+	}
+
 	.social-eye-wrap {
-		animation: bloom-reveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+		animation: bloom-reveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+				   eye-breathe 2.5s ease-in-out 0.6s infinite;
 		position: relative; z-index: 2;
 	}
 	@keyframes bloom-reveal {
 		from { opacity: 0; transform: scale(0.2) rotate(-5deg); }
 		40% { opacity: 1; transform: scale(1.08) rotate(1deg); }
 		to { opacity: 1; transform: scale(1) rotate(0deg); }
+	}
+	@keyframes eye-breathe {
+		0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(232,88,140,0)); }
+		50% { transform: scale(1.02); filter: drop-shadow(0 0 30px rgba(232,88,140,0.3)); }
 	}
 
 	.social-eye-frame {
@@ -357,8 +394,19 @@
 	}
 
 	/* ===== PHASE: AOA ===== */
-	.social-art-layer { animation: aoa-bg-in 0.3s ease-out both; }
+	.social-art-layer {
+		animation: aoa-bg-in 0.3s ease-out both;
+		&::before {
+			content: ''; position: absolute; inset: 0; z-index: 10;
+			background: white; pointer-events: none;
+			animation: flash-pop 0.15s ease-out 0.05s forwards;
+		}
+	}
 	@keyframes aoa-bg-in { from { opacity: 0; } to { opacity: 1; } }
+	@keyframes flash-pop {
+		0% { opacity: 0.9; }
+		100% { opacity: 0; }
+	}
 
 	.social-art-img {
 		object-fit: cover;
