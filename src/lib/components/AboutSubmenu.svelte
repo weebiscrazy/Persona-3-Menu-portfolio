@@ -7,7 +7,6 @@
 	let activeTab = $state(0);
 	let phase = $state<"eye" | "aoa" | "content">("eye");
 	let closing = $state(false);
-	let assetsLoaded = $state(false);
 
 	const tabs = [
 		{ name: "Profile", index: 0, arcanaNumber: "0" },
@@ -53,39 +52,23 @@
 	}
 
 	onMount(() => {
-		// Preload images before starting sequence
-		const preloadSrcs = [
-			"/T_UI_Camp_Status_Character_Glass_0001.png",
-			"/T_Btl_AlloutFinish_Pc01_A1out.png",
-			"/T_Btl_AlloutFinishText_Pc01out.png",
-			"/T_UI_Camp_Status_Character_0001.png"
-		];
-		let loaded = 0;
-		preloadSrcs.forEach(src => {
-			const img = new Image();
-			img.onload = () => { loaded++; if (loaded === preloadSrcs.length) startSequence(); };
-			img.onerror = () => { loaded++; if (loaded === preloadSrcs.length) startSequence(); };
-			img.src = src;
-		});
-		// Fallback timeout
-		setTimeout(() => { if (!assetsLoaded) startSequence(); }, 3000);
+		// Optimistically warm image cache (doesn't block UI)
+		["/T_UI_Camp_Status_Character_Glass_0001.png",
+		 "/T_Btl_AlloutFinish_Pc01_A1out.png",
+		 "/T_Btl_AlloutFinishText_Pc01out.png",
+		 "/T_UI_Camp_Status_Character_0001.png"
+		].forEach(src => { const img = new Image(); img.src = src; });
 
-		function startSequence() {
-			if (assetsLoaded) return;
-			assetsLoaded = true;
+		// Phase sequence starts immediately — no loading flash
+		setTimeout(() => {
+			if (phase === "content") return;
+			phase = "aoa";
+		}, 900);
 
-			// Eye phase (0.9s)
-			setTimeout(() => {
-				if (phase === "content") return;
-				phase = "aoa";
-			}, 900);
-
-			// AOA phase (1.6s) → content
-			setTimeout(() => {
-				if (phase === "content") return;
-				phase = "content";
-			}, 2500);
-		}
+		setTimeout(() => {
+			if (phase === "content") return;
+			phase = "content";
+		}, 2500);
 	});
 </script>
 
@@ -98,12 +81,8 @@
 	tabindex="-1"
 	class:about-closing={closing}
 >
-	<!-- Loading state until assets are preloaded -->
-	{#if !assetsLoaded}
-		<div class="absolute inset-0 bg-bg aoa-loading"></div>
-
 	<!-- Phase 1: Eye cut-in from above -->
-	{:else if phase === "eye"}
+	{#if phase === "eye"}
 		<div class="absolute inset-0 z-10 aoa-bg-dim">
 			<div class="absolute inset-0 aoa-bg-dim-overlay"></div>
 		</div>
@@ -252,10 +231,6 @@
 	.about-closing { animation: about-fade-out 0.35s ease-in forwards; }
 	@keyframes about-fade-out { from { opacity: 1; } to { opacity: 0; } }
 
-	/* === Loading === */
-	.aoa-loading { animation: load-fade 0.3s ease-out 2.5s forwards; }
-	@keyframes load-fade { to { opacity: 0; } }
-
 	/* ===== PHASE: EYE ===== */
 	.aoa-bg-dim-overlay {
 		animation: dim-in 0.4s ease-out forwards;
@@ -352,7 +327,7 @@
 		object-fit: cover;
 		object-position: center 30%;
 		animation: aoa-slam 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-		transition: opacity 0.6s ease-out, filter 0.6s ease-out;
+		transition: opacity 0.35s ease-out, filter 0.35s ease-out;
 	}
 	@keyframes aoa-slam {
 		from { opacity: 0; transform: scale(1.3); filter: brightness(1.8); }
@@ -360,8 +335,8 @@
 	}
 
 	.aoa-art-content {
-		opacity: 0.35;
-		filter: blur(3px) brightness(0.55);
+		opacity: 0.4;
+		filter: blur(2px) brightness(0.55);
 	}
 
 	.aoa-nameplate {
@@ -378,7 +353,7 @@
 	.aoa-art-vignette {
 		background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.25) 100%);
 		z-index: 2;
-		transition: all 0.6s ease-out;
+		transition: all 0.35s ease-out;
 	}
 	.aoa-vig-strong {
 		background: radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.4) 100%);
@@ -389,7 +364,7 @@
 		max-width: 1320px;
 		margin: 0 auto;
 		width: 100%;
-		animation: panel-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+		animation: panel-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s both;
 	}
 	@keyframes panel-in {
 		from { opacity: 0; transform: translateY(20px); }
@@ -449,8 +424,8 @@
 	.about-info-side {
 		flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.5rem;
 		padding: 0.75rem 1rem; border-radius: 0.75rem;
-		background: rgba(0,0,0,0.25); backdrop-filter: blur(8px);
-		border: 1px solid rgba(255,255,255,0.06);
+		background: rgba(0,0,0,0.55); backdrop-filter: blur(12px);
+		border: 1px solid rgba(255,255,255,0.08);
 		box-shadow: 0 8px 32px rgba(0,0,0,0.2);
 	}
 	.about-info-nameplate {
