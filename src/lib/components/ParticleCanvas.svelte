@@ -17,48 +17,48 @@
 
 	const PRESETS: Record<ParticleType, ParticleConfig> = {
 		electric: {
-			count: 40,
-			color: "#B8B0A8",
-			secondaryColor: "#FFD700",
-			speedRange: [1.5, 4],
-			sizeRange: [1.5, 4],
+			count: 80,
+			color: "#FFD700",
+			secondaryColor: "#FFFFFF",
+			speedRange: [2, 6],
+			sizeRange: [2, 6],
 			spawnArea: "edges",
 			gravity: 0,
-			wind: 0.03,
-			emissionRate: 0.3
+			wind: 0.05,
+			emissionRate: 0.6
 		},
 		data: {
-			count: 50,
-			color: "#4ADE80",
-			secondaryColor: "#22C55E",
-			speedRange: [0.5, 2],
-			sizeRange: [8, 16],
+			count: 100,
+			color: "#EAB308",
+			secondaryColor: "#FDE047",
+			speedRange: [1, 3],
+			sizeRange: [10, 22],
 			spawnArea: "top",
-			gravity: 0.008,
-			wind: 0.01,
-			emissionRate: 0.35
+			gravity: 0.012,
+			wind: 0.02,
+			emissionRate: 0.7
 		},
 		petals: {
-			count: 25,
+			count: 50,
 			color: "#FD77D9",
 			secondaryColor: "#F472B6",
-			speedRange: [0.3, 1],
-			sizeRange: [6, 14],
+			speedRange: [0.5, 1.5],
+			sizeRange: [8, 18],
 			spawnArea: "top",
-			gravity: 0.004,
-			wind: 0.02,
-			emissionRate: 0.1
+			gravity: 0.006,
+			wind: 0.04,
+			emissionRate: 0.25
 		},
 		water: {
-			count: 45,
+			count: 80,
 			color: "#16CFFB",
 			secondaryColor: "#7DE6FD",
-			speedRange: [0.8, 2.5],
-			sizeRange: [2, 6],
+			speedRange: [1, 3],
+			sizeRange: [3, 8],
 			spawnArea: "full",
-			gravity: 0.01,
-			wind: 0.008,
-			emissionRate: 0.4
+			gravity: 0.015,
+			wind: 0.012,
+			emissionRate: 0.6
 		}
 	};
 
@@ -205,7 +205,7 @@
 				ctx.lineCap = "round";
 				ctx.lineJoin = "round";
 				ctx.shadowColor = p.color;
-				ctx.shadowBlur = p.size * 3;
+				ctx.shadowBlur = p.size * 6;
 				ctx.beginPath();
 				const segments = 5 + Math.floor(p.size);
 				ctx.moveTo(-p.size * 3, 0);
@@ -233,7 +233,7 @@
 			case "circle": // Data/hex - glowing hexagons & squares
 				ctx.fillStyle = p.color;
 				ctx.shadowColor = p.color;
-				ctx.shadowBlur = p.size;
+				ctx.shadowBlur = p.size * 2;
 				if (Math.random() < 0.4) {
 					// Hexagon
 					ctx.beginPath();
@@ -261,7 +261,7 @@
 			case "petal": // Rose petal - organic teardrop shape
 				ctx.fillStyle = p.color;
 				ctx.shadowColor = p.color;
-				ctx.shadowBlur = p.size * 0.8;
+				ctx.shadowBlur = p.size * 2;
 				ctx.beginPath();
 				ctx.moveTo(0, -p.size);
 				ctx.bezierCurveTo(
@@ -288,7 +288,7 @@
 			case "drop": // Water droplet - with ripple
 				ctx.fillStyle = p.color;
 				ctx.shadowColor = p.color;
-				ctx.shadowBlur = p.size;
+				ctx.shadowBlur = p.size * 2;
 				ctx.beginPath();
 				ctx.moveTo(0, -p.size);
 				ctx.bezierCurveTo(
