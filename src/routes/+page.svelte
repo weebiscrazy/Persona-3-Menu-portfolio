@@ -14,10 +14,10 @@
 	import PersonaSubmenu from "$lib/components/PersonaSubmenu.svelte";
 
 	const options: OptionValue[] = [
-		{ name: "ABOUT", description: "View Profile & Bio", rotation: -25, zIndex: 1, offsetX: -60, offsetY: 55 },
-		{ name: "SOCIAL", description: "Social Links & Contact", rotation: -15, zIndex: 0, offsetX: 0, offsetY: 30 },
-		{ name: "FRIENDS", description: "Allies & Testimonials", rotation: -20, zIndex: 1, offsetX: -50, offsetY: 35 },
-		{ name: "PERSONA", description: "Hobbies & Fun Facts", rotation: -15, zIndex: 2, offsetX: -80, offsetY: 40 },
+		{ name: "ABOUT", description: "View Profile & Bio", rotation: -25, zIndex: 1, offsetX: -60, offsetY: 55, color: "var(--color-button-1)", arcana: "/arcana/fool.png" },
+		{ name: "SOCIAL", description: "Social Links & Contact", rotation: -15, zIndex: 0, offsetX: 0, offsetY: 30, color: "var(--color-pink)", arcana: "/arcana/lovers.png" },
+		{ name: "FRIENDS", description: "Allies & Testimonials", rotation: -20, zIndex: 1, offsetX: -50, offsetY: 35, color: "var(--color-button-4)", arcana: "/arcana/strength.png" },
+		{ name: "PERSONA", description: "Hobbies & Fun Facts", rotation: -15, zIndex: 2, offsetX: -80, offsetY: 40, color: "var(--color-button-5)", arcana: "/arcana/hermit.png" },
 		{ name: "SYSTEM", description: "View Settings", rotation: 8, zIndex: 0, offsetX: 0, offsetY: 0 }
 	];
 

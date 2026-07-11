@@ -5,6 +5,8 @@ export interface OptionValue {
   offsetX: number;
   offsetY: number;
   description: string;
+  color?: string;
+  arcana?: string;
 }
 
 export type SubmenuType = 'about' | 'social' | 'friends' | 'persona' | 'settings';

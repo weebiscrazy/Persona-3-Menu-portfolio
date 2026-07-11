@@ -4,12 +4,6 @@
   import { animate, createTimeline, spring, utils } from "animejs";
   import type { OptionValue } from "$lib/types";
 
-  const colors = [
-    "fill-button-1",
-    "fill-button-2",
-    "fill-button-3"
-  ];
-
   let element: SVGElement = $state()!;
   let textElement: SVGTextElement = $state()!;
   let textRedElement: SVGTextElement = $state()!;
@@ -140,21 +134,32 @@
     </g>
 
     <text
-      bind:this={textElement}
-      transform-origin="25% center"
-      x="150"
-      y="120"
-      class={cn(
-        "text-7xl tracking-[-0.14em] italic",
-        {
-          [colors[(index + 2) % colors.length]]: !isSelected,
-          "text-black": isSelected && !isMobile,
-          "text-fg": isMobile
-        }
-      )}
-    >
-      {option.name}
-    </text>
+	      bind:this={textElement}
+	      transform-origin="25% center"
+	      x="150"
+	      y="120"
+	      style:fill={option.color}
+	      class={cn(
+	        "text-7xl tracking-[-0.14em] italic",
+	        {
+	          "fill-white": isSelected && !isMobile,
+	          "text-fg": isMobile,
+	          "text-fg": !option.color
+	        }
+	      )}
+	    >
+	      {option.name}
+	    </text>
+
+	    {#if option.arcana}
+	      <image
+	        href={option.arcana}
+	        x="620" y="20"
+	        width="70" height="105"
+	        class="arcana-icon"
+	        style="opacity: 0.6; image-rendering: auto;"
+	      />
+	    {/if}
 
     {#if !isMobile && isSelected}
       <g mask={`url(#${selectorMaskId})`}>
