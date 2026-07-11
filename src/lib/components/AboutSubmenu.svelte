@@ -52,7 +52,6 @@
 	}
 
 	onMount(() => {
-		// Preload images
 		const preloadSrcs = [
 			"/T_UI_Camp_Status_Character_Glass_0001.png",
 			"/T_Btl_AlloutFinish_Pc01_A1out.png",
@@ -70,26 +69,25 @@
 			img.onerror = onLoad;
 			img.src = src;
 		});
-		// Fallback — don't leave user hanging
 		setTimeout(() => { if (phase === "cover") startSequence(); }, 2500);
 
 		function startSequence() {
 			if (phase !== "cover") return;
 
-			// Cover → eye: brief flash then eye cut-in
+			// Cover → eye: fade cover out, dim overlay in, eye drops from above
 			phase = "eye";
 
-			// Eye phase: 400ms, then slam into AOA
+			// Eye phase: 900ms total, then AOA slam
 			setTimeout(() => {
 				if (phase === "content") return;
 				phase = "aoa";
-			}, 400);
+			}, 900);
 
-			// AOA phase: 1.2s of art glory, then content
+			// AOA phase: 1600ms, then content
 			setTimeout(() => {
 				if (phase === "content") return;
 				phase = "content";
-			}, 1600);
+			}, 2500);
 		}
 	});
 </script>
@@ -103,16 +101,17 @@
 	tabindex="-1"
 	class:about-closing={closing}
 >
-	<!-- === COVER: Fully opaque to hide main menu === -->
+	<!-- === COVER: briefly opaque to hide mount flash, then fades out === -->
 	{#if phase === "cover"}
-		<div class="absolute inset-0" style="background: {AOA_BG};"></div>
+		<div class="absolute inset-0 aoa-cover" style="background: {AOA_BG};"></div>
 
-	<!-- === PHASE 1: Eye cut-in (fast) === -->
+	<!-- === PHASE 1: Eye cut-in over dimmed main menu === -->
 	{:else if phase === "eye"}
-		<div class="absolute inset-0" style="background: {AOA_BG};">
-			<div class="absolute inset-0 aoa-bg-pattern"></div>
-		</div>
-		<div class="absolute inset-0 aoa-flash"></div>
+		<!-- Semi-transparent dim overlay so main menu shows through -->
+		<div class="absolute inset-0 aoa-dim-overlay"></div>
+		<!-- Flash pop -->
+		<div class="absolute inset-0 aoa-eye-flash"></div>
+		<!-- Eye cut-in drops from above -->
 		<div class="absolute inset-0 z-20 flex items-center justify-center aoa-eye-wrap">
 			<div class="aoa-eye-frame">
 				<img
@@ -131,71 +130,35 @@
 			</div>
 		</div>
 
-	<!-- === PHASE 2: AOA art slam (with water ripple) === -->
+	<!-- === PHASE 2: AOA art slam (clean) === -->
 	{:else if phase === "aoa"}
 		<div class="absolute inset-0 aoa-art-layer" style="background: {AOA_BG};">
-			<!-- SVG water distortion filter -->
-			<svg aria-hidden="true" class="absolute inset-0 w-full h-full pointer-events-none z-[1]">
-				<defs>
-					<filter id="aoa-water-distortion">
-						<feTurbulence type="fractalNoise" baseFrequency="0.008" numOctaves="2" result="noise">
-							<animate attributeName="baseFrequency" values="0.008;0.012;0.008" dur="8s" repeatCount="indefinite"/>
-						</feTurbulence>
-						<feDisplacementMap in="SourceGraphic" in2="noise" scale="12" xChannelSelector="R" yChannelSelector="G"/>
-					</filter>
-				</defs>
-			</svg>
-			<div class="absolute inset-0 aoa-art-wrap" style="filter: url(#aoa-water-distortion);">
-				<img
-					src="/T_Btl_AlloutFinish_Pc01_A1out.png"
-					alt="all-out attack"
-					class="absolute inset-0 w-full h-full aoa-art-img"
-				/>
-			</div>
+			<img
+				src="/T_Btl_AlloutFinish_Pc01_A1out.png"
+				alt="all-out attack"
+				class="absolute inset-0 w-full h-full aoa-art-img"
+			/>
 			<div class="absolute inset-0 aoa-art-vignette"></div>
-			<div class="absolute inset-0 aoa-impact-flash"></div>
-			<!-- Impact ring -->
-			<div class="aoa-impact-ring"></div>
-			<!-- Radial impact lines -->
-			<div class="aoa-radial-lines"></div>
-			<!-- Nameplate -->
+			<div class="absolute inset-0 aoa-slam-flash"></div>
 			<img
 				src="/T_Btl_AlloutFinishText_Pc01out.png"
 				alt=""
 				class="aoa-nameplate"
 			/>
-			<!-- Water ripple overlays -->
-			<div class="aoa-water-ripple aoa-ripple-1"></div>
-			<div class="aoa-water-ripple aoa-ripple-2"></div>
 		</div>
 
-	<!-- === PHASE 3: Content overlays on AOA art === -->
+	<!-- === PHASE 3: Content on AOA art background === -->
 	{:else}
-		<div class="absolute inset-0 aoa-content-bg" style="background: {AOA_BG};">
-			<svg aria-hidden="true" class="absolute inset-0 w-full h-full pointer-events-none z-[1]">
-				<defs>
-					<filter id="content-water-distortion">
-						<feTurbulence type="fractalNoise" baseFrequency="0.006" numOctaves="2" result="noise">
-							<animate attributeName="baseFrequency" values="0.006;0.01;0.006" dur="10s" repeatCount="indefinite"/>
-						</feTurbulence>
-						<feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G"/>
-					</filter>
-				</defs>
-			</svg>
-			<div class="absolute inset-0 aoa-bg-wrap" style="filter: url(#content-water-distortion);">
-				<img
-					src="/T_Btl_AlloutFinish_Pc01_A1out.png"
-					alt=""
-					class="absolute inset-0 w-full h-full aoa-bg-img"
-				/>
-			</div>
-			<div class="absolute inset-0 aoa-bg-vignette"></div>
-			<div class="aoa-water-ripple aoa-ripple-1"></div>
-			<div class="aoa-water-ripple aoa-ripple-2"></div>
+		<div class="absolute inset-0 aoa-content-bg-wrap" style="background: {AOA_BG};">
+			<img
+				src="/T_Btl_AlloutFinish_Pc01_A1out.png"
+				alt=""
+				class="absolute inset-0 w-full h-full aoa-content-bg-img"
+			/>
+			<div class="absolute inset-0 aoa-content-vignette"></div>
 		</div>
 
 		<div class="relative z-10 h-full flex flex-col about-content-panel">
-			<!-- Header -->
 			<header class="about-header">
 				<h1 class="about-title">ABOUT</h1>
 				<div class="flex gap-2" role="tablist">
@@ -210,9 +173,7 @@
 				</div>
 			</header>
 
-			<!-- Body -->
 			<div class="flex-1 flex flex-col md:flex-row gap-6 about-body">
-				<!-- Portrait -->
 				<div class="about-portrait-side">
 					<div class="about-portrait-inner">
 						<img
@@ -224,7 +185,6 @@
 					</div>
 				</div>
 
-				<!-- Info -->
 				<div class="about-info-side">
 					<img src="/T_Btl_AlloutFinishText_Pc01out.png" alt="" class="about-info-nameplate" />
 
@@ -293,38 +253,46 @@
 </div>
 
 <style>
-	/* === Root === */
 	.about-root { background: transparent; outline: none; }
 	.about-closing { animation: about-fade-out 0.35s ease-in forwards; }
 	@keyframes about-fade-out { from { opacity: 1; } to { opacity: 0; } }
 
-	/* ===== COVER ===== */
+	/* === COVER: fades out to reveal dimmed main menu behind === */
+	.aoa-cover {
+		animation: cover-fade 0.4s ease-out forwards;
+	}
+	@keyframes cover-fade {
+		from { opacity: 1; }
+		to { opacity: 0; }
+	}
 
 	/* ===== PHASE: EYE ===== */
-	.aoa-bg-pattern {
-		background:
-			radial-gradient(ellipse at 30% 40%, rgba(255,255,255,0.04), transparent 60%),
-			radial-gradient(ellipse at 70% 60%, rgba(255,255,255,0.03), transparent 50%);
-		opacity: 0.5;
+	.aoa-dim-overlay {
+		background: rgba(0,34,90,0.65);
+		animation: dim-in 0.4s ease-out forwards;
+	}
+	@keyframes dim-in {
+		from { opacity: 0; }
+		to { opacity: 1; }
 	}
 
-	.aoa-flash {
-		background: #fff;
-		z-index: 25;
-		animation: aoa-white-flash 0.2s ease-out forwards;
+	.aoa-eye-flash {
+		background: rgba(255,255,255,0.2);
+		z-index: 15;
+		animation: flash-pop 0.2s ease-out forwards;
 		pointer-events: none;
 	}
-	@keyframes aoa-white-flash {
-		0% { opacity: 0.6; }
+	@keyframes flash-pop {
+		0% { opacity: 0.5; }
 		100% { opacity: 0; }
 	}
 
 	.aoa-eye-wrap {
-		animation: eye-drop 0.25s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+		animation: eye-drop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 	}
 	@keyframes eye-drop {
-		from { transform: translateY(-100vh) scale(0.9); opacity: 0; }
-		to { transform: translateY(0) scale(1); opacity: 1; }
+		from { transform: translateY(-100vh); opacity: 0; }
+		to { transform: translateY(0); opacity: 1; }
 	}
 
 	.aoa-eye-frame {
@@ -342,30 +310,30 @@
 		object-fit: contain;
 		position: relative;
 		z-index: 2;
-		animation: eye-zoom 0.2s cubic-bezier(0.2, 1.4, 0.4, 1) both;
-		filter: drop-shadow(0 0 40px rgba(21,194,252,0.4));
+		animation: eye-zoom 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+		filter: drop-shadow(0 0 40px rgba(21,194,252,0.3));
 	}
 	@keyframes eye-zoom {
-		from { opacity: 0; transform: scale(0.6); filter: brightness(2.5); }
+		from { opacity: 0; transform: scale(0.7); filter: brightness(2); }
 		to { opacity: 1; transform: scale(1); filter: brightness(1); }
 	}
 
 	.aoa-eye-border {
 		position: absolute; inset: -8px; z-index: 3; pointer-events: none;
-		border: 2px solid rgba(21,194,252,0.6);
+		border: 2px solid rgba(21,194,252,0.5);
 		clip-path: polygon(0% 5%, 3% 0%, 97% 2%, 100% 4%, 100% 96%, 96% 100%, 4% 98%, 0% 95%);
-		animation: border-flick 0.4s ease-out forwards;
+		animation: border-flick 0.6s ease-out forwards;
 	}
 	@keyframes border-flick {
-		0% { border-color: rgba(255,255,255,0.95); opacity: 0; }
-		20% { border-color: rgba(21,194,252,0.9); opacity: 1; }
-		50% { border-color: rgba(255,255,255,0.7); }
-		100% { border-color: rgba(21,194,252,0.3); opacity: 0.7; }
+		0% { border-color: rgba(255,255,255,0.9); opacity: 0; }
+		30% { border-color: rgba(21,194,252,0.8); opacity: 1; }
+		60% { border-color: rgba(255,255,255,0.6); }
+		100% { border-color: rgba(21,194,252,0.3); opacity: 0.8; }
 	}
 
 	.aoa-eye-corner {
 		position: absolute; width: 28px; height: 28px; z-index: 4; pointer-events: none;
-		border-color: #15c2fc; opacity: 0.9;
+		border-color: #15c2fc; opacity: 0.8;
 	}
 	.aoa-corner-tl { top: -14px; left: -14px; border-top: 3px solid; border-left: 3px solid; }
 	.aoa-corner-tr { top: -14px; right: -14px; border-top: 3px solid; border-right: 3px solid; }
@@ -376,91 +344,62 @@
 		position: absolute; font-family: var(--font-skip); font-size: 2.5rem;
 		color: #fff; z-index: 5; pointer-events: none; line-height: 1;
 		text-shadow: 0 0 20px rgba(21,194,252,0.8), 0 0 40px rgba(21,194,252,0.4);
-		animation: ex-pop 0.2s cubic-bezier(0.2, 1.6, 0.4, 1) 0.05s both;
+		animation: ex-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
 	}
 	.aoa-ex-left { top: -16px; left: 12%; }
 	.aoa-ex-right { bottom: -16px; right: 12%; }
 	@keyframes ex-pop {
-		from { opacity: 0; transform: scale(0.3) rotate(-15deg); }
+		from { opacity: 0; transform: scale(0.3) rotate(-10deg); }
 		to { opacity: 1; transform: scale(1) rotate(0deg); }
 	}
 
 	.aoa-impact-lines {
 		position: absolute; inset: -30px; z-index: 1; pointer-events: none; opacity: 0;
 		background:
-			linear-gradient(90deg, transparent 39%, rgba(255,255,255,0.08) 40%, transparent 41%) 0 0 / 100% 100%,
-			linear-gradient(0deg, transparent 39%, rgba(255,255,255,0.08) 40%, transparent 41%) 0 0 / 100% 100%,
-			linear-gradient(45deg, transparent 39%, rgba(255,255,255,0.06) 40%, transparent 41%) 0 0 / 100% 100%,
-			linear-gradient(135deg, transparent 39%, rgba(255,255,255,0.06) 40%, transparent 41%) 0 0 / 100% 100%;
+			linear-gradient(90deg, transparent 39%, rgba(255,255,255,0.06) 40%, transparent 41%) 0 0 / 100% 100%,
+			linear-gradient(0deg, transparent 39%, rgba(255,255,255,0.06) 40%, transparent 41%) 0 0 / 100% 100%,
+			linear-gradient(45deg, transparent 39%, rgba(255,255,255,0.04) 40%, transparent 41%) 0 0 / 100% 100%,
+			linear-gradient(135deg, transparent 39%, rgba(255,255,255,0.04) 40%, transparent 41%) 0 0 / 100% 100%;
 		mask-image: radial-gradient(ellipse at center, black 25%, transparent 60%);
 		-webkit-mask-image: radial-gradient(ellipse at center, black 25%, transparent 60%);
-		animation: impact-in 0.15s ease-out 0.02s both;
+		animation: impact-in 0.2s ease-out 0.05s both;
 	}
-	@keyframes impact-in { from { opacity: 0; transform: scale(0.8); } to { opacity: 0.6; } }
+	@keyframes impact-in { from { opacity: 0; } to { opacity: 0.5; } }
 
 	/* ===== PHASE: AOA ===== */
-	.aoa-art-layer { animation: aoa-bg-in 0.2s ease-out both; z-index: 1; }
+	.aoa-art-layer { animation: aoa-bg-in 0.3s ease-out both; }
 	@keyframes aoa-bg-in { from { opacity: 0; } to { opacity: 1; } }
-
-	.aoa-art-wrap { z-index: 1; }
 
 	.aoa-art-img {
 		object-fit: cover;
 		object-position: center 30%;
-		animation: aoa-slam 0.35s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+		animation: aoa-slam 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 	}
 	@keyframes aoa-slam {
-		from { opacity: 0; transform: scale(1.4); filter: brightness(2); }
+		from { opacity: 0; transform: scale(1.3); filter: brightness(1.8); }
 		to { opacity: 1; transform: scale(1); filter: brightness(1); }
 	}
 
-	.aoa-impact-flash {
-		background: rgba(255,255,255,0.4);
+	.aoa-slam-flash {
+		background: rgba(255,255,255,0.35);
 		z-index: 6;
-		animation: flash-out 0.15s ease-out both;
+		animation: slam-flash 0.2s ease-out both;
 		pointer-events: none;
 	}
-	@keyframes flash-out { from { opacity: 1; } to { opacity: 0; } }
-
-	.aoa-impact-ring {
-		position: absolute; top: 50%; left: 50%; z-index: 5; pointer-events: none;
-		width: 300px; height: 300px; margin: -150px 0 0 -150px;
-		border: 3px solid rgba(255,255,255,0.15);
-		border-radius: 50%;
-		animation: ring-expand 0.6s ease-out forwards;
+	@keyframes slam-flash {
+		from { opacity: 1; }
+		to { opacity: 0; }
 	}
-	@keyframes ring-expand {
-		from { transform: scale(0.3); opacity: 0.8; }
-		to { transform: scale(3); opacity: 0; }
-	}
-
-	.aoa-radial-lines {
-		position: absolute; inset: 0; z-index: 4; pointer-events: none; overflow: hidden;
-	}
-	.aoa-radial-lines::before {
-		content: '';
-		position: absolute; inset: 0;
-		background:
-			conic-gradient(from 0deg, transparent, rgba(255,255,255,0.04) 10%, transparent 20%,
-			               rgba(255,255,255,0.03) 30%, transparent 40%,
-			               rgba(255,255,255,0.04) 50%, transparent 60%,
-			               rgba(255,255,255,0.03) 70%, transparent 80%,
-			               rgba(255,255,255,0.04) 90%, transparent 100%);
-		mask-image: radial-gradient(circle at center, transparent 20%, black 25%, black 40%, transparent 50%);
-		-webkit-mask-image: radial-gradient(circle at center, transparent 20%, black 25%, black 40%, transparent 50%);
-		animation: radial-spin 3s linear infinite;
-	}
-	@keyframes radial-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 	.aoa-nameplate {
 		position: absolute; bottom: 12%; left: 50%; transform: translateX(-50%);
 		width: min(55vw, 450px); height: auto; z-index: 5;
-		animation: nameplate-in 0.35s cubic-bezier(0.2, 1.4, 0.4, 1) 0.1s both;
+		animation: nameplate-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
 		filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
 	}
 	@keyframes nameplate-in {
-		from { opacity: 0; transform: translateX(-50%) translateY(60px) scale(0.8); }
-		to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+		from { opacity: 0; transform: translateX(-50%) translateY(50px); }
+		to { opacity: 1; transform: translateX(-50%) translateY(0); }
 	}
 
 	.aoa-art-vignette {
@@ -468,50 +407,18 @@
 		z-index: 3;
 	}
 
-	/* === Water Ripple Effects === */
-	.aoa-water-ripple {
-		position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden;
-	}
-	.aoa-ripple-1::before {
-		content: '';
-		position: absolute; inset: -50%;
-		background:
-			radial-gradient(ellipse at 30% 40%, rgba(255,255,255,0.03) 0%, transparent 50%),
-			radial-gradient(ellipse at 70% 60%, rgba(255,255,255,0.02) 0%, transparent 40%);
-		animation: water-flow-1 6s ease-in-out infinite alternate;
-	}
-	.aoa-ripple-2::after {
-		content: '';
-		position: absolute; inset: -50%;
-		background:
-			radial-gradient(ellipse at 60% 30%, rgba(255,255,255,0.02) 0%, transparent 45%),
-			radial-gradient(ellipse at 40% 70%, rgba(255,255,255,0.015) 0%, transparent 35%);
-		animation: water-flow-2 8s ease-in-out infinite alternate;
-	}
-	@keyframes water-flow-1 {
-		0% { transform: translateX(-3%) translateY(-2%) scale(1); }
-		100% { transform: translateX(3%) translateY(2%) scale(1.05); }
-	}
-	@keyframes water-flow-2 {
-		0% { transform: translateX(2%) translateY(3%) scale(1); }
-		100% { transform: translateX(-2%) translateY(-3%) scale(1.05); }
-	}
-
 	/* ===== PHASE: CONTENT ===== */
-	.aoa-content-bg { animation: content-bg-in 0.35s ease-out both; }
+	.aoa-content-bg-wrap { animation: content-bg-in 0.4s ease-out both; }
 	@keyframes content-bg-in { from { opacity: 0; } to { opacity: 1; } }
 
-	.aoa-bg-wrap { z-index: 0; }
-
-	.aoa-bg-img {
+	.aoa-content-bg-img {
 		object-fit: cover;
 		object-position: center 30%;
 		opacity: 0.35;
 		filter: blur(3px) brightness(0.55);
 	}
-	.aoa-bg-vignette {
+	.aoa-content-vignette {
 		background: radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.4) 100%);
-		z-index: 1;
 	}
 
 	.about-content-panel {
@@ -519,10 +426,10 @@
 		max-width: 1320px;
 		margin: 0 auto;
 		width: 100%;
-		animation: panel-in 0.4s cubic-bezier(0.2, 1.4, 0.4, 1) 0.05s both;
+		animation: panel-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
 	}
 	@keyframes panel-in {
-		from { opacity: 0; transform: translateY(15px); }
+		from { opacity: 0; transform: translateY(20px); }
 		to { opacity: 1; transform: translateY(0); }
 	}
 
