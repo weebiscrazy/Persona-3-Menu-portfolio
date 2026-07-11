@@ -25,7 +25,7 @@
 	function handleClose() {
 		if (closing) return;
 		closing = true;
-		setTimeout(() => (window as any).closeSubmenu?.(), 400);
+		(window as any).closeSubmenu?.();
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
@@ -79,7 +79,6 @@
 	aria-label="About"
 	onkeydown={handleKeydown}
 	tabindex="-1"
-	class:about-closing={closing}
 >
 	<!-- Phase 1: Eye cut-in from above -->
 	{#if phase === "eye"}
@@ -230,15 +229,6 @@
 	.about-root {
 		background: transparent;
 		outline: none;
-	}
-	.about-closing {
-		opacity: 0;
-		transition: opacity 0.25s ease-out;
-	}
-	.about-closing .about-info-side,
-	.about-closing .about-tab-active {
-		backdrop-filter: none;
-		-webkit-backdrop-filter: none;
 	}
 
 	/* ===== PHASE: EYE ===== */
