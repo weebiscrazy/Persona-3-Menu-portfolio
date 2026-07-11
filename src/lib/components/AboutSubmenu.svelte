@@ -227,8 +227,19 @@
 
 <style>
 	/* === Root === */
-	.about-root { background: transparent; outline: none; }
-	.about-closing { animation: about-fade-out 0.35s ease-in forwards; }
+	.about-root {
+		background: transparent;
+		outline: none;
+		isolation: isolate;
+		will-change: opacity;
+	}
+	.about-closing {
+		animation: about-fade-out 0.35s ease-in forwards;
+	}
+	.about-closing .about-info-side,
+	.about-closing .about-tab-active {
+		backdrop-filter: none;
+	}
 	@keyframes about-fade-out { from { opacity: 1; } to { opacity: 0; } }
 
 	/* ===== PHASE: EYE ===== */
