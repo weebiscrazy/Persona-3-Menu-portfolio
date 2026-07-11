@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import Control from "./Control.svelte";
+	import ParticleCanvas from "./ParticleCanvas.svelte";
 	import { profileData } from "$lib/portfolio";
 	import { cn } from "$lib/utils";
 
@@ -128,6 +129,7 @@
 
 		{#if phase === "content"}
 		<div class="relative z-10 h-full flex flex-col social-content-panel">
+			<ParticleCanvas type="petals" class="pointer-events-none" />
 			<!-- Header -->
 			<header class="social-header">
 				<div class="social-title-row">
@@ -164,7 +166,7 @@
 										class={cn(
 											"social-link-card group",
 										)}
-										style="animation-delay: {0.08 + i * 0.07}s"
+										style="animation-delay: {0.3 + i * 0.12}s"
 									>
 										<div class="social-link-icon-wrap" style="background: {link.color}">
 											<iconify-icon icon={link.icon} class="text-2xl text-bg"></iconify-icon>
@@ -447,8 +449,9 @@
 		animation: stagger-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 	}
 	@keyframes stagger-in {
-		from { opacity: 0; transform: translateY(12px); }
-		to { opacity: 1; transform: translateY(0); }
+		from { opacity: 0; transform: translateY(20px) rotate(-3deg) scale(0.92); }
+		50% { transform: translateY(-4px) rotate(1deg) scale(1.02); }
+		to { opacity: 1; transform: translateY(0) rotate(0) scale(1); }
 	}
 	.social-link-card:hover {
 		border-color: rgba(232,88,140,0.5);

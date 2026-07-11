@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import Control from "./Control.svelte";
+	import ParticleCanvas from "./ParticleCanvas.svelte";
 	import { personaData } from "$lib/portfolio";
 	import { cn } from "$lib/utils";
 
@@ -124,8 +125,9 @@
 			/>
 		{/if}
 
-		{#if phase === "content"}
+{#if phase === "content"}
 		<div class="relative z-10 h-full flex flex-col persona-content-panel">
+			<ParticleCanvas type="data" class="pointer-events-none" />
 			<header class="persona-header">
 				<div class="persona-title-row">
 					<img src="/arcana/hermit.png" alt="Hermit" class="persona-arcana-icon" />
@@ -161,7 +163,7 @@
 												"hover:border-green/50 hover:bg-fg/10 hover:shadow-[0_0_30px_rgba(74,222,128,0.1)]",
 												"transition-all duration-300"
 											)}
-											style="animation-delay: {0.08 + i * 0.07}s"
+style="animation-delay: {0.3 + i * 0.12}s"
 										>
 											<div class="flex items-start gap-4 mb-4">
 												<div class="size-14 rounded-xl flex items-center justify-center shrink-0" style="background: {persona.color}">
@@ -197,7 +199,7 @@
 											"hover:border-green/30 hover:bg-fg/10 hover:shadow-[0_0_20px_rgba(74,222,128,0.08)]",
 											"transition-all duration-300"
 										)}
-										style="animation-delay: {0.08 + i * 0.07}s"
+										style="animation-delay: {0.3 + i * 0.12}s"
 									>
 										<div class="flex items-start gap-4">
 											<div class="size-10 rounded-lg flex items-center justify-center shrink-0" style="background: {persona.color}">
@@ -211,7 +213,7 @@
 									</div>
 								{/each}
 
-								<div class="mt-12 p-6 rounded-2xl bg-gradient-to-r from-green/10 to-emerald/10 border border-fg/10 stagger-in">
+								<div class="mt-12 p-6 rounded-2xl bg-gradient-to-r from-green/10 to-emerald/10 border border-fg/10 stagger-in" style="animation-delay: 0.8s">
 									<h4 class="font-skip text-xl mb-4 text-center text-green" style="text-shadow: var(--text-shadow-border)">Current Build</h4>
 									<div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
 										<div class="p-4 rounded-xl bg-fg/5">
@@ -424,14 +426,19 @@
 	.persona-content-scroll::-webkit-scrollbar-thumb { background: rgba(74,222,128,0.3); border-radius: 2px; }
 
 	/* === Hobby cards === */
-	.persona-hobby-card { animation: stagger-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+	.persona-hobby-card {
+		animation: stagger-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+	}
 	@keyframes stagger-in {
-		from { opacity: 0; transform: translateY(12px); }
-		to { opacity: 1; transform: translateY(0); }
+		from { opacity: 0; transform: translateY(20px) rotate(-3deg) scale(0.92); }
+		50% { transform: translateY(-4px) rotate(1deg) scale(1.02); }
+		to { opacity: 1; transform: translateY(0) rotate(0) scale(1); }
 	}
 
 	/* === Fact cards === */
-	.persona-fact-card { animation: stagger-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+	.persona-fact-card {
+		animation: stagger-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+	}
 
 	/* === Footer === */
 	.persona-footer {

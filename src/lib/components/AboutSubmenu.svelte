@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import Control from "./Control.svelte";
+	import ParticleCanvas from "./ParticleCanvas.svelte";
 	import { profileData } from "$lib/portfolio";
 	import { cn } from "$lib/utils";
 
@@ -126,11 +127,12 @@
 			/>
 		{/if}
 
-		{#if phase === "content"}
+{#if phase === "content"}
 
-		<div class="relative z-10 h-full flex flex-col about-content-panel">
-			<!-- Header -->
-			<header class="about-header">
+	<div class="relative z-10 h-full flex flex-col about-content-panel">
+		<ParticleCanvas type="water" class="pointer-events-none" />
+		<!-- Header -->
+		<header class="about-header">
 				<h1 class="about-title">ABOUT</h1>
 				<div class="flex gap-2" role="tablist">
 					{#each tabs as tab, i}
@@ -168,8 +170,8 @@
 					</div>
 
 					<div class="about-stats-grid">
-						{#each profileData.stats as stat}
-							<div class="about-stat-item">
+						{#each profileData.stats as stat, i}
+							<div class="about-stat-item stagger-in" style="animation-delay: {0.3 + i * 0.12}s">
 								<span class="about-stat-val">{stat.value}</span>
 								<span class="about-stat-lbl">{stat.label}</span>
 							</div>
@@ -177,14 +179,14 @@
 					</div>
 
 					<div class="about-social-row">
-						{#each profileData.socialLinks as link}
-							<a href={link.url} target="_blank" rel="noopener noreferrer" class="about-social-link" style="color: {link.color}" aria-label={link.platform}>
+						{#each profileData.socialLinks as link, i}
+							<a href={link.url} target="_blank" rel="noopener noreferrer" class="about-social-link stagger-in" style="color: {link.color}; animation-delay: {0.3 + i * 0.12}s" aria-label={link.platform}>
 								<iconify-icon icon={link.icon} class="about-social-icon"></iconify-icon>
 							</a>
 						{/each}
 					</div>
 
-					<div class="about-content-divider"></div>
+					<div class="about-content-divider stagger-in" style="animation-delay: 0.6s"></div>
 
 					{#key activeTab}
 						<div class="about-sub-content">
@@ -547,5 +549,12 @@
 	.about-footer {
 		display: flex; align-items: center; justify-content: center;
 		gap: 1.5rem; padding: 0.5rem 0; flex-shrink: 0;
+	}
+
+	/* Card-shuffle stagger animation */
+	@keyframes stagger-in {
+		from { opacity: 0; transform: translateY(20px) rotate(-3deg) scale(0.92); }
+		50% { transform: translateY(-4px) rotate(1deg) scale(1.02); }
+		to { opacity: 1; transform: translateY(0) rotate(0) scale(1); }
 	}
 </style>
