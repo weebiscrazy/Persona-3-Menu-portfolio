@@ -5,9 +5,9 @@
 	import { cn } from "$lib/utils";
 
 	let activeTab = $state(0);
-	let phase = $state<"cover" | "eye" | "aoa" | "content">("cover");
+	let phase = $state<"eye" | "aoa" | "content">("eye");
 	let closing = $state(false);
-	let showNameplate = $state(false);
+	let assetsLoaded = $state(false);
 
 	const tabs = [
 		{ name: "Profile", index: 0, arcanaNumber: "0" },
@@ -26,7 +26,7 @@
 	function handleClose() {
 		if (closing) return;
 		closing = true;
-		setTimeout(() => (window as any).closeSubmenu?.(), 350);
+		setTimeout(() => (window as any).closeSubmenu?.(), 400);
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
@@ -53,6 +53,7 @@
 	}
 
 	onMount(() => {
+		// Preload images before starting sequence
 		const preloadSrcs = [
 			"/T_UI_Camp_Status_Character_Glass_0001.png",
 			"/T_Btl_AlloutFinish_Pc01_A1out.png",
@@ -60,36 +61,26 @@
 			"/T_UI_Camp_Status_Character_0001.png"
 		];
 		let loaded = 0;
-		const onLoad = () => {
-			loaded++;
-			if (loaded === preloadSrcs.length) startSequence();
-		};
 		preloadSrcs.forEach(src => {
 			const img = new Image();
-			img.onload = onLoad;
-			img.onerror = onLoad;
+			img.onload = () => { loaded++; if (loaded === preloadSrcs.length) startSequence(); };
+			img.onerror = () => { loaded++; if (loaded === preloadSrcs.length) startSequence(); };
 			img.src = src;
 		});
-		setTimeout(() => { if (phase === "cover") startSequence(); }, 2500);
+		// Fallback timeout
+		setTimeout(() => { if (!assetsLoaded) startSequence(); }, 3000);
 
 		function startSequence() {
-			if (phase !== "cover") return;
-			phase = "eye";
+			if (assetsLoaded) return;
+			assetsLoaded = true;
 
-			// 900ms eye → aoa
+			// Eye phase (0.9s)
 			setTimeout(() => {
 				if (phase === "content") return;
 				phase = "aoa";
-				showNameplate = false;
-
-				// 400ms later: nameplate
-				setTimeout(() => {
-					if (phase === "content") return;
-					showNameplate = true;
-				}, 400);
 			}, 900);
 
-			// 2500ms aoa → content
+			// AOA phase (1.6s) → content
 			setTimeout(() => {
 				if (phase === "content") return;
 				phase = "content";
@@ -107,38 +98,16 @@
 	tabindex="-1"
 	class:about-closing={closing}
 >
-	<!-- ===== AOA ART BG — ALWAYS MOUNTED from start ===== -->
-	<!-- Hidden during cover/eye, visible during aoa/content -->
-	<div
-		class="absolute inset-0 transition-all duration-500 ease-out"
-		class:aoa-bg-visible={phase === "aoa" || phase === "content"}
-		class:aoa-bg-hidden={phase === "cover" || phase === "eye"}
-		style="background: {AOA_BG};"
-	>
-		<img
-			src="/T_Btl_AlloutFinish_Pc01_A1out.png"
-			alt=""
-			class="absolute inset-0 w-full h-full transition-all duration-700 ease-out"
-			class:aoa-img-active={phase === "aoa"}
-			class:aoa-img-content={phase === "content"}
-		/>
-		<div
-			class="absolute inset-0 transition-all duration-700 ease-out"
-			class:aoa-vignette-content={phase === "content"}
-		></div>
+	<!-- Loading state until assets are preloaded -->
+	{#if !assetsLoaded}
+		<div class="absolute inset-0 bg-bg aoa-loading"></div>
 
-		<!-- Water ripple effect (always visible when AOA bg is) -->
-		<div class="absolute inset-0 opacity-20 aoa-water-ripple"></div>
-	</div>
-
-	<!-- ===== COVER ===== -->
-	{#if phase === "cover"}
-		<div class="absolute inset-0 z-30" style="background: {AOA_BG};"></div>
-
-	<!-- ===== EYE ===== -->
+	<!-- Phase 1: Eye cut-in from above -->
 	{:else if phase === "eye"}
-		<div class="absolute inset-0 z-20 aoa-dim-overlay"></div>
-		<div class="absolute inset-0 z-30 flex items-center justify-center aoa-eye-wrap">
+		<div class="absolute inset-0 z-10 aoa-bg-dim">
+			<div class="absolute inset-0 aoa-bg-dim-overlay"></div>
+		</div>
+		<div class="absolute inset-0 z-20 flex items-center justify-center aoa-eye-wrap">
 			<div class="aoa-eye-frame">
 				<img
 					src="/T_UI_Camp_Status_Character_Glass_0001.png"
@@ -156,18 +125,35 @@
 			</div>
 		</div>
 
-	<!-- ===== AOA (nameplate overlays on AOA art bg) ===== -->
+	<!-- Phase 2: AOA art slam -->
 	{:else if phase === "aoa"}
-		<img
-			src="/T_Btl_AlloutFinishText_Pc01out.png"
-			alt=""
-			class="aoa-nameplate z-20"
-			class:aoa-nameplate-visible={showNameplate}
-		/>
+		<div class="absolute inset-0 aoa-art-layer" style="background: {AOA_BG};">
+			<img
+				src="/T_Btl_AlloutFinish_Pc01_A1out.png"
+				alt="all-out attack"
+				class="absolute inset-0 w-full h-full aoa-art-img"
+			/>
+			<img
+				src="/T_Btl_AlloutFinishText_Pc01out.png"
+				alt=""
+				class="aoa-nameplate"
+			/>
+			<div class="absolute inset-0 aoa-art-vignette"></div>
+		</div>
 
-	<!-- ===== CONTENT ===== -->
+	<!-- Phase 3: Content on AOA background -->
 	{:else}
-		<div class="relative z-20 h-full flex flex-col about-content-panel">
+		<div class="absolute inset-0 aoa-content-bg" style="background: {AOA_BG};">
+			<img
+				src="/T_Btl_AlloutFinish_Pc01_A1out.png"
+				alt=""
+				class="absolute inset-0 w-full h-full object-cover aoa-bg-img"
+			/>
+			<div class="absolute inset-0 aoa-bg-vignette"></div>
+		</div>
+
+		<div class="relative z-10 h-full flex flex-col about-content-panel">
+			<!-- Header -->
 			<header class="about-header">
 				<h1 class="about-title">ABOUT</h1>
 				<div class="flex gap-2" role="tablist">
@@ -182,7 +168,9 @@
 				</div>
 			</header>
 
+			<!-- Body -->
 			<div class="flex-1 flex flex-col md:flex-row gap-6 about-body">
+				<!-- Portrait side -->
 				<div class="about-portrait-side">
 					<div class="about-portrait-inner">
 						<img
@@ -194,6 +182,7 @@
 					</div>
 				</div>
 
+				<!-- Info side -->
 				<div class="about-info-side">
 					<img src="/T_Btl_AlloutFinishText_Pc01out.png" alt="" class="about-info-nameplate" />
 
@@ -262,60 +251,23 @@
 </div>
 
 <style>
+	/* === Root === */
 	.about-root { background: transparent; outline: none; }
 	.about-closing { animation: about-fade-out 0.35s ease-in forwards; }
 	@keyframes about-fade-out { from { opacity: 1; } to { opacity: 0; } }
 
-	/* ===== PERSISTENT AOA BG ===== */
-	.aoa-bg-hidden { opacity: 0; pointer-events: none; }
-	.aoa-bg-visible { opacity: 1; z-index: 1; }
+	/* === Loading === */
+	.aoa-loading { animation: load-fade 0.3s ease-out 2.5s forwards; }
+	@keyframes load-fade { to { opacity: 0; } }
 
-	.aoa-bg-visible .aoa-water-ripple {
-		background:
-			radial-gradient(ellipse at 30% 40%, rgba(255,255,255,0.04) 0%, transparent 50%),
-			radial-gradient(ellipse at 70% 60%, rgba(255,255,255,0.03) 0%, transparent 40%);
-		animation: water-drift 6s ease-in-out infinite alternate;
-	}
-	@keyframes water-drift {
-		0% { transform: translateX(-2%) translateY(-1%) scale(1); }
-		100% { transform: translateX(2%) translateY(1%) scale(1.02); }
-	}
-
-	.aoa-persistent-img {
-		object-fit: cover;
-		object-position: center 30%;
-	}
-
-	.aoa-img-active {
-		opacity: 1;
-		filter: brightness(1);
-		animation: aoa-slam 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-	}
-	@keyframes aoa-slam {
-		from { opacity: 0; transform: scale(1.3); filter: brightness(1.8); }
-		to { opacity: 1; transform: scale(1); filter: brightness(1); }
-	}
-
-	.aoa-img-content {
-		opacity: 0.35;
-		filter: blur(3px) brightness(0.55);
-	}
-
-	.aoa-bg-visible .aoa-persistent-vignette {
-		background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.15) 100%);
-	}
-	.aoa-vignette-content {
-		background: radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.4) 100%) !important;
-	}
-
-	/* ===== COVER ===== */
-
-	/* ===== EYE ===== */
-	.aoa-dim-overlay {
-		background: rgba(0,34,90,0.65);
+	/* ===== PHASE: EYE ===== */
+	.aoa-bg-dim-overlay {
 		animation: dim-in 0.4s ease-out forwards;
 	}
-	@keyframes dim-in { from { opacity: 0; } to { opacity: 1; } }
+	@keyframes dim-in {
+		from { background: rgba(0,34,90,0); }
+		to { background: rgba(0,34,90,0.7); }
+	}
 
 	.aoa-eye-wrap {
 		animation: eye-drop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
@@ -396,28 +348,63 @@
 	}
 	@keyframes impact-in { from { opacity: 0; } to { opacity: 0.5; } }
 
-	/* ===== AOA NAMEPLATE ===== */
+	/* ===== PHASE: AOA ===== */
+	.aoa-art-layer { animation: aoa-bg-in 0.3s ease-out both; }
+	@keyframes aoa-bg-in { from { opacity: 0; } to { opacity: 1; } }
+
+	.aoa-art-img {
+		object-fit: cover;
+		object-position: center 30%;
+		animation: aoa-slam 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+	}
+	@keyframes aoa-slam {
+		from { opacity: 0; transform: scale(1.3); filter: brightness(1.8); }
+		to { opacity: 1; transform: scale(1); filter: brightness(1); }
+	}
+
 	.aoa-nameplate {
 		position: absolute; bottom: 12%; left: 50%; transform: translateX(-50%);
-		width: min(55vw, 450px); height: auto;
-		opacity: 0; transition: opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+		width: min(55vw, 450px); height: auto; z-index: 5;
+		animation: nameplate-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
 		filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
 	}
-	.aoa-nameplate-visible { opacity: 1; }
+	@keyframes nameplate-in {
+		from { opacity: 0; transform: translateX(-50%) translateY(50px); }
+		to { opacity: 1; transform: translateX(-50%) translateY(0); }
+	}
 
-	/* ===== CONTENT PANEL ===== */
+	.aoa-art-vignette {
+		background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.25) 100%);
+		z-index: 2;
+	}
+
+	/* ===== PHASE: CONTENT ===== */
+	.aoa-content-bg { animation: content-bg-in 0.4s ease-out both; }
+	@keyframes content-bg-in { from { opacity: 0; } to { opacity: 1; } }
+
+	.aoa-bg-img {
+		object-fit: cover;
+		object-position: center 30%;
+		opacity: 0.4;
+		filter: blur(2px) brightness(0.6);
+	}
+	.aoa-bg-vignette {
+		background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.35) 100%);
+	}
+
 	.about-content-panel {
 		padding: 1rem;
 		max-width: 1320px;
 		margin: 0 auto;
 		width: 100%;
-		animation: panel-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+		animation: panel-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
 	}
 	@keyframes panel-in {
 		from { opacity: 0; transform: translateY(20px); }
 		to { opacity: 1; transform: translateY(0); }
 	}
 
+	/* === Header === */
 	.about-header {
 		display: flex; align-items: center; justify-content: space-between;
 		padding: 0.5rem 0; flex-shrink: 0;
@@ -438,8 +425,10 @@
 	.about-tab-inactive { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.5); }
 	.about-tab-inactive:hover { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.8); }
 
+	/* === Body === */
 	.about-body { flex: 1; min-height: 0; padding: 0.5rem 0; gap: 1.5rem; }
 
+	/* Portrait */
 	.about-portrait-side { display: none; }
 	@media (min-width: 768px) {
 		.about-portrait-side { display: flex; flex-shrink: 0; width: 260px; align-items: flex-end; }
@@ -464,6 +453,7 @@
 		z-index: 3; pointer-events: none;
 	}
 
+	/* Info side */
 	.about-info-side {
 		flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.5rem;
 		padding: 0.75rem 1rem; border-radius: 0.75rem;
@@ -487,6 +477,7 @@
 		font-style: italic; font-size: 0.85rem; margin-top: 0.1rem;
 	}
 
+	/* Stats */
 	.about-stats-grid {
 		display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.35rem;
 	}
@@ -507,6 +498,7 @@
 		text-align: center;
 	}
 
+	/* Social */
 	.about-social-row { display: flex; gap: 0.4rem; }
 	.about-social-link {
 		width: 2rem; height: 2rem; border-radius: 9999px;
@@ -516,12 +508,14 @@
 	.about-social-link:hover { background: rgba(255,255,255,0.12); transform: scale(1.1); }
 	.about-social-icon { font-size: 1rem; }
 
+	/* Divider */
 	.about-content-divider {
 		height: 1px;
 		background: linear-gradient(90deg, transparent, rgba(21,194,252,0.15), transparent);
 		margin: 0.1rem 0 0.35rem;
 	}
 
+	/* Sub-content */
 	.about-sub-content {
 		flex: 1; overflow-y: auto; max-height: 28vh; padding-right: 0.25rem;
 	}
@@ -567,6 +561,7 @@
 	}
 	.about-fi-icon { font-size: 1rem; flex-shrink: 0; }
 
+	/* Footer */
 	.about-footer {
 		display: flex; align-items: center; justify-content: center;
 		gap: 1.5rem; padding: 0.5rem 0; flex-shrink: 0;
