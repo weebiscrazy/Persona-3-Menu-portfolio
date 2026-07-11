@@ -56,10 +56,10 @@
 	}
 
 	onMount(() => {
-		["/T_UI_Camp_Status_Character_Glass_0004.png",
-		 "/T_Btl_AlloutFinish_Pc04_A1out.png",
-		 "/T_Btl_AlloutFinishText_Pc04out.png",
-		 "/T_UI_Camp_Status_Character_0004.png"
+		["/T_UI_Camp_Status_Character_Glass_0002.png",
+		 "/T_Btl_AlloutFinish_Pc02_A1out.png",
+		 "/T_Btl_AlloutFinishText_Pc02out.png",
+		 "/T_UI_Camp_Status_Character_0002.png"
 		].forEach(src => { const img = new Image(); img.src = src; });
 
 		setTimeout(() => {
@@ -91,7 +91,7 @@
 		<div class="absolute inset-0 z-20 flex items-center justify-center social-eye-wrap">
 			<div class="social-eye-frame">
 				<img
-					src="/T_UI_Camp_Status_Character_Glass_0004.png"
+					src="/T_UI_Camp_Status_Character_Glass_0002.png"
 					alt="eye cut-in"
 					class="social-eye-img"
 				/>
@@ -110,7 +110,7 @@
 	{:else}
 		<div class="absolute inset-0 social-art-layer" style="background: {AOA_BG};">
 			<img
-				src="/T_Btl_AlloutFinish_Pc04_A1out.png"
+				src="/T_Btl_AlloutFinish_Pc02_A1out.png"
 				alt=""
 				class="absolute inset-0 w-full h-full social-art-img"
 				class:social-art-content={phase === "content"}
@@ -120,7 +120,7 @@
 
 		{#if phase === "aoa"}
 			<img
-				src="/T_Btl_AlloutFinishText_Pc04out.png"
+				src="/T_Btl_AlloutFinishText_Pc02out.png"
 				alt=""
 				class="social-nameplate"
 			/>
