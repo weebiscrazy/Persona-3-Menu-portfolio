@@ -30,6 +30,8 @@
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (closing) return;
+		// Stop propagation so the document-level main handler doesn't re-process this key
+		e.stopPropagation();
 		if (e.key === "ArrowRight" && activeTab < tabs.length - 1) {
 			activeTab++;
 			e.preventDefault();
