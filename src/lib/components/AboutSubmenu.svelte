@@ -125,32 +125,27 @@
 			</div>
 		</div>
 
-	<!-- Phase 2: AOA art slam -->
-	{:else if phase === "aoa"}
+	<!-- Phase 2 & 3: AOA art (shared element, no remount) -->
+	{:else}
 		<div class="absolute inset-0 aoa-art-layer" style="background: {AOA_BG};">
 			<img
 				src="/T_Btl_AlloutFinish_Pc01_A1out.png"
-				alt="all-out attack"
+				alt=""
 				class="absolute inset-0 w-full h-full aoa-art-img"
+				class:aoa-art-content={phase === "content"}
 			/>
+			<div class="absolute inset-0 aoa-art-vignette" class:aoa-vig-strong={phase === "content"}></div>
+		</div>
+
+		{#if phase === "aoa"}
 			<img
 				src="/T_Btl_AlloutFinishText_Pc01out.png"
 				alt=""
 				class="aoa-nameplate"
 			/>
-			<div class="absolute inset-0 aoa-art-vignette"></div>
-		</div>
+		{/if}
 
-	<!-- Phase 3: Content on AOA background -->
-	{:else}
-		<div class="absolute inset-0 aoa-content-bg" style="background: {AOA_BG};">
-			<img
-				src="/T_Btl_AlloutFinish_Pc01_A1out.png"
-				alt=""
-				class="absolute inset-0 w-full h-full object-cover aoa-bg-img"
-			/>
-			<div class="absolute inset-0 aoa-bg-vignette"></div>
-		</div>
+		{#if phase === "content"}
 
 		<div class="relative z-10 h-full flex flex-col about-content-panel">
 			<!-- Header -->
@@ -247,6 +242,7 @@
 				<Control key="B">Back</Control>
 			</footer>
 		</div>
+	{/if}
 	{/if}
 </div>
 
@@ -356,10 +352,16 @@
 		object-fit: cover;
 		object-position: center 30%;
 		animation: aoa-slam 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+		transition: opacity 0.6s ease-out, filter 0.6s ease-out;
 	}
 	@keyframes aoa-slam {
 		from { opacity: 0; transform: scale(1.3); filter: brightness(1.8); }
 		to { opacity: 1; transform: scale(1); filter: brightness(1); }
+	}
+
+	.aoa-art-content {
+		opacity: 0.35;
+		filter: blur(3px) brightness(0.55);
 	}
 
 	.aoa-nameplate {
@@ -376,20 +378,10 @@
 	.aoa-art-vignette {
 		background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.25) 100%);
 		z-index: 2;
+		transition: all 0.6s ease-out;
 	}
-
-	/* ===== PHASE: CONTENT ===== */
-	.aoa-content-bg { animation: content-bg-in 0.4s ease-out both; }
-	@keyframes content-bg-in { from { opacity: 0; } to { opacity: 1; } }
-
-	.aoa-bg-img {
-		object-fit: cover;
-		object-position: center 30%;
-		opacity: 0.4;
-		filter: blur(2px) brightness(0.6);
-	}
-	.aoa-bg-vignette {
-		background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.35) 100%);
+	.aoa-vig-strong {
+		background: radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.4) 100%);
 	}
 
 	.about-content-panel {
