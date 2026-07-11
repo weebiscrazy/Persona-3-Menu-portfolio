@@ -66,12 +66,12 @@
 		setTimeout(() => {
 			if (phase === "content") return;
 			phase = "aoa";
-		}, 2000);
+		}, 1500);
 
 		setTimeout(() => {
 			if (phase === "content") return;
 			phase = "content";
-		}, 4500);
+		}, 3500);
 	});
 </script>
 
@@ -270,14 +270,14 @@
 	}
 
 	/* ===== PHASE: EYE — Cherry Blossom Storm ===== */
-	/* Soft sakura twilight */
+	/* Dark neutral backdrop — pink eye pops against it */
 	.social-bg-dim-overlay {
-		animation: sakura-dim 0.9s ease-out forwards;
+		animation: sakura-dim 0.7s ease-out forwards;
 	}
 	@keyframes sakura-dim {
-		0% { background: rgba(80,10,40,0); }
-		35% { background: rgba(120,20,60,0.3); }
-		100% { background: rgba(80,10,40,0.5); }
+		0% { background: rgba(0,0,0,0); }
+		30% { background: rgba(15,10,20,0.35); }
+		100% { background: rgba(10,8,18,0.55); }
 	}
 
 	/* Soft pink ambient glow */
@@ -330,19 +330,18 @@
 		100% { transform: translateY(-105vh) rotate(calc(var(--f-r) + 120deg)) scale(0.6); opacity: 0; }
 	}
 
-	/* Petal shimmer overlay */
+	/* Subtle pink highlight overlay */
 	.social-petal-shimmer {
 		position: absolute; inset: 0; z-index: 4; pointer-events: none;
 		background: linear-gradient(135deg,
 			transparent 25%,
-			rgba(253,119,217,0.05) 35%,
-			rgba(255,255,255,0.04) 40%,
-			rgba(232,88,140,0.03) 45%,
+			rgba(253,119,217,0.06) 35%,
+			rgba(255,255,255,0.05) 40%,
+			rgba(232,88,140,0.04) 45%,
 			transparent 55%
 		);
 		background-size: 300% 300%;
 		animation: petal-shimmer 3s ease-in-out infinite;
-		mix-blend-mode: overlay;
 	}
 	@keyframes petal-shimmer {
 		0% { background-position: 0% 50%; opacity: 0.2; }
@@ -384,19 +383,19 @@
 
 	/* Eye wrap — graceful flower bloom */
 	.social-eye-wrap {
-		animation: blossom-reveal 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both,
-				   blossom-breathe 2.5s ease-in-out 1.0s infinite;
+		animation: blossom-reveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+				   blossom-breathe 2.5s ease-in-out 0.7s infinite;
 		position: relative; z-index: 2;
 	}
 	@keyframes blossom-reveal {
-		0% { opacity: 0; transform: scale(0.3) rotate(-8deg) translateY(20px); filter: blur(5px) saturate(2); }
-		30% { opacity: 0.8; transform: scale(1.12) rotate(2deg) translateY(-5px); filter: blur(0) saturate(1.5); }
-		60% { opacity: 1; transform: scale(0.98) rotate(-1deg) translateY(1px); filter: blur(0) saturate(0.95); }
+		0% { opacity: 0; transform: scale(0.4) rotate(-6deg) translateY(15px); filter: blur(3px) saturate(2); }
+		25% { opacity: 0.85; transform: scale(1.08) rotate(1.5deg) translateY(-3px); filter: blur(0) saturate(1.4); }
+		55% { opacity: 1; transform: scale(0.99) rotate(-0.5deg) translateY(1px); filter: blur(0) saturate(0.95); }
 		100% { opacity: 1; transform: scale(1) rotate(0deg) translateY(0); filter: blur(0) saturate(1); }
 	}
 	@keyframes blossom-breathe {
 		0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 0px rgba(232,88,140,0)); }
-		50% { transform: scale(1.02) rotate(0.5deg); filter: drop-shadow(0 0 50px rgba(232,88,140,0.25)) drop-shadow(0 0 100px rgba(253,119,217,0.12)); }
+		50% { transform: scale(1.02) rotate(0.5deg); filter: drop-shadow(0 0 60px rgba(232,88,140,0.3)) drop-shadow(0 0 120px rgba(253,119,217,0.15)); }
 	}
 
 	.social-eye-frame {
@@ -410,13 +409,13 @@
 
 	.social-eye-img {
 		width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2;
-		animation: bloom-zoom 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-		filter: drop-shadow(0 0 80px rgba(232,88,140,0.35)) drop-shadow(0 0 160px rgba(253,119,217,0.18));
+		animation: bloom-zoom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+		filter: drop-shadow(0 0 100px rgba(232,88,140,0.45)) drop-shadow(0 0 200px rgba(253,119,217,0.25));
 	}
 	@keyframes bloom-zoom {
-		0% { opacity: 0; transform: scale(0.5) rotate(-5deg); filter: brightness(2.8) saturate(0.4) hue-rotate(-20deg) blur(3px); }
-		40% { opacity: 0.85; transform: scale(1.08) rotate(2deg); filter: brightness(1.4) saturate(1.3) hue-rotate(5deg) blur(0); }
-		70% { opacity: 1; transform: scale(0.98) rotate(-0.5deg); filter: brightness(1.05) saturate(1) hue-rotate(0deg); }
+		0% { opacity: 0; transform: scale(0.35) rotate(-5deg); filter: brightness(2) saturate(0.6) hue-rotate(-15deg) blur(2px); }
+		35% { opacity: 0.9; transform: scale(1.06) rotate(1.5deg); filter: brightness(1.3) saturate(1.2) hue-rotate(3deg) blur(0); }
+		65% { opacity: 1; transform: scale(0.99) rotate(-0.5deg); filter: brightness(1.05) saturate(1) hue-rotate(0deg); }
 		100% { opacity: 1; transform: scale(1) rotate(0deg); filter: brightness(1) saturate(1) hue-rotate(0deg); }
 	}
 

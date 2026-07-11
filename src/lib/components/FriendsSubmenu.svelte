@@ -66,8 +66,8 @@
 		 "/T_UI_Camp_Status_Character_0004.png"
 		].forEach(src => { const img = new Image(); img.src = src; });
 
-		setTimeout(() => { if (phase !== "content") phase = "aoa"; }, 2000);
-		setTimeout(() => { if (phase !== "content") phase = "content"; }, 4500);
+		setTimeout(() => { if (phase !== "content") phase = "aoa"; }, 1500);
+		setTimeout(() => { if (phase !== "content") phase = "content"; }, 3500);
 	});
 </script>
 
