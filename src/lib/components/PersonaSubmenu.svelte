@@ -66,12 +66,12 @@
 		setTimeout(() => {
 			if (phase === "content") return;
 			phase = "aoa";
-		}, 900);
+		}, 2000);
 
 		setTimeout(() => {
 			if (phase === "content") return;
 			phase = "content";
-		}, 2500);
+		}, 4500);
 	});
 </script>
 
@@ -103,8 +103,8 @@
 						alt="eye cut-in"
 						class="persona-eye-img"
 					/>
-					{#each Array(35) as _, i}
-						<div class="persona-glitch-square" style="--gs-left: {2 + (i * 11) % 92}%; --gs-top: {3 + (i * 9) % 90}%; --gs-delay: {0.3 + (i % 20) * 0.04}s; --gs-color: {i % 3 === 0 ? 'rgba(234,179,8,0.4)' : i % 3 === 1 ? 'rgba(255,255,255,0.15)' : 'rgba(234,179,8,0.2)'}; --gs-size: {6 + (i % 6) * 4}px"></div>
+					{#each Array(15) as _, i}
+						<div class="persona-glitch-square" style="--gs-left: {5 + (i * 16) % 88}%; --gs-top: {6 + (i * 22) % 84}%; --gs-delay: {0.3 + (i % 10) * 0.06}s; --gs-color: {i % 3 === 0 ? 'rgba(234,179,8,0.4)' : i % 3 === 1 ? 'rgba(255,255,255,0.15)' : 'rgba(234,179,8,0.2)'}; --gs-size: {8 + (i % 4) * 6}px"></div>
 					{/each}
 					<div class="persona-eye-glitch" aria-hidden="true"></div>
 					<div class="persona-eye-border"></div>

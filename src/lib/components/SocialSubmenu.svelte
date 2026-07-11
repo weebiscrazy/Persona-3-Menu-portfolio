@@ -66,12 +66,12 @@
 		setTimeout(() => {
 			if (phase === "content") return;
 			phase = "aoa";
-		}, 900);
+		}, 2000);
 
 		setTimeout(() => {
 			if (phase === "content") return;
 			phase = "content";
-		}, 2500);
+		}, 4500);
 	});
 </script>
 
@@ -272,12 +272,12 @@
 	/* ===== PHASE: EYE — Cherry Blossom Storm ===== */
 	/* Soft sakura twilight */
 	.social-bg-dim-overlay {
-		animation: sakura-dim 0.7s ease-out forwards;
+		animation: sakura-dim 0.9s ease-out forwards;
 	}
 	@keyframes sakura-dim {
 		0% { background: rgba(80,10,40,0); }
-		40% { background: rgba(120,20,60,0.4); }
-		100% { background: rgba(80,10,40,0.75); }
+		35% { background: rgba(120,20,60,0.3); }
+		100% { background: rgba(80,10,40,0.5); }
 	}
 
 	/* Soft pink ambient glow */
@@ -384,19 +384,19 @@
 
 	/* Eye wrap — graceful flower bloom */
 	.social-eye-wrap {
-		animation: blossom-reveal 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both,
-				   blossom-breathe 2.5s ease-in-out 0.7s infinite;
+		animation: blossom-reveal 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+				   blossom-breathe 2.5s ease-in-out 1.0s infinite;
 		position: relative; z-index: 2;
 	}
 	@keyframes blossom-reveal {
-		0% { opacity: 0; transform: scale(0.15) rotate(-12deg) translateY(30px); filter: blur(6px) saturate(2); }
-		35% { opacity: 0.7; transform: scale(1.1) rotate(2deg) translateY(-5px); filter: blur(1px) saturate(1.4); }
-		65% { opacity: 1; transform: scale(0.97) rotate(-1deg) translateY(2px); filter: blur(0) saturate(0.9); }
+		0% { opacity: 0; transform: scale(0.3) rotate(-8deg) translateY(20px); filter: blur(5px) saturate(2); }
+		30% { opacity: 0.8; transform: scale(1.12) rotate(2deg) translateY(-5px); filter: blur(0) saturate(1.5); }
+		60% { opacity: 1; transform: scale(0.98) rotate(-1deg) translateY(1px); filter: blur(0) saturate(0.95); }
 		100% { opacity: 1; transform: scale(1) rotate(0deg) translateY(0); filter: blur(0) saturate(1); }
 	}
 	@keyframes blossom-breathe {
 		0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 0px rgba(232,88,140,0)); }
-		50% { transform: scale(1.015) rotate(0.5deg); filter: drop-shadow(0 0 40px rgba(232,88,140,0.2)) drop-shadow(0 0 80px rgba(253,119,217,0.1)); }
+		50% { transform: scale(1.02) rotate(0.5deg); filter: drop-shadow(0 0 50px rgba(232,88,140,0.25)) drop-shadow(0 0 100px rgba(253,119,217,0.12)); }
 	}
 
 	.social-eye-frame {
@@ -410,12 +410,13 @@
 
 	.social-eye-img {
 		width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2;
-		animation: bloom-zoom 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-		filter: drop-shadow(0 0 60px rgba(232,88,140,0.3)) drop-shadow(0 0 120px rgba(253,119,217,0.15));
+		animation: bloom-zoom 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+		filter: drop-shadow(0 0 80px rgba(232,88,140,0.35)) drop-shadow(0 0 160px rgba(253,119,217,0.18));
 	}
 	@keyframes bloom-zoom {
-		0% { opacity: 0; transform: scale(0.6) rotate(-5deg); filter: brightness(2.5) saturate(0.5) hue-rotate(-20deg); }
-		50% { opacity: 0.8; transform: scale(1.06) rotate(1deg); filter: brightness(1.3) saturate(1.2) hue-rotate(5deg); }
+		0% { opacity: 0; transform: scale(0.5) rotate(-5deg); filter: brightness(2.8) saturate(0.4) hue-rotate(-20deg) blur(3px); }
+		40% { opacity: 0.85; transform: scale(1.08) rotate(2deg); filter: brightness(1.4) saturate(1.3) hue-rotate(5deg) blur(0); }
+		70% { opacity: 1; transform: scale(0.98) rotate(-0.5deg); filter: brightness(1.05) saturate(1) hue-rotate(0deg); }
 		100% { opacity: 1; transform: scale(1) rotate(0deg); filter: brightness(1) saturate(1) hue-rotate(0deg); }
 	}
 
@@ -424,13 +425,13 @@
 		position: absolute; inset: -10px; z-index: 3; pointer-events: none;
 		border: 2px solid rgba(232,88,140,0.4);
 		clip-path: polygon(0% 5%, 3% 0%, 97% 2%, 100% 4%, 100% 96%, 96% 100%, 4% 98%, 0% 95%);
-		animation: blossom-border 0.8s ease-out forwards;
+		animation: blossom-border 1s ease-out forwards;
 	}
 	@keyframes blossom-border {
 		0% { border-color: rgba(255,255,255,0); opacity: 0; border-width: 3px; transform: scale(0.9); }
-		20% { border-color: rgba(253,119,217,1); opacity: 1; border-width: 3px; transform: scale(1.02); box-shadow: 0 0 40px rgba(232,88,140,0.3), inset 0 0 40px rgba(232,88,140,0.08); }
-		50% { border-color: rgba(255,255,255,0.6); border-width: 2px; }
-		100% { border-color: rgba(232,88,140,0.4); opacity: 0.9; border-width: 1.5px; transform: scale(1); box-shadow: 0 0 15px rgba(232,88,140,0.1); }
+		15% { border-color: rgba(253,119,217,1); opacity: 1; border-width: 3px; transform: scale(1.04); box-shadow: 0 0 60px rgba(232,88,140,0.4), inset 0 0 60px rgba(232,88,140,0.1); }
+		45% { border-color: rgba(255,255,255,0.7); border-width: 2px; }
+		100% { border-color: rgba(232,88,140,0.6); opacity: 1; border-width: 1.5px; transform: scale(1); box-shadow: 0 0 25px rgba(232,88,140,0.15); }
 	}
 
 	/* Corner brackets — pink pulse */
@@ -450,22 +451,22 @@
 
 	/* "!!" — sakura energy marks */
 	.social-exclamation {
-		position: absolute; font-family: var(--font-skip); font-size: 2.8rem;
-		color: #fff; z-index: 5; pointer-events: none; line-height: 1;
-		text-shadow: 0 0 30px rgba(232,88,140,0.9), 0 0 60px rgba(253,119,217,0.5), 0 0 100px rgba(232,88,140,0.2);
-		animation: petal-ex-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both,
+		position: absolute; font-family: var(--font-skip); font-size: 3rem;
+		color: #ffe0f0; z-index: 5; pointer-events: none; line-height: 1;
+		text-shadow: 0 0 40px rgba(232,88,140,1), 0 0 80px rgba(253,119,217,0.6), 0 0 120px rgba(232,88,140,0.3);
+		animation: petal-ex-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both,
 				   petal-ex-glow 2s ease-in-out 0.5s infinite;
 	}
-	.social-ex-left { top: -18px; left: 10%; }
-	.social-ex-right { bottom: -18px; right: 10%; }
+	.social-ex-left { top: -20px; left: 10%; }
+	.social-ex-right { bottom: -20px; right: 10%; }
 	@keyframes petal-ex-pop {
 		0% { opacity: 0; transform: scale(0.2) rotate(-15deg) translateY(10px); filter: blur(4px); }
-		60% { opacity: 1; transform: scale(1.2) rotate(3deg) translateY(-3px); filter: blur(0); }
+		50% { opacity: 1; transform: scale(1.3) rotate(3deg) translateY(-3px); filter: blur(0); }
 		100% { opacity: 1; transform: scale(1) rotate(0deg) translateY(0); filter: blur(0); }
 	}
 	@keyframes petal-ex-glow {
-		0%, 100% { text-shadow: 0 0 30px rgba(232,88,140,0.9), 0 0 60px rgba(253,119,217,0.5); }
-		50% { text-shadow: 0 0 50px rgba(232,88,140,1), 0 0 100px rgba(253,119,217,0.7), 0 0 150px rgba(232,88,140,0.3); }
+		0%, 100% { text-shadow: 0 0 40px rgba(232,88,140,1), 0 0 80px rgba(253,119,217,0.6); }
+		50% { text-shadow: 0 0 60px rgba(232,88,140,1), 0 0 120px rgba(253,119,217,0.8), 0 0 160px rgba(232,88,140,0.4); }
 	}
 
 	/* ===== PHASE: AOA ===== */

@@ -66,12 +66,12 @@
 		setTimeout(() => {
 			if (phase === "content") return;
 			phase = "aoa";
-		}, 900);
+		}, 2000);
 
 		setTimeout(() => {
 			if (phase === "content") return;
 			phase = "content";
-		}, 2500);
+		}, 4500);
 	});
 </script>
 
