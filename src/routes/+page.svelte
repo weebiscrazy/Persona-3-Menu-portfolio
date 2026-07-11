@@ -1,11 +1,10 @@
 <script lang="ts">
 	import Option from "$lib/components/Option.svelte";
-	import { fade } from "svelte/transition";
+	import { fade, fly } from "svelte/transition";
 	import type { OptionValue, SubmenuType, ViewState } from "$lib/types";
 	import { onMount } from "svelte";
 	import { Howl } from "howler";
 	import { animate } from "animejs";
-	import { playNav, playSelect, playOpen, playClose, playConfirm } from "$lib/sounds";
 
 	import Control from "$lib/components/Control.svelte";
 	import SettingsOption from "$lib/components/SettingsOption.svelte";
@@ -49,13 +48,22 @@
 	let activeSubmenu = $state<SubmenuType | null>(null);
 	let submenuTabIndex = $state(0);
 
-	let isTransitioning = $state(false);
+	let arcanaImage = $state<string | null>(null);
+	let isArcanaVisible = $state(false);
+	let burstColor = $state("#fff");
+	let showBurst = $state(false);
+
+	const navigationSound = new Howl({ src: ["/sfx/navigation.wav"], volume: 0.5 });
+	const selectSound = new Howl({ src: ["/sfx/navigation.wav"], volume: 0.6 });
+
+	function playNavSound() { if (isSFXEnabled) navigationSound.play(); }
+	function playSelectSound() { if (isSFXEnabled) selectSound.play(); }
 
 	function setIndex(index: number) {
 		if (index === selectedIndex) return;
 		selectedIndex = index;
 		currentOptionElement = document.getElementById(`option-${index}`) as HTMLButtonElement;
-		if (isSFXEnabled) playNav();
+		playNavSound();
 	}
 
 	function setSettingsIndex(index: number) {
@@ -69,32 +77,35 @@
 	}
 
 	function openSubmenu(type: SubmenuType) {
-		isTransitioning = true;
-		if (isSFXEnabled) playOpen();
+		const option = options.find(o => o.name.toLowerCase() === type);
+		arcanaImage = option?.arcana || null;
+		isArcanaVisible = true;
+		playSelectSound();
 		setTimeout(() => {
 			activeSubmenu = type;
 			currentView = "submenu";
 			submenuTabIndex = 0;
-			if (isSFXEnabled) playConfirm();
+			isArcanaVisible = false;
+			playSelectSound();
+			// Particle burst
+			burstColor = option?.color || "#fff";
+			showBurst = true;
+			setTimeout(() => { showBurst = false; }, 500);
 			setTimeout(() => {
-				isTransitioning = false;
 				const submenu = document.querySelector('[role="dialog"]') as HTMLElement;
 				submenu?.focus();
 			}, 50);
-		}, 350);
+		}, 700);
 	}
 
 	function closeSubmenu() {
-		isTransitioning = true;
-		if (isSFXEnabled) playClose();
+		activeSubmenu = null;
+		currentView = "main";
+		arcanaImage = null;
+		playNavSound();
 		setTimeout(() => {
-			activeSubmenu = null;
-			currentView = "main";
-			isTransitioning = false;
-			setTimeout(() => {
-				currentOptionElement?.focus();
-			}, 50);
-		}, 350);
+			currentOptionElement?.focus();
+		}, 50);
 	}
 
 	if (typeof window !== "undefined") {
@@ -121,7 +132,7 @@
 	}
 
 	function handleMainKeydown(e: KeyboardEvent) {
-		if (!isStarted || currentView === "submenu" || isTransitioning) return;
+		if (!isStarted || currentView === "submenu" || isArcanaVisible) return;
 
 		if (e.key === "ArrowDown" || e.key === "s") {
 			setIndex((selectedIndex + 1) % options.length);
@@ -132,7 +143,7 @@
 			const selectedOption = options[selectedIndex].name;
 			if (selectedOption === "SYSTEM") {
 				setSettingsIndex(0);
-				if (isSFXEnabled) playSelect();
+				playSelectSound();
 			} else {
 				openSubmenu(selectedOption.toLowerCase() as SubmenuType);
 			}
@@ -217,32 +228,48 @@
 	<!-- mobile dark overlay -->
 	<div class="fixed inset-0 bg-black/40 md:bg-transparent -z-10 pointer-events-none"></div>
 
-	<!-- Submenu Overlay — slides in from right -->
-	<div class="fixed inset-0 z-50 pointer-events-none"
-	     class:submenu-active={currentView === "submenu" && activeSubmenu}>
-		<div class="submenu-panel">
-			{#if currentView === "submenu" && activeSubmenu}
-				{#if activeSubmenu === "about"}
-					<AboutSubmenu />
-				{:else if activeSubmenu === "social"}
-					<SocialSubmenu />
-				{:else if activeSubmenu === "friends"}
-					<FriendsSubmenu />
-				{:else if activeSubmenu === "persona"}
-					<PersonaSubmenu />
-				{/if}
-			{/if}
+	<!-- Arcana Card Flip -->
+	{#if isArcanaVisible && arcanaImage}
+		<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70" transition:fade={{ duration: 200 }}>
+			<div class="arcana-card-flip">
+				<img
+					src={arcanaImage}
+					alt="arcana"
+					class="arcana-card-img"
+				/>
+			</div>
 		</div>
-	</div>
+	{/if}
 
-	<!-- Main Menu Options — slides left when submenu opens -->
-	<div class="flex flex-col justify-center h-full relative
+	<!-- Particle Burst -->
+	{#if showBurst}
+		<div class="fixed inset-0 z-40 pointer-events-none" transition:fade={{ duration: 200 }}>
+			{#each Array(24) as _, i}
+				<div class="burst-particle" style="--b-angle: {i * 15}deg; --b-color: {burstColor}; --b-delay: {(i % 6) * 0.03}s; --b-size: {6 + (i % 4) * 4}px; --b-dist: {80 + (i % 6) * 30}px"></div>
+			{/each}
+		</div>
+	{/if}
+
+	<!-- Submenu Overlay -->
+	{#if currentView === "submenu" && activeSubmenu}
+		{#if activeSubmenu === "about"}
+			<AboutSubmenu />
+		{:else if activeSubmenu === "social"}
+			<SocialSubmenu />
+		{:else if activeSubmenu === "friends"}
+			<FriendsSubmenu />
+		{:else if activeSubmenu === "persona"}
+			<PersonaSubmenu />
+		{/if}
+	{/if}
+
+	<!-- Main Menu Options -->
+	<div class="flex flex-col justify-center h-full relative md:transition-all md:duration-500
 	            md:left-[42rem] 3xl:left-[55rem]
 	            space-y-4 md:-space-y-32
 	            md:items-start items-center
-	            w-full md:w-auto px-4 md:px-0
-	            transition-all duration-400 ease-out"
-	     class:menu-exit={currentView !== "main"}>
+	            w-full md:w-auto px-4 md:px-0"
+	     transition:fly={{ y: currentView === "main" ? 0 : 80, duration: 300 }}>
 		{#each options as option, i}
 			<Option
 				index={i}
@@ -287,24 +314,46 @@
 </main>
 
 <style>
-	/* Main menu — slide left & dim when submenu opens */
-	.menu-exit {
-		transform: translateX(-40%) scale(0.92);
-		opacity: 0.25;
-		filter: blur(1px);
-		pointer-events: none;
+	/* Arcana card flip animation */
+	.arcana-card-flip {
+		width: min(60vw, 280px);
+		aspect-ratio: 3 / 5;
+		perspective: 1000px;
+		animation: arcana-reveal 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+	}
+	.arcana-card-img {
+		width: 100%; height: 100%; object-fit: contain;
+		animation: card-flip 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+		filter: drop-shadow(0 0 60px rgba(255,255,255,0.3)) drop-shadow(0 0 120px rgba(255,255,255,0.1));
+	}
+	@keyframes arcana-reveal {
+		0% { transform: scale(0.3) translateY(40px); opacity: 0; }
+		50% { transform: scale(1.1) translateY(-5px); opacity: 1; }
+		100% { transform: scale(1) translateY(0); opacity: 1; }
+	}
+	@keyframes card-flip {
+		0% { transform: rotateY(90deg) scale(0.5); filter: brightness(2) saturate(0.3); }
+		50% { transform: rotateY(10deg) scale(1.05); filter: brightness(1.2) saturate(1); }
+		100% { transform: rotateY(0deg) scale(1); filter: brightness(1) saturate(1); }
 	}
 
-	/* Submenu container — slides in from right */
-	.submenu-active {
-		pointer-events: auto;
+	/* Particle burst */
+	.burst-particle {
+		position: absolute;
+		left: 50%; top: 50%;
+		width: var(--b-size); height: var(--b-size);
+		margin-left: calc(var(--b-size) * -0.5);
+		margin-top: calc(var(--b-size) * -0.5);
+		background: var(--b-color);
+		border-radius: 50%;
+		transform: rotate(var(--b-angle)) translateY(0);
+		opacity: 0;
+		animation: burst-fly 0.45s ease-out var(--b-delay) forwards;
+		box-shadow: 0 0 6px var(--b-color), 0 0 20px var(--b-color);
 	}
-	.submenu-panel {
-		height: 100%;
-		transform: translateX(100%);
-		transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-	}
-	.submenu-active .submenu-panel {
-		transform: translateX(0);
+	@keyframes burst-fly {
+		0% { opacity: 1; transform: rotate(var(--b-angle)) translateY(0) scale(1); }
+		60% { opacity: 0.8; transform: rotate(var(--b-angle)) translateY(calc(var(--b-dist) * -1)) scale(0.6); }
+		100% { opacity: 0; transform: rotate(var(--b-angle)) translateY(calc(var(--b-dist) * -1.3)) scale(0.2); }
 	}
 </style>
