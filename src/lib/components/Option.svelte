@@ -27,7 +27,7 @@
   const selectorPath = "M 24.853754, 93.31573 135.14625, 49.684266 114.14751, 97.331142 Z";
   const selectorBackgroundPath = "M 12.7428765,95.50088 144.25712,47.499123 116.75625,95.465764 Z";
   const selectorMaskId = $derived(`selector-mask-${index}`);
-  const selectorTransform = $derived(`translate(-60, -15) rotate(8, 0, 100) scale(${option.name.replaceAll(" ", "").length * 0.7 + 2.5}, 5.0)`);
+  const selectorTransform = $derived(`translate(-50, -15) rotate(8, 0, 100) scale(${option.name.replaceAll(" ", "").length * 0.85 + 3.0}, 6.0)`);
 
   $effect(() => {
     if (isMobile) return;
@@ -146,9 +146,10 @@
  	      x="150"
  	      y="120"
  	      style:fill={option.color}
-          stroke="rgba(0,0,0,0.45)"
-          stroke-width="2"
+          stroke="rgba(0,0,0,0.5)"
+          stroke-width="1.8"
           stroke-linejoin="round"
+          paint-order="stroke fill"
           filter="url(#text-shadow)"
  	      class={cn(
  	        "text-7xl tracking-[-0.14em] italic",
@@ -170,8 +171,9 @@
             x="150"
             y="120"
             stroke="rgba(180,0,0,0.5)"
-            stroke-width="2"
+            stroke-width="1.8"
             stroke-linejoin="round"
+            paint-order="stroke fill"
             filter="url(#text-shadow-glow)"
             class="text-7xl tracking-[-0.14em] italic fill-red"
           >
