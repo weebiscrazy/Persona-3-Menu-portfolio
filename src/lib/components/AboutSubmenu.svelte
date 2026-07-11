@@ -74,23 +74,22 @@
 
 		function startSequence() {
 			if (phase !== "cover") return;
-
 			phase = "eye";
 
-			// Eye phase 900ms → AOA
+			// 900ms eye → aoa
 			setTimeout(() => {
 				if (phase === "content") return;
 				phase = "aoa";
 				showNameplate = false;
 
-				// Nameplate appears 400ms after AOA art
+				// 400ms later: nameplate
 				setTimeout(() => {
 					if (phase === "content") return;
 					showNameplate = true;
 				}, 400);
 			}, 900);
 
-			// AOA phase → content (smooth, art stays)
+			// 2500ms aoa → content
 			setTimeout(() => {
 				if (phase === "content") return;
 				phase = "content";
@@ -108,14 +107,38 @@
 	tabindex="-1"
 	class:about-closing={closing}
 >
-	<!-- === COVER === -->
-	{#if phase === "cover"}
-		<div class="absolute inset-0 aoa-cover" style="background: {AOA_BG};"></div>
+	<!-- ===== AOA ART BG — ALWAYS MOUNTED from start ===== -->
+	<!-- Hidden during cover/eye, visible during aoa/content -->
+	<div
+		class="absolute inset-0 transition-all duration-500 ease-out"
+		class:aoa-bg-visible={phase === "aoa" || phase === "content"}
+		class:aoa-bg-hidden={phase === "cover" || phase === "eye"}
+		style="background: {AOA_BG};"
+	>
+		<img
+			src="/T_Btl_AlloutFinish_Pc01_A1out.png"
+			alt=""
+			class="absolute inset-0 w-full h-full transition-all duration-700 ease-out"
+			class:aoa-img-active={phase === "aoa"}
+			class:aoa-img-content={phase === "content"}
+		/>
+		<div
+			class="absolute inset-0 transition-all duration-700 ease-out"
+			class:aoa-vignette-content={phase === "content"}
+		></div>
 
-	<!-- === PHASE 1: Eye cut-in over dimmed main menu === -->
+		<!-- Water ripple effect (always visible when AOA bg is) -->
+		<div class="absolute inset-0 opacity-20 aoa-water-ripple"></div>
+	</div>
+
+	<!-- ===== COVER ===== -->
+	{#if phase === "cover"}
+		<div class="absolute inset-0 z-30" style="background: {AOA_BG};"></div>
+
+	<!-- ===== EYE ===== -->
 	{:else if phase === "eye"}
-		<div class="absolute inset-0 aoa-dim-overlay"></div>
-		<div class="absolute inset-0 z-20 flex items-center justify-center aoa-eye-wrap">
+		<div class="absolute inset-0 z-20 aoa-dim-overlay"></div>
+		<div class="absolute inset-0 z-30 flex items-center justify-center aoa-eye-wrap">
 			<div class="aoa-eye-frame">
 				<img
 					src="/T_UI_Camp_Status_Character_Glass_0001.png"
@@ -133,127 +156,108 @@
 			</div>
 		</div>
 
-	<!-- === PHASE 2 & 3: AOA art (shared element, smooth transition) === -->
+	<!-- ===== AOA (nameplate overlays on AOA art bg) ===== -->
+	{:else if phase === "aoa"}
+		<img
+			src="/T_Btl_AlloutFinishText_Pc01out.png"
+			alt=""
+			class="aoa-nameplate z-20"
+			class:aoa-nameplate-visible={showNameplate}
+		/>
+
+	<!-- ===== CONTENT ===== -->
 	{:else}
-		<!-- AOA art - SAME element for both aoa and content phases -->
-		<div class="absolute inset-0 aoa-persistent-bg" style="background: {AOA_BG};">
-			<img
-				src="/T_Btl_AlloutFinish_Pc01_A1out.png"
-				alt=""
-				class="absolute inset-0 w-full h-full aoa-persistent-img"
-				class:aoa-img-slam={phase === "aoa"}
-				class:aoa-img-content={phase === "content"}
-			/>
-			<div
-				class="absolute inset-0 aoa-persistent-vignette"
-				class:aoa-vignette-content={phase === "content"}
-			></div>
-		</div>
+		<div class="relative z-20 h-full flex flex-col about-content-panel">
+			<header class="about-header">
+				<h1 class="about-title">ABOUT</h1>
+				<div class="flex gap-2" role="tablist">
+					{#each tabs as tab, i}
+						<button
+							class={cn("about-tab-btn", i === activeTab ? "about-tab-active" : "about-tab-inactive")}
+							role="tab"
+							aria-selected={i === activeTab}
+							onclick={() => handleTabClick(i)}
+						>{tab.name}</button>
+					{/each}
+				</div>
+			</header>
 
-		<!-- Nameplate (appears after delay in AOA phase) -->
-		{#if phase === "aoa"}
-			<img
-				src="/T_Btl_AlloutFinishText_Pc01out.png"
-				alt=""
-				class="aoa-nameplate"
-				class:aoa-nameplate-visible={showNameplate}
-			/>
-		{/if}
-
-		<!-- Content panel (only in content phase) -->
-		{#if phase === "content"}
-			<div class="relative z-10 h-full flex flex-col about-content-panel">
-				<header class="about-header">
-					<h1 class="about-title">ABOUT</h1>
-					<div class="flex gap-2" role="tablist">
-						{#each tabs as tab, i}
-							<button
-								class={cn("about-tab-btn", i === activeTab ? "about-tab-active" : "about-tab-inactive")}
-								role="tab"
-								aria-selected={i === activeTab}
-								onclick={() => handleTabClick(i)}
-							>{tab.name}</button>
-						{/each}
-					</div>
-				</header>
-
-				<div class="flex-1 flex flex-col md:flex-row gap-6 about-body">
-					<div class="about-portrait-side">
-						<div class="about-portrait-inner">
-							<img
-								src="/T_UI_Camp_Status_Character_0001.png"
-								alt=""
-								class="about-camp-img"
-							/>
-							<div class="about-camp-glass"></div>
-						</div>
-					</div>
-
-					<div class="about-info-side">
-						<img src="/T_Btl_AlloutFinishText_Pc01out.png" alt="" class="about-info-nameplate" />
-
-						<div>
-							<h2 class="about-info-title">{profileData.title}</h2>
-							<p class="about-info-tagline">"{profileData.tagline}"</p>
-						</div>
-
-						<div class="about-stats-grid">
-							{#each profileData.stats as stat}
-								<div class="about-stat-item">
-									<span class="about-stat-val">{stat.value}</span>
-									<span class="about-stat-lbl">{stat.label}</span>
-								</div>
-							{/each}
-						</div>
-
-						<div class="about-social-row">
-							{#each profileData.socialLinks as link}
-								<a href={link.url} target="_blank" rel="noopener noreferrer" class="about-social-link" style="color: {link.color}" aria-label={link.platform}>
-									<iconify-icon icon={link.icon} class="about-social-icon"></iconify-icon>
-								</a>
-							{/each}
-						</div>
-
-						<div class="about-content-divider"></div>
-
-						{#key activeTab}
-							<div class="about-sub-content">
-								{#if activeTab === 0}
-									<p class="about-bio-p">{profileData.bio}</p>
-								{:else if activeTab === 1}
-									<div class="grid grid-cols-2 gap-3">
-										{#each profileData.stats as stat}
-											<div class="about-stat-detail">
-												<span class="about-stat-dv">{stat.value}</span>
-												<span class="about-stat-dl">{stat.label}</span>
-											</div>
-										{/each}
-									</div>
-								{:else}
-									<div class="about-bio-wrap">
-										<p class="about-bio-p">{profileData.bio}</p>
-										<div class="about-bio-sep">━━━</div>
-										<div class="about-focus-box">
-											<h3 class="about-focus-h">Current Focus</h3>
-											<ul class="about-focus-list">
-												<li class="about-focus-li"><iconify-icon icon="mdi:rocket-launch" class="about-fi-icon text-pink"></iconify-icon> Building portfolio sites with game-inspired UX</li>
-												<li class="about-focus-li"><iconify-icon icon="mdi:code-braces" class="about-fi-icon text-button-1"></iconify-icon> Learning Rust for systems programming</li>
-												<li class="about-focus-li"><iconify-icon icon="mdi:gamepad-variant" class="about-fi-icon text-button-2"></iconify-icon> Experimenting with Godot 4 for game jams</li>
-											</ul>
-										</div>
-									</div>
-								{/if}
-							</div>
-						{/key}
+			<div class="flex-1 flex flex-col md:flex-row gap-6 about-body">
+				<div class="about-portrait-side">
+					<div class="about-portrait-inner">
+						<img
+							src="/T_UI_Camp_Status_Character_0001.png"
+							alt=""
+							class="about-camp-img"
+						/>
+						<div class="about-camp-glass"></div>
 					</div>
 				</div>
 
-				<footer class="about-footer">
-					<Control key="← →">Tabs</Control>
-					<Control key="B">Back</Control>
-				</footer>
+				<div class="about-info-side">
+					<img src="/T_Btl_AlloutFinishText_Pc01out.png" alt="" class="about-info-nameplate" />
+
+					<div>
+						<h2 class="about-info-title">{profileData.title}</h2>
+						<p class="about-info-tagline">"{profileData.tagline}"</p>
+					</div>
+
+					<div class="about-stats-grid">
+						{#each profileData.stats as stat}
+							<div class="about-stat-item">
+								<span class="about-stat-val">{stat.value}</span>
+								<span class="about-stat-lbl">{stat.label}</span>
+							</div>
+						{/each}
+					</div>
+
+					<div class="about-social-row">
+						{#each profileData.socialLinks as link}
+							<a href={link.url} target="_blank" rel="noopener noreferrer" class="about-social-link" style="color: {link.color}" aria-label={link.platform}>
+								<iconify-icon icon={link.icon} class="about-social-icon"></iconify-icon>
+							</a>
+						{/each}
+					</div>
+
+					<div class="about-content-divider"></div>
+
+					{#key activeTab}
+						<div class="about-sub-content">
+							{#if activeTab === 0}
+								<p class="about-bio-p">{profileData.bio}</p>
+							{:else if activeTab === 1}
+								<div class="grid grid-cols-2 gap-3">
+									{#each profileData.stats as stat}
+										<div class="about-stat-detail">
+											<span class="about-stat-dv">{stat.value}</span>
+											<span class="about-stat-dl">{stat.label}</span>
+										</div>
+									{/each}
+								</div>
+							{:else}
+								<div class="about-bio-wrap">
+									<p class="about-bio-p">{profileData.bio}</p>
+									<div class="about-bio-sep">━━━</div>
+									<div class="about-focus-box">
+										<h3 class="about-focus-h">Current Focus</h3>
+										<ul class="about-focus-list">
+											<li class="about-focus-li"><iconify-icon icon="mdi:rocket-launch" class="about-fi-icon text-pink"></iconify-icon> Building portfolio sites with game-inspired UX</li>
+											<li class="about-focus-li"><iconify-icon icon="mdi:code-braces" class="about-fi-icon text-button-1"></iconify-icon> Learning Rust for systems programming</li>
+											<li class="about-focus-li"><iconify-icon icon="mdi:gamepad-variant" class="about-fi-icon text-button-2"></iconify-icon> Experimenting with Godot 4 for game jams</li>
+										</ul>
+									</div>
+								</div>
+							{/if}
+						</div>
+					{/key}
+				</div>
 			</div>
-		{/if}
+
+			<footer class="about-footer">
+				<Control key="← →">Tabs</Control>
+				<Control key="B">Back</Control>
+			</footer>
+		</div>
 	{/if}
 </div>
 
@@ -262,24 +266,56 @@
 	.about-closing { animation: about-fade-out 0.35s ease-in forwards; }
 	@keyframes about-fade-out { from { opacity: 1; } to { opacity: 0; } }
 
-	/* === COVER === */
-	.aoa-cover {
-		animation: cover-fade 0.4s ease-out forwards;
+	/* ===== PERSISTENT AOA BG ===== */
+	.aoa-bg-hidden { opacity: 0; pointer-events: none; }
+	.aoa-bg-visible { opacity: 1; z-index: 1; }
+
+	.aoa-bg-visible .aoa-water-ripple {
+		background:
+			radial-gradient(ellipse at 30% 40%, rgba(255,255,255,0.04) 0%, transparent 50%),
+			radial-gradient(ellipse at 70% 60%, rgba(255,255,255,0.03) 0%, transparent 40%);
+		animation: water-drift 6s ease-in-out infinite alternate;
 	}
-	@keyframes cover-fade {
-		from { opacity: 1; }
-		to { opacity: 0; }
+	@keyframes water-drift {
+		0% { transform: translateX(-2%) translateY(-1%) scale(1); }
+		100% { transform: translateX(2%) translateY(1%) scale(1.02); }
 	}
 
-	/* ===== PHASE: EYE ===== */
+	.aoa-persistent-img {
+		object-fit: cover;
+		object-position: center 30%;
+	}
+
+	.aoa-img-active {
+		opacity: 1;
+		filter: brightness(1);
+		animation: aoa-slam 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+	}
+	@keyframes aoa-slam {
+		from { opacity: 0; transform: scale(1.3); filter: brightness(1.8); }
+		to { opacity: 1; transform: scale(1); filter: brightness(1); }
+	}
+
+	.aoa-img-content {
+		opacity: 0.35;
+		filter: blur(3px) brightness(0.55);
+	}
+
+	.aoa-bg-visible .aoa-persistent-vignette {
+		background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.15) 100%);
+	}
+	.aoa-vignette-content {
+		background: radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.4) 100%) !important;
+	}
+
+	/* ===== COVER ===== */
+
+	/* ===== EYE ===== */
 	.aoa-dim-overlay {
 		background: rgba(0,34,90,0.65);
 		animation: dim-in 0.4s ease-out forwards;
 	}
-	@keyframes dim-in {
-		from { opacity: 0; }
-		to { opacity: 1; }
-	}
+	@keyframes dim-in { from { opacity: 0; } to { opacity: 1; } }
 
 	.aoa-eye-wrap {
 		animation: eye-drop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
@@ -360,55 +396,14 @@
 	}
 	@keyframes impact-in { from { opacity: 0; } to { opacity: 0.5; } }
 
-	/* ===== PERSISTENT AOA ART (shared between aoa + content) ===== */
-	.aoa-persistent-bg {
-		animation: aoa-bg-in 0.3s ease-out both;
-	}
-	@keyframes aoa-bg-in { from { opacity: 0; } to { opacity: 1; } }
-
-	.aoa-persistent-img {
-		object-fit: cover;
-		object-position: center 30%;
-		transition:
-			opacity 0.6s ease-out,
-			filter 0.6s ease-out;
-	}
-
-	/* AOA phase: slam in with impact */
-	.aoa-img-slam {
-		animation: aoa-slam 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-	}
-	@keyframes aoa-slam {
-		from { opacity: 0; transform: scale(1.3); filter: brightness(1.8); }
-		to { opacity: 1; transform: scale(1); filter: brightness(1); }
-	}
-
-	/* Content phase: smoothly dim/blur the same img element */
-	.aoa-img-content {
-		opacity: 0.35;
-		filter: blur(3px) brightness(0.55);
-	}
-
-	.aoa-persistent-vignette {
-		background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.15) 100%);
-		transition: all 0.6s ease-out;
-	}
-	.aoa-vignette-content {
-		background: radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.4) 100%);
-	}
-
-	/* Nameplate — sequenced after art slam */
+	/* ===== AOA NAMEPLATE ===== */
 	.aoa-nameplate {
 		position: absolute; bottom: 12%; left: 50%; transform: translateX(-50%);
-		width: min(55vw, 450px); height: auto; z-index: 5;
-		opacity: 0;
-		transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+		width: min(55vw, 450px); height: auto;
+		opacity: 0; transition: opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 		filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
 	}
-	.aoa-nameplate-visible {
-		opacity: 1;
-		transform: translateX(-50%) translateY(0);
-	}
+	.aoa-nameplate-visible { opacity: 1; }
 
 	/* ===== CONTENT PANEL ===== */
 	.about-content-panel {
