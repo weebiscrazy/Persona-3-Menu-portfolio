@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Option from "$lib/components/Option.svelte";
+	import { fade } from "svelte/transition";
 	import type { OptionValue, SubmenuType, ViewState } from "$lib/types";
 	import { onMount } from "svelte";
 	import { Howl } from "howler";
