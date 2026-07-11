@@ -345,7 +345,7 @@
 
 	.social-art-img {
 		object-fit: cover;
-		object-position: center 30%;
+		object-position: center 40%;
 		animation: aoa-slam 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 		transition: opacity 0.35s ease-out, filter 0.35s ease-out;
 	}
