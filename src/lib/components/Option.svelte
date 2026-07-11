@@ -27,7 +27,7 @@
   const selectorPath = "M 24.853754, 93.31573 135.14625, 49.684266 114.14751, 97.331142 Z";
   const selectorBackgroundPath = "M 12.7428765,95.50088 144.25712,47.499123 116.75625,95.465764 Z";
   const selectorMaskId = $derived(`selector-mask-${index}`);
-  const selectorTransform = $derived(`translate(-60, -10) rotate(8, 0, 100) scale(${option.name.replaceAll(" ", "").length * 0.65 + 2.0}, 4.5)`);
+  const selectorTransform = $derived(`translate(-60, -10) rotate(8, 0, 100) scale(${option.name.replaceAll(" ", "").length * 0.8 + 3.0}, 6.0)`);
 
   $effect(() => {
     if (isMobile) return;
@@ -95,6 +95,13 @@
     transform-origin="25% center"
   >
     <defs>
+      <filter id="text-shadow" x="-30%" y="-30%" width="160%" height="160%">
+        <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.6)" flood-opacity="0.6"/>
+      </filter>
+      <filter id="text-shadow-glow" x="-30%" y="-30%" width="160%" height="160%">
+        <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="rgba(255,255,255,0.15)" flood-opacity="0.15"/>
+        <feDropShadow dx="1" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.5)" flood-opacity="0.5"/>
+      </filter>
       <mask
         id={selectorMaskId}
         maskUnits="userSpaceOnUse"
@@ -134,35 +141,43 @@
     </g>
 
     <text
-	      bind:this={textElement}
-	      transform-origin="25% center"
-	      x="150"
-	      y="120"
-	      style:fill={option.color}
-	      class={cn(
-	        "text-7xl tracking-[-0.14em] italic",
-	        {
-	          "fill-white": isSelected && !isMobile,
-	          "text-fg": isMobile,
-	          "text-fg": !option.color
-	        }
-	      )}
-	    >
-	      {option.name}
-	    </text>
+ 	      bind:this={textElement}
+ 	      transform-origin="25% center"
+ 	      x="150"
+ 	      y="120"
+ 	      style:fill={option.color}
+          stroke="rgba(0,0,0,0.45)"
+          stroke-width="2"
+          stroke-linejoin="round"
+          filter="url(#text-shadow)"
+ 	      class={cn(
+ 	        "text-7xl tracking-[-0.14em] italic",
+ 	        {
+ 	          "fill-white": isSelected && !isMobile,
+ 	          "text-fg": isMobile,
+ 	          "text-fg": !option.color
+ 	        }
+ 	      )}
+ 	    >
+ 	      {option.name}
+ 	    </text>
 
-    {#if !isMobile && isSelected}
-      <g mask={`url(#${selectorMaskId})`}>
-        <text
-          bind:this={textRedElement}
-          transform-origin="25% center"
-          x="150"
-          y="120"
-          class="text-7xl tracking-[-0.14em] italic fill-red"
-        >
-          {option.name}
-        </text>
-      </g>
-    {/if}
+      {#if !isMobile && isSelected}
+        <g mask={`url(#${selectorMaskId})`}>
+          <text
+            bind:this={textRedElement}
+            transform-origin="25% center"
+            x="150"
+            y="120"
+            stroke="rgba(180,0,0,0.5)"
+            stroke-width="2"
+            stroke-linejoin="round"
+            filter="url(#text-shadow-glow)"
+            class="text-7xl tracking-[-0.14em] italic fill-red"
+          >
+            {option.name}
+          </text>
+        </g>
+      {/if}
   </svg>
 </div>
