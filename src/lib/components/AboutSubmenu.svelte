@@ -25,7 +25,7 @@
 	function handleClose() {
 		if (closing) return;
 		closing = true;
-		(window as any).closeSubmenu?.();
+		setTimeout(() => (window as any).closeSubmenu?.(), 350);
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
@@ -77,6 +77,7 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
 	class="about-root fixed inset-0 z-50"
+	class:about-closing={closing}
 	role="dialog"
 	aria-label="About"
 	onkeydown={handleKeydown}
@@ -231,6 +232,16 @@
 	.about-root {
 		background: transparent;
 		outline: none;
+		isolation: isolate;
+	}
+	.about-closing {
+		opacity: 0;
+		transition: opacity 0.3s ease-out;
+	}
+	.about-closing .about-info-side,
+	.about-closing .about-tab-active {
+		backdrop-filter: none;
+		-webkit-backdrop-filter: none;
 	}
 
 	/* ===== PHASE: EYE ===== */
