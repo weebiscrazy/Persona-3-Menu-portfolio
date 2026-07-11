@@ -355,8 +355,8 @@
 	}
 
 	.social-art-content {
-		opacity: 0.35;
-		filter: blur(2px) brightness(0.55);
+		opacity: 0.25;
+		filter: blur(3px) brightness(0.35);
 	}
 
 	.social-nameplate {
@@ -376,7 +376,7 @@
 		transition: all 0.35s ease-out;
 	}
 	.social-vig-strong {
-		background: radial-gradient(ellipse at center, transparent 35%, rgba(30,10,20,0.4) 100%);
+		background: radial-gradient(ellipse at center, transparent 30%, rgba(30,10,20,0.7) 100%);
 	}
 
 	/* ===== PHASE: CONTENT ===== */
@@ -418,7 +418,7 @@
 		backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
 		box-shadow: 0 0 20px rgba(232,88,140,0.25);
 	}
-	.social-tab-inactive { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.5); }
+	.social-tab-inactive { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); }
 	.social-tab-inactive:hover { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.8); }
 
 	/* === Arcana watermark === */
@@ -441,8 +441,8 @@
 	.social-link-card {
 		display: flex; align-items: center; gap: 1.5rem;
 		padding: 1.25rem; border-radius: 0.75rem;
-		background: rgba(0,0,0,0.35); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-		border: 1px solid rgba(232,88,140,0.12);
+		background: rgba(0,0,0,0.55); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+		border: 1px solid rgba(232,88,140,0.15);
 		transition: all 0.3s;
 		animation: stagger-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 	}
@@ -452,8 +452,8 @@
 	}
 	.social-link-card:hover {
 		border-color: rgba(232,88,140,0.5);
-		background: rgba(0,0,0,0.45);
-		box-shadow: 0 0 30px rgba(232,88,140,0.1);
+		background: rgba(0,0,0,0.65);
+		box-shadow: 0 0 30px rgba(232,88,140,0.15);
 	}
 
 	.social-link-icon-wrap {
@@ -466,12 +466,14 @@
 		text-shadow: 0 2px 8px rgba(0,0,0,0.3);
 	}
 	.social-link-url {
-		color: rgba(255,255,255,0.45); font-size: 0.8rem;
+		color: rgba(255,255,255,0.7); font-size: 0.8rem;
 		font-family: var(--font-new-rodin); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+		text-shadow: 0 1px 6px rgba(0,0,0,0.4);
 	}
 	.social-link-ext {
-		color: rgba(255,255,255,0.3); font-size: 1.5rem; flex-shrink: 0;
+		color: rgba(255,255,255,0.5); font-size: 1.5rem; flex-shrink: 0;
 		transition: color 0.2s;
+		text-shadow: 0 1px 6px rgba(0,0,0,0.4);
 	}
 	.social-link-card:hover .social-link-ext { color: #e8588c; }
 
@@ -483,8 +485,9 @@
 		margin-bottom: 0.75rem;
 	}
 	.social-section-desc {
-		font-family: var(--font-new-rodin); color: rgba(255,255,255,0.6);
+		font-family: var(--font-new-rodin); color: rgba(255,255,255,0.85);
 		font-style: italic; font-size: 0.95rem;
+		text-shadow: 0 1px 8px rgba(0,0,0,0.5);
 	}
 
 	.social-divider {
@@ -495,8 +498,9 @@
 
 	.social-email-card {
 		padding: 1.5rem; border-radius: 0.75rem;
-		background: linear-gradient(135deg, rgba(232,88,140,0.1), rgba(200,60,110,0.05));
-		border: 1px solid rgba(232,88,140,0.15);
+		background: linear-gradient(135deg, rgba(232,88,140,0.15), rgba(200,60,110,0.08));
+		backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+		border: 1px solid rgba(232,88,140,0.2);
 		animation: stagger-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.06s both;
 	}
 	.social-email-icon {
@@ -508,7 +512,7 @@
 		text-shadow: 0 2px 8px rgba(0,0,0,0.3);
 	}
 	.social-email-sub {
-		font-family: var(--font-new-rodin); color: rgba(255,255,255,0.45); font-size: 0.85rem; margin-top: 0.1rem;
+		font-family: var(--font-new-rodin); color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-top: 0.1rem;
 	}
 	.social-copy-btn {
 		width: 100%; padding: 0.75rem 1.5rem; border-radius: 0.5rem;
@@ -525,8 +529,8 @@
 
 	.social-avail-card {
 		padding: 1.25rem; border-radius: 0.75rem;
-		background: rgba(0,0,0,0.25); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-		border: 1px solid rgba(232,88,140,0.1);
+		background: rgba(0,0,0,0.45); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+		border: 1px solid rgba(232,88,140,0.12);
 		animation: stagger-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.09s both;
 	}
 	.social-avail-title {
@@ -542,7 +546,7 @@
 		text-shadow: var(--text-shadow-border);
 	}
 	.social-avail-lbl {
-		font-family: var(--font-new-rodin); color: rgba(255,255,255,0.4);
+		font-family: var(--font-new-rodin); color: rgba(255,255,255,0.6);
 		font-size: 0.7rem; margin-top: 0.1rem;
 	}
 
