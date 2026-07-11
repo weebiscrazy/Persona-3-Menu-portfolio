@@ -7,6 +7,7 @@
 	let activeTab = $state(0);
 	let phase = $state<"cover" | "eye" | "aoa" | "content">("cover");
 	let closing = $state(false);
+	let showNameplate = $state(false);
 
 	const tabs = [
 		{ name: "Profile", index: 0, arcanaNumber: "0" },
@@ -74,16 +75,22 @@
 		function startSequence() {
 			if (phase !== "cover") return;
 
-			// Cover → eye: fade cover out, dim overlay in, eye drops from above
 			phase = "eye";
 
-			// Eye phase: 900ms total, then AOA slam
+			// Eye phase 900ms → AOA
 			setTimeout(() => {
 				if (phase === "content") return;
 				phase = "aoa";
+				showNameplate = false;
+
+				// Nameplate appears 400ms after AOA art
+				setTimeout(() => {
+					if (phase === "content") return;
+					showNameplate = true;
+				}, 400);
 			}, 900);
 
-			// AOA phase: 1600ms, then content
+			// AOA phase → content (smooth, art stays)
 			setTimeout(() => {
 				if (phase === "content") return;
 				phase = "content";
@@ -101,17 +108,13 @@
 	tabindex="-1"
 	class:about-closing={closing}
 >
-	<!-- === COVER: briefly opaque to hide mount flash, then fades out === -->
+	<!-- === COVER === -->
 	{#if phase === "cover"}
 		<div class="absolute inset-0 aoa-cover" style="background: {AOA_BG};"></div>
 
 	<!-- === PHASE 1: Eye cut-in over dimmed main menu === -->
 	{:else if phase === "eye"}
-		<!-- Semi-transparent dim overlay so main menu shows through -->
 		<div class="absolute inset-0 aoa-dim-overlay"></div>
-		<!-- Flash pop -->
-		<div class="absolute inset-0 aoa-eye-flash"></div>
-		<!-- Eye cut-in drops from above -->
 		<div class="absolute inset-0 z-20 flex items-center justify-center aoa-eye-wrap">
 			<div class="aoa-eye-frame">
 				<img
@@ -130,125 +133,127 @@
 			</div>
 		</div>
 
-	<!-- === PHASE 2: AOA art slam (clean) === -->
-	{:else if phase === "aoa"}
-		<div class="absolute inset-0 aoa-art-layer" style="background: {AOA_BG};">
+	<!-- === PHASE 2 & 3: AOA art (shared element, smooth transition) === -->
+	{:else}
+		<!-- AOA art - SAME element for both aoa and content phases -->
+		<div class="absolute inset-0 aoa-persistent-bg" style="background: {AOA_BG};">
 			<img
 				src="/T_Btl_AlloutFinish_Pc01_A1out.png"
-				alt="all-out attack"
-				class="absolute inset-0 w-full h-full aoa-art-img"
+				alt=""
+				class="absolute inset-0 w-full h-full aoa-persistent-img"
+				class:aoa-img-slam={phase === "aoa"}
+				class:aoa-img-content={phase === "content"}
 			/>
-			<div class="absolute inset-0 aoa-art-vignette"></div>
-			<div class="absolute inset-0 aoa-slam-flash"></div>
+			<div
+				class="absolute inset-0 aoa-persistent-vignette"
+				class:aoa-vignette-content={phase === "content"}
+			></div>
+		</div>
+
+		<!-- Nameplate (appears after delay in AOA phase) -->
+		{#if phase === "aoa"}
 			<img
 				src="/T_Btl_AlloutFinishText_Pc01out.png"
 				alt=""
 				class="aoa-nameplate"
+				class:aoa-nameplate-visible={showNameplate}
 			/>
-		</div>
+		{/if}
 
-	<!-- === PHASE 3: Content on AOA art background === -->
-	{:else}
-		<div class="absolute inset-0 aoa-content-bg-wrap" style="background: {AOA_BG};">
-			<img
-				src="/T_Btl_AlloutFinish_Pc01_A1out.png"
-				alt=""
-				class="absolute inset-0 w-full h-full aoa-content-bg-img"
-			/>
-			<div class="absolute inset-0 aoa-content-vignette"></div>
-		</div>
-
-		<div class="relative z-10 h-full flex flex-col about-content-panel">
-			<header class="about-header">
-				<h1 class="about-title">ABOUT</h1>
-				<div class="flex gap-2" role="tablist">
-					{#each tabs as tab, i}
-						<button
-							class={cn("about-tab-btn", i === activeTab ? "about-tab-active" : "about-tab-inactive")}
-							role="tab"
-							aria-selected={i === activeTab}
-							onclick={() => handleTabClick(i)}
-						>{tab.name}</button>
-					{/each}
-				</div>
-			</header>
-
-			<div class="flex-1 flex flex-col md:flex-row gap-6 about-body">
-				<div class="about-portrait-side">
-					<div class="about-portrait-inner">
-						<img
-							src="/T_UI_Camp_Status_Character_0001.png"
-							alt=""
-							class="about-camp-img"
-						/>
-						<div class="about-camp-glass"></div>
-					</div>
-				</div>
-
-				<div class="about-info-side">
-					<img src="/T_Btl_AlloutFinishText_Pc01out.png" alt="" class="about-info-nameplate" />
-
-					<div>
-						<h2 class="about-info-title">{profileData.title}</h2>
-						<p class="about-info-tagline">"{profileData.tagline}"</p>
-					</div>
-
-					<div class="about-stats-grid">
-						{#each profileData.stats as stat}
-							<div class="about-stat-item">
-								<span class="about-stat-val">{stat.value}</span>
-								<span class="about-stat-lbl">{stat.label}</span>
-							</div>
+		<!-- Content panel (only in content phase) -->
+		{#if phase === "content"}
+			<div class="relative z-10 h-full flex flex-col about-content-panel">
+				<header class="about-header">
+					<h1 class="about-title">ABOUT</h1>
+					<div class="flex gap-2" role="tablist">
+						{#each tabs as tab, i}
+							<button
+								class={cn("about-tab-btn", i === activeTab ? "about-tab-active" : "about-tab-inactive")}
+								role="tab"
+								aria-selected={i === activeTab}
+								onclick={() => handleTabClick(i)}
+							>{tab.name}</button>
 						{/each}
 					</div>
+				</header>
 
-					<div class="about-social-row">
-						{#each profileData.socialLinks as link}
-							<a href={link.url} target="_blank" rel="noopener noreferrer" class="about-social-link" style="color: {link.color}" aria-label={link.platform}>
-								<iconify-icon icon={link.icon} class="about-social-icon"></iconify-icon>
-							</a>
-						{/each}
-					</div>
-
-					<div class="about-content-divider"></div>
-
-					{#key activeTab}
-						<div class="about-sub-content">
-							{#if activeTab === 0}
-								<p class="about-bio-p">{profileData.bio}</p>
-							{:else if activeTab === 1}
-								<div class="grid grid-cols-2 gap-3">
-									{#each profileData.stats as stat}
-										<div class="about-stat-detail">
-											<span class="about-stat-dv">{stat.value}</span>
-											<span class="about-stat-dl">{stat.label}</span>
-										</div>
-									{/each}
-								</div>
-							{:else}
-								<div class="about-bio-wrap">
-									<p class="about-bio-p">{profileData.bio}</p>
-									<div class="about-bio-sep">━━━</div>
-									<div class="about-focus-box">
-										<h3 class="about-focus-h">Current Focus</h3>
-										<ul class="about-focus-list">
-											<li class="about-focus-li"><iconify-icon icon="mdi:rocket-launch" class="about-fi-icon text-pink"></iconify-icon> Building portfolio sites with game-inspired UX</li>
-											<li class="about-focus-li"><iconify-icon icon="mdi:code-braces" class="about-fi-icon text-button-1"></iconify-icon> Learning Rust for systems programming</li>
-											<li class="about-focus-li"><iconify-icon icon="mdi:gamepad-variant" class="about-fi-icon text-button-2"></iconify-icon> Experimenting with Godot 4 for game jams</li>
-										</ul>
-									</div>
-								</div>
-							{/if}
+				<div class="flex-1 flex flex-col md:flex-row gap-6 about-body">
+					<div class="about-portrait-side">
+						<div class="about-portrait-inner">
+							<img
+								src="/T_UI_Camp_Status_Character_0001.png"
+								alt=""
+								class="about-camp-img"
+							/>
+							<div class="about-camp-glass"></div>
 						</div>
-					{/key}
-				</div>
-			</div>
+					</div>
 
-			<footer class="about-footer">
-				<Control key="← →">Tabs</Control>
-				<Control key="B">Back</Control>
-			</footer>
-		</div>
+					<div class="about-info-side">
+						<img src="/T_Btl_AlloutFinishText_Pc01out.png" alt="" class="about-info-nameplate" />
+
+						<div>
+							<h2 class="about-info-title">{profileData.title}</h2>
+							<p class="about-info-tagline">"{profileData.tagline}"</p>
+						</div>
+
+						<div class="about-stats-grid">
+							{#each profileData.stats as stat}
+								<div class="about-stat-item">
+									<span class="about-stat-val">{stat.value}</span>
+									<span class="about-stat-lbl">{stat.label}</span>
+								</div>
+							{/each}
+						</div>
+
+						<div class="about-social-row">
+							{#each profileData.socialLinks as link}
+								<a href={link.url} target="_blank" rel="noopener noreferrer" class="about-social-link" style="color: {link.color}" aria-label={link.platform}>
+									<iconify-icon icon={link.icon} class="about-social-icon"></iconify-icon>
+								</a>
+							{/each}
+						</div>
+
+						<div class="about-content-divider"></div>
+
+						{#key activeTab}
+							<div class="about-sub-content">
+								{#if activeTab === 0}
+									<p class="about-bio-p">{profileData.bio}</p>
+								{:else if activeTab === 1}
+									<div class="grid grid-cols-2 gap-3">
+										{#each profileData.stats as stat}
+											<div class="about-stat-detail">
+												<span class="about-stat-dv">{stat.value}</span>
+												<span class="about-stat-dl">{stat.label}</span>
+											</div>
+										{/each}
+									</div>
+								{:else}
+									<div class="about-bio-wrap">
+										<p class="about-bio-p">{profileData.bio}</p>
+										<div class="about-bio-sep">━━━</div>
+										<div class="about-focus-box">
+											<h3 class="about-focus-h">Current Focus</h3>
+											<ul class="about-focus-list">
+												<li class="about-focus-li"><iconify-icon icon="mdi:rocket-launch" class="about-fi-icon text-pink"></iconify-icon> Building portfolio sites with game-inspired UX</li>
+												<li class="about-focus-li"><iconify-icon icon="mdi:code-braces" class="about-fi-icon text-button-1"></iconify-icon> Learning Rust for systems programming</li>
+												<li class="about-focus-li"><iconify-icon icon="mdi:gamepad-variant" class="about-fi-icon text-button-2"></iconify-icon> Experimenting with Godot 4 for game jams</li>
+											</ul>
+										</div>
+									</div>
+								{/if}
+							</div>
+						{/key}
+					</div>
+				</div>
+
+				<footer class="about-footer">
+					<Control key="← →">Tabs</Control>
+					<Control key="B">Back</Control>
+				</footer>
+			</div>
+		{/if}
 	{/if}
 </div>
 
@@ -257,7 +262,7 @@
 	.about-closing { animation: about-fade-out 0.35s ease-in forwards; }
 	@keyframes about-fade-out { from { opacity: 1; } to { opacity: 0; } }
 
-	/* === COVER: fades out to reveal dimmed main menu behind === */
+	/* === COVER === */
 	.aoa-cover {
 		animation: cover-fade 0.4s ease-out forwards;
 	}
@@ -274,17 +279,6 @@
 	@keyframes dim-in {
 		from { opacity: 0; }
 		to { opacity: 1; }
-	}
-
-	.aoa-eye-flash {
-		background: rgba(255,255,255,0.2);
-		z-index: 15;
-		animation: flash-pop 0.2s ease-out forwards;
-		pointer-events: none;
-	}
-	@keyframes flash-pop {
-		0% { opacity: 0.5; }
-		100% { opacity: 0; }
 	}
 
 	.aoa-eye-wrap {
@@ -366,13 +360,22 @@
 	}
 	@keyframes impact-in { from { opacity: 0; } to { opacity: 0.5; } }
 
-	/* ===== PHASE: AOA ===== */
-	.aoa-art-layer { animation: aoa-bg-in 0.3s ease-out both; }
+	/* ===== PERSISTENT AOA ART (shared between aoa + content) ===== */
+	.aoa-persistent-bg {
+		animation: aoa-bg-in 0.3s ease-out both;
+	}
 	@keyframes aoa-bg-in { from { opacity: 0; } to { opacity: 1; } }
 
-	.aoa-art-img {
+	.aoa-persistent-img {
 		object-fit: cover;
 		object-position: center 30%;
+		transition:
+			opacity 0.6s ease-out,
+			filter 0.6s ease-out;
+	}
+
+	/* AOA phase: slam in with impact */
+	.aoa-img-slam {
 		animation: aoa-slam 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 	}
 	@keyframes aoa-slam {
@@ -380,60 +383,46 @@
 		to { opacity: 1; transform: scale(1); filter: brightness(1); }
 	}
 
-	.aoa-slam-flash {
-		background: rgba(255,255,255,0.35);
-		z-index: 6;
-		animation: slam-flash 0.2s ease-out both;
-		pointer-events: none;
-	}
-	@keyframes slam-flash {
-		from { opacity: 1; }
-		to { opacity: 0; }
-	}
-
-	.aoa-nameplate {
-		position: absolute; bottom: 12%; left: 50%; transform: translateX(-50%);
-		width: min(55vw, 450px); height: auto; z-index: 5;
-		animation: nameplate-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
-		filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
-	}
-	@keyframes nameplate-in {
-		from { opacity: 0; transform: translateX(-50%) translateY(50px); }
-		to { opacity: 1; transform: translateX(-50%) translateY(0); }
-	}
-
-	.aoa-art-vignette {
-		background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.2) 100%);
-		z-index: 3;
-	}
-
-	/* ===== PHASE: CONTENT ===== */
-	.aoa-content-bg-wrap { animation: content-bg-in 0.4s ease-out both; }
-	@keyframes content-bg-in { from { opacity: 0; } to { opacity: 1; } }
-
-	.aoa-content-bg-img {
-		object-fit: cover;
-		object-position: center 30%;
+	/* Content phase: smoothly dim/blur the same img element */
+	.aoa-img-content {
 		opacity: 0.35;
 		filter: blur(3px) brightness(0.55);
 	}
-	.aoa-content-vignette {
+
+	.aoa-persistent-vignette {
+		background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.15) 100%);
+		transition: all 0.6s ease-out;
+	}
+	.aoa-vignette-content {
 		background: radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.4) 100%);
 	}
 
+	/* Nameplate — sequenced after art slam */
+	.aoa-nameplate {
+		position: absolute; bottom: 12%; left: 50%; transform: translateX(-50%);
+		width: min(55vw, 450px); height: auto; z-index: 5;
+		opacity: 0;
+		transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+		filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+	}
+	.aoa-nameplate-visible {
+		opacity: 1;
+		transform: translateX(-50%) translateY(0);
+	}
+
+	/* ===== CONTENT PANEL ===== */
 	.about-content-panel {
 		padding: 1rem;
 		max-width: 1320px;
 		margin: 0 auto;
 		width: 100%;
-		animation: panel-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+		animation: panel-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 	}
 	@keyframes panel-in {
 		from { opacity: 0; transform: translateY(20px); }
 		to { opacity: 1; transform: translateY(0); }
 	}
 
-	/* === Header === */
 	.about-header {
 		display: flex; align-items: center; justify-content: space-between;
 		padding: 0.5rem 0; flex-shrink: 0;
@@ -454,10 +443,8 @@
 	.about-tab-inactive { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.5); }
 	.about-tab-inactive:hover { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.8); }
 
-	/* === Body === */
 	.about-body { flex: 1; min-height: 0; padding: 0.5rem 0; gap: 1.5rem; }
 
-	/* Portrait */
 	.about-portrait-side { display: none; }
 	@media (min-width: 768px) {
 		.about-portrait-side { display: flex; flex-shrink: 0; width: 260px; align-items: flex-end; }
@@ -482,7 +469,6 @@
 		z-index: 3; pointer-events: none;
 	}
 
-	/* Info side */
 	.about-info-side {
 		flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.5rem;
 		padding: 0.75rem 1rem; border-radius: 0.75rem;
@@ -506,7 +492,6 @@
 		font-style: italic; font-size: 0.85rem; margin-top: 0.1rem;
 	}
 
-	/* Stats */
 	.about-stats-grid {
 		display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.35rem;
 	}
@@ -527,7 +512,6 @@
 		text-align: center;
 	}
 
-	/* Social */
 	.about-social-row { display: flex; gap: 0.4rem; }
 	.about-social-link {
 		width: 2rem; height: 2rem; border-radius: 9999px;
@@ -537,14 +521,12 @@
 	.about-social-link:hover { background: rgba(255,255,255,0.12); transform: scale(1.1); }
 	.about-social-icon { font-size: 1rem; }
 
-	/* Divider */
 	.about-content-divider {
 		height: 1px;
 		background: linear-gradient(90deg, transparent, rgba(21,194,252,0.15), transparent);
 		margin: 0.1rem 0 0.35rem;
 	}
 
-	/* Sub-content */
 	.about-sub-content {
 		flex: 1; overflow-y: auto; max-height: 28vh; padding-right: 0.25rem;
 	}
@@ -590,7 +572,6 @@
 	}
 	.about-fi-icon { font-size: 1rem; flex-shrink: 0; }
 
-	/* Footer */
 	.about-footer {
 		display: flex; align-items: center; justify-content: center;
 		gap: 1.5rem; padding: 0.5rem 0; flex-shrink: 0;
