@@ -90,8 +90,8 @@
 			<div class="persona-digital-grid" aria-hidden="true"></div>
 		</div>
 		<div class="persona-amber-flash" aria-hidden="true"></div>
-		{#each Array(25) as _, i}
-			<div class="persona-data-char" style="--dc-x: {2 + (i * 4) % 96}%; --dc-d: {0.1 + (i % 10) * 0.15}s; --dc-s: {10 + (i % 5) * 4}px; --dc-c: '{['0','1','ダ','マ','ス','ク','Ψ','Ω','データ','◈','⬡','▣'][i % 12]}'"></div>
+		{#each Array(12) as _, i}
+			<div class="persona-data-char" style="--dc-x: {2 + (i * 8) % 96}%; --dc-d: {0.1 + (i % 8) * 0.15}s; --dc-s: {10 + (i % 5) * 4}px; --dc-c: '{['0','1','ダ','マ','ス','ク','Ψ','Ω','データ','◈','⬡','▣'][i % 12]}'"></div>
 		{/each}
 		<div class="absolute inset-0 z-20 flex items-center justify-center">
 			<div class="persona-eye-wrap">
@@ -103,8 +103,8 @@
 						alt="eye cut-in"
 						class="persona-eye-img"
 					/>
-					{#each Array(15) as _, i}
-						<div class="persona-glitch-square" style="--gs-left: {5 + (i * 16) % 88}%; --gs-top: {6 + (i * 22) % 84}%; --gs-delay: {0.3 + (i % 10) * 0.06}s; --gs-color: {i % 3 === 0 ? 'rgba(234,179,8,0.4)' : i % 3 === 1 ? 'rgba(255,255,255,0.15)' : 'rgba(234,179,8,0.2)'}; --gs-size: {8 + (i % 4) * 6}px"></div>
+{#each Array(8) as _, i}
+					<div class="persona-glitch-square" style="--gs-left: {5 + (i * 20) % 88}%; --gs-top: {6 + (i * 28) % 84}%; --gs-delay: {0.3 + (i % 6) * 0.06}s; --gs-color: {i % 3 === 0 ? 'rgba(234,179,8,0.4)' : i % 3 === 1 ? 'rgba(255,255,255,0.15)' : 'rgba(234,179,8,0.2)'}; --gs-size: {8 + (i % 4) * 6}px"></div>
 					{/each}
 					<div class="persona-eye-glitch" aria-hidden="true"></div>
 					<div class="persona-eye-border"></div>
@@ -398,7 +398,7 @@ style="animation-delay: {0.3 + i * 0.12}s"
 	}
 
 	.persona-eye-img {
-		width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2;
+		width: 95%; height: 95%; object-fit: contain; position: relative; z-index: 2;
 		animation: digital-zoom 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 		filter: drop-shadow(0 0 70px rgba(234,179,8,0.35)) drop-shadow(0 0 140px rgba(234,179,8,0.15));
 	}

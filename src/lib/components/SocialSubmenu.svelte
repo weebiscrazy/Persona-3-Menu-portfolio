@@ -132,6 +132,12 @@
 		</div>
 
 		{#if phase === "aoa"}
+			{#each Array(3) as _, i}
+				<div class="aoa-ring" style="--ring-delay: {i * 0.08}s"></div>
+			{/each}
+			{#each Array(20) as _, i}
+				<div class="aoa-petal-burst" style="--ba: {i * 18}deg; --bd: {i * 0.015}s; --bdist: {100 + (i % 8) * 30}px"></div>
+			{/each}
 			<img
 				src="/T_Btl_AlloutFinishText_Pc02out.png"
 				alt=""
@@ -317,7 +323,7 @@
 	.social-floating-petal {
 		position: absolute; z-index: 1; pointer-events: none;
 		width: var(--f-s); height: calc(var(--f-s) * 0.5);
-		left: var(--f-x); bottom: -20px;
+		left: var(--f-x); bottom: 20%;
 		background: radial-gradient(ellipse, rgba(253,119,217,0.5) 0%, rgba(232,88,140,0.2) 60%, transparent 80%);
 		border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
 		transform: rotate(var(--f-r));
@@ -325,9 +331,9 @@
 	}
 	@keyframes petal-drift {
 		0% { transform: translateY(0) rotate(var(--f-r)) scale(0.3); opacity: 0; }
-		10% { opacity: 0.5; transform: translateY(-30px) rotate(calc(var(--f-r) + 20deg)) scale(1); }
+		10% { opacity: 0.5; transform: translateY(-20px) rotate(calc(var(--f-r) + 20deg)) scale(1); }
 		80% { opacity: 0.3; }
-		100% { transform: translateY(-105vh) rotate(calc(var(--f-r) + 120deg)) scale(0.6); opacity: 0; }
+		100% { transform: translateY(-85vh) rotate(calc(var(--f-r) + 120deg)) scale(0.6); opacity: 0; }
 	}
 
 	/* Subtle pink highlight overlay */
@@ -470,17 +476,38 @@
 
 	/* ===== PHASE: AOA ===== */
 	.social-art-layer {
-		animation: aoa-bg-in 0.3s ease-out both;
+		animation: aoa-bg-in 0.3s ease-out both, screen-shake 0.4s ease-out 0.05s;
 		&::before {
 			content: ''; position: absolute; inset: 0; z-index: 10;
 			background: white; pointer-events: none;
 			animation: flash-pop 0.15s ease-out 0.05s forwards;
 		}
+		&::after {
+			content: ''; position: absolute; inset: 0; z-index: 9;
+			background: radial-gradient(circle at center, rgba(253,119,217,0.4), transparent 60%);
+			pointer-events: none;
+			animation: glamour-flash 0.5s ease-out 0.05s forwards;
+		}
 	}
 	@keyframes aoa-bg-in { from { opacity: 0; } to { opacity: 1; } }
 	@keyframes flash-pop {
-		0% { opacity: 0.9; }
+		0% { opacity: 0.95; }
 		100% { opacity: 0; }
+	}
+	@keyframes glamour-flash {
+		0% { opacity: 0; transform: scale(0.3); }
+		20% { opacity: 1; transform: scale(2); }
+		100% { opacity: 0; transform: scale(3); }
+	}
+	@keyframes screen-shake {
+		0% { transform: translate(0); }
+		10% { transform: translate(-8px, 4px); }
+		20% { transform: translate(6px, -3px); }
+		30% { transform: translate(-4px, 5px); }
+		45% { transform: translate(3px, -2px); }
+		60% { transform: translate(-2px, 1px); }
+		80% { transform: translate(1px, -1px); }
+		100% { transform: translate(0); }
 	}
 
 	.social-art-img {
@@ -490,7 +517,7 @@
 		transition: opacity 0.35s ease-out, filter 0.35s ease-out;
 	}
 	@keyframes aoa-slam {
-		from { opacity: 0; transform: scale(1.3); filter: brightness(1.8); }
+		from { opacity: 0; transform: scale(1.4); filter: brightness(2); }
 		to { opacity: 1; transform: scale(1); filter: brightness(1); }
 	}
 
@@ -501,13 +528,46 @@
 
 	.social-nameplate {
 		position: absolute; bottom: 12%; left: 50%; transform: translateX(-50%);
-		width: min(55vw, 450px); height: auto; z-index: 5;
-		animation: nameplate-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+		width: min(55vw, 450px); height: auto; z-index: 8;
+		animation: nameplate-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
 		filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
 	}
 	@keyframes nameplate-in {
-		from { opacity: 0; transform: translateX(-50%) translateY(50px); }
-		to { opacity: 1; transform: translateX(-50%) translateY(0); }
+		from { opacity: 0; transform: translateX(-50%) translateY(50px) scale(0.8); }
+		50% { opacity: 1; transform: translateX(-50%) translateY(-5px) scale(1.05); }
+		to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+	}
+
+	/* Energy rings — expanding circles from center */
+	.aoa-ring {
+		position: absolute; left: 50%; top: 50%; z-index: 6;
+		width: 60px; height: 60px; margin-left: -30px; margin-top: -30px;
+		border: 2px solid rgba(253,119,217,0.6);
+		border-radius: 50%;
+		pointer-events: none;
+		animation: ring-expand 0.6s ease-out var(--ring-delay) forwards;
+		box-shadow: 0 0 20px rgba(253,119,217,0.2), inset 0 0 20px rgba(253,119,217,0.1);
+	}
+	@keyframes ring-expand {
+		0% { opacity: 1; transform: scale(0.5); border-width: 3px; }
+		100% { opacity: 0; transform: scale(8); border-width: 0.5px; }
+	}
+
+	/* Cherry blossom burst particles at AOA moment */
+	.aoa-petal-burst {
+		position: absolute; left: 50%; top: 50%; z-index: 7; pointer-events: none;
+		width: 14px; height: 8px;
+		margin-left: -7px; margin-top: -4px;
+		background: radial-gradient(ellipse, rgba(253,119,217,0.8), rgba(232,88,140,0.3));
+		border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+		transform: rotate(var(--ba));
+		opacity: 0;
+		animation: petal-explode 0.5s ease-out var(--bd) forwards;
+	}
+	@keyframes petal-explode {
+		0% { opacity: 1; transform: rotate(var(--ba)) translateY(0) scale(0.5); }
+		60% { opacity: 0.9; transform: rotate(calc(var(--ba) + 80deg)) translateY(calc(var(--bdist) * -1)) scale(1.2); }
+		100% { opacity: 0; transform: rotate(calc(var(--ba) + 160deg)) translateY(calc(var(--bdist) * -1.4)) scale(0.3); }
 	}
 
 	.social-art-vignette {
