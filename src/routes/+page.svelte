@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Option from "$lib/components/Option.svelte";
-	import { fade, fly } from "svelte/transition";
+	import { fade } from "svelte/transition";
 	import type { OptionValue, SubmenuType, ViewState } from "$lib/types";
 	import { onMount } from "svelte";
 	import { Howl } from "howler";
@@ -108,10 +108,6 @@
 		}, 50);
 	}
 
-	if (typeof window !== "undefined") {
-		(window as any).closeSubmenu = closeSubmenu;
-	}
-
 	function start() {
 		isStarted = true;
 		backgroundVideo.play();
@@ -171,6 +167,12 @@
 
 		const mq = window.matchMedia("(max-width: 767px)");
 		mq.addEventListener("change", (e) => { isMobile = e.matches; });
+
+		// Listen for submenu close events (instead of window.closeSubmenu hack)
+		window.addEventListener("submenu-close", closeSubmenu);
+		return () => {
+			window.removeEventListener("submenu-close", closeSubmenu);
+		};
 	});
 </script>
 

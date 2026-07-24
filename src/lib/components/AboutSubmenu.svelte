@@ -1,13 +1,22 @@
 <script lang="ts">
-	import { onMount } from "svelte";
 	import Control from "./Control.svelte";
 	import ParticleCanvas from "./ParticleCanvas.svelte";
 	import { profileData } from "$lib/portfolio";
 	import { cn } from "$lib/utils";
+	import { createSubmenu } from "$lib/submenu.svelte";
 
-	let activeTab = $state(0);
-	let phase = $state<"eye" | "aoa" | "content">("eye");
-	let closing = $state(false);
+	const {
+		phase, closing, activeTab,
+		handleClose, skipToContent, handleKeydown, handleTabClick,
+		setupLifecycle
+	} = createSubmenu({
+		images: [
+			"/T_UI_Camp_Status_Character_Glass_0001.png",
+			"/T_Btl_AlloutFinish_Pc01_A1out.png",
+			"/T_Btl_AlloutFinishText_Pc01out.png",
+			"/T_UI_Camp_Status_Character_0001.png"
+		]
+	});
 
 	const tabs = [
 		{ name: "Profile", index: 0, arcanaNumber: "0" },
@@ -17,68 +26,14 @@
 
 	const AOA_BG = "#15c2fc";
 
-	function skipToContent(): boolean {
-		if (phase === "content") return false;
-		phase = "content";
-		return true;
-	}
-
-	function handleClose() {
-		if (closing) return;
-		closing = true;
-		setTimeout(() => (window as any).closeSubmenu?.(), 350);
-	}
-
-	function handleKeydown(e: KeyboardEvent) {
-		if (closing) return;
-		// Stop propagation so the document-level main handler doesn't re-process this key
-		e.stopPropagation();
-		if (e.key === "ArrowRight" && activeTab < tabs.length - 1) {
-			activeTab++;
-			e.preventDefault();
-		} else if (e.key === "ArrowLeft" && activeTab > 0) {
-			activeTab--;
-			e.preventDefault();
-		} else if (e.key === "Escape" || e.key === "b" || e.key === "B") {
-			e.preventDefault();
-			if (phase !== "content") {
-				skipToContent();
-			} else {
-				handleClose();
-			}
-		}
-	}
-
-	function handleTabClick(index: number) {
-		if (index === activeTab) return;
-		activeTab = index;
-	}
-
-	onMount(() => {
-		// Optimistically warm image cache (doesn't block UI)
-		["/T_UI_Camp_Status_Character_Glass_0001.png",
-		 "/T_Btl_AlloutFinish_Pc01_A1out.png",
-		 "/T_Btl_AlloutFinishText_Pc01out.png",
-		 "/T_UI_Camp_Status_Character_0001.png"
-		].forEach(src => { const img = new Image(); img.src = src; });
-
-		// Phase sequence starts immediately — no loading flash
-		setTimeout(() => {
-			if (phase === "content") return;
-			phase = "aoa";
-		}, 1500);
-
-		setTimeout(() => {
-			if (phase === "content") return;
-			phase = "content";
-		}, 3500);
-	});
+	import { onMount } from "svelte";
+	onMount(() => setupLifecycle());
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	class="about-root fixed inset-0 z-50"
-	class:about-closing={closing}
+	class="submenu-root fixed inset-0 z-50"
+	class:submenu-closing={closing}
 	role="dialog"
 	aria-label="About"
 	onkeydown={handleKeydown}
@@ -139,15 +94,15 @@
 
 {#if phase === "content"}
 
-	<div class="relative z-10 h-full flex flex-col about-content-panel">
+	<div class="relative z-10 h-full flex flex-col submenu-content-panel">
 		<ParticleCanvas type="water" class="pointer-events-none" />
 		<!-- Header -->
-		<header class="about-header">
-				<h1 class="about-title">ABOUT</h1>
+		<header class="submenu-header">
+				<h1 class="submenu-title">ABOUT</h1>
 				<div class="flex gap-2" role="tablist">
 					{#each tabs as tab, i}
 						<button
-							class={cn("about-tab-btn", i === activeTab ? "about-tab-active" : "about-tab-inactive")}
+							class={cn("submenu-tab-btn", i === activeTab ? "submenu-tab-active" : "submenu-tab-inactive")}
 							role="tab"
 							aria-selected={i === activeTab}
 							onclick={() => handleTabClick(i)}
@@ -230,7 +185,7 @@
 				</div>
 			</div>
 
-			<footer class="about-footer">
+			<footer class="submenu-footer">
 				<Control key="← →">Tabs</Control>
 				<Control key="B">Back</Control>
 			</footer>
@@ -250,8 +205,7 @@
 		opacity: 0;
 		transition: opacity 0.3s ease-out;
 	}
-	.about-closing .about-info-side,
-	.about-closing .about-tab-active {
+	.submenu-closing .about-info-side {
 		backdrop-filter: none;
 		-webkit-backdrop-filter: none;
 	}
@@ -508,39 +462,12 @@
 		background: radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.4) 100%);
 	}
 
-	.about-content-panel {
+	:global(.submenu-content-panel) {
 		padding: 1rem;
 		max-width: 1320px;
 		margin: 0 auto;
 		width: 100%;
-		animation: panel-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s both;
 	}
-	@keyframes panel-in {
-		from { opacity: 0; transform: translateY(20px); }
-		to { opacity: 1; transform: translateY(0); }
-	}
-
-	/* === Header === */
-	.about-header {
-		display: flex; align-items: center; justify-content: space-between;
-		padding: 0.5rem 0; flex-shrink: 0;
-	}
-	.about-title {
-		font-family: var(--font-skip); font-size: 1.75rem; color: #fff;
-		text-shadow: 0 2px 12px rgba(0,0,0,0.5), var(--text-shadow-border);
-	}
-	.about-tab-btn {
-		padding: 0.35rem 1rem; border-radius: 0.375rem;
-		font-family: var(--font-new-rodin); font-size: 0.9rem;
-		transition: all 0.2s; cursor: pointer; border: none; outline: none;
-	}
-	.about-tab-active {
-		background: rgba(255,255,255,0.2); color: #fff; font-weight: 700;
-		backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-		box-shadow: 0 0 20px rgba(21,194,252,0.2);
-	}
-	.about-tab-inactive { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.5); }
-	.about-tab-inactive:hover { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.8); }
 
 	/* === Body === */
 	.about-body { flex: 1; min-height: 0; padding: 0.5rem 0; gap: 1.5rem; }
@@ -679,16 +606,5 @@
 	}
 	.about-fi-icon { font-size: 1rem; flex-shrink: 0; }
 
-	/* Footer */
-	.about-footer {
-		display: flex; align-items: center; justify-content: center;
-		gap: 1.5rem; padding: 0.5rem 0; flex-shrink: 0;
-	}
-
-	/* Card-shuffle stagger animation */
-	@keyframes stagger-in {
-		from { opacity: 0; transform: translateY(20px) rotate(-3deg) scale(0.92); }
-		50% { transform: translateY(-4px) rotate(1deg) scale(1.02); }
-		to { opacity: 1; transform: translateY(0) rotate(0) scale(1); }
-	}
+	/* Footer already handled by .submenu-footer in layout.css */
 </style>

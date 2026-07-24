@@ -69,12 +69,17 @@
 		vy: number;
 		size: number;
 		color: string;
+		secondaryColor: string;
 		opacity: number;
 		rotation: number;
 		rotationSpeed: number;
 		life: number;
 		maxLife: number;
 		type: "line" | "circle" | "petal" | "drop";
+		/** Pre-generated zigzag Y offsets for electric particles (stable per particle) */
+		segments: number[];
+		/** Pre-determined shape for data particles: true = hexagon, false = square */
+		isHex: boolean;
 	}
 
 	let { type = "water", className = "", style = "", paused = false }: {
@@ -151,6 +156,15 @@
 
 		const useSecondary = Math.random() < 0.3;
 
+		// Pre-generate electric zigzag segments (avoid Math.random() in draw loop)
+		const segCount = 5 + Math.floor(config.sizeRange[1]);
+		const segments: number[] = [];
+		for (let i = 0; i <= segCount; i++) {
+			segments.push((Math.random() - 0.5) * config.sizeRange[1] * 4);
+		}
+
+		const particleType = type === "electric" ? "line" : type === "data" ? "circle" : type === "petals" ? "petal" : "drop";
+
 		return {
 			x,
 			y,
@@ -158,12 +172,15 @@
 			vy: type === "petals" ? config.speedRange[0] + Math.random() * 0.5 : vy,
 			size: config.sizeRange[0] + Math.random() * (config.sizeRange[1] - config.sizeRange[0]),
 			color: useSecondary ? config.secondaryColor : config.color,
+			secondaryColor: config.secondaryColor,
 			opacity: 0.3 + Math.random() * 0.5,
 			rotation: Math.random() * Math.PI * 2,
 			rotationSpeed: (Math.random() - 0.5) * 0.02,
 			life: 0,
 			maxLife: 100 + Math.random() * 200,
-			type: type === "electric" ? "line" : type === "data" ? "circle" : type === "petals" ? "petal" : "drop"
+			type: particleType,
+			segments,
+			isHex: Math.random() < 0.4,
 		};
 	}
 
@@ -199,7 +216,7 @@
 		ctx.globalAlpha = p.opacity * (1 - p.life / p.maxLife);
 
 		switch (p.type) {
-			case "line": // Electric spark - jagged lightning bolt
+			case "line": // Electric spark - jagged lightning bolt (uses pre-generated segments)
 				ctx.strokeStyle = p.color;
 				ctx.lineWidth = p.size;
 				ctx.lineCap = "round";
@@ -207,11 +224,11 @@
 				ctx.shadowColor = p.color;
 				ctx.shadowBlur = p.size * 14;
 				ctx.beginPath();
-				const segments = 5 + Math.floor(p.size);
 				ctx.moveTo(-p.size * 3, 0);
-				for (let i = 1; i <= segments; i++) {
-					const px = (-p.size * 3) + (i / segments) * p.size * 6;
-					const py = (Math.random() - 0.5) * p.size * 4;
+				const segLen = p.segments.length - 1;
+				for (let i = 1; i <= segLen; i++) {
+					const px = (-p.size * 3) + (i / segLen) * p.size * 6;
+					const py = p.segments[i] * (p.size / config.sizeRange[1]);
 					ctx.lineTo(px, py);
 				}
 				ctx.stroke();
@@ -222,19 +239,19 @@
 				ctx.globalAlpha *= 0.8;
 				ctx.beginPath();
 				ctx.moveTo(-p.size * 3, 0);
-				for (let i = 1; i <= segments; i++) {
-					const px = (-p.size * 3) + (i / segments) * p.size * 6;
-					const py = (Math.random() - 0.5) * p.size * 2;
+				for (let i = 1; i <= segLen; i++) {
+					const px = (-p.size * 3) + (i / segLen) * p.size * 6;
+					const py = p.segments[i] * (p.size / config.sizeRange[1]) * 0.5;
 					ctx.lineTo(px, py);
 				}
 				ctx.stroke();
 				break;
 
-			case "circle": // Data/hex - glowing hexagons & squares
+			case "circle": // Data/hex - glowing hexagons & squares (pre-determined at spawn)
 				ctx.fillStyle = p.color;
 				ctx.shadowColor = p.color;
 				ctx.shadowBlur = p.size * 6;
-				if (Math.random() < 0.4) {
+				if (p.isHex) {
 					// Hexagon
 					ctx.beginPath();
 					for (let i = 0; i < 6; i++) {
