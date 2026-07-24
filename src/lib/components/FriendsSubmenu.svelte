@@ -5,11 +5,7 @@
 	import { cn } from "$lib/utils";
 	import { createSubmenu } from "$lib/submenu.svelte";
 
-	const {
-		phase, closing, activeTab,
-		handleClose, skipToContent, handleKeydown, handleTabClick,
-		setupLifecycle
-	} = createSubmenu({
+	const submenu = createSubmenu({
 		images: [
 			"/T_UI_Camp_Status_Character_Glass_0004.png",
 			"/T_Btl_AlloutFinish_Pc04_A1out.png",
@@ -39,19 +35,22 @@
 	}
 
 	import { onMount } from "svelte";
-	onMount(() => setupLifecycle());
+	onMount(() => {
+		const cleanup = submenu.setupLifecycle();
+		return cleanup;
+	});
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
 	class="submenu-root fixed inset-0 z-50"
-	class:submenu-closing={closing}
+	class:submenu-closing={submenu.closing}
 	role="dialog"
 	aria-label="Friends"
-	onkeydown={handleKeydown}
+	onkeydown={(e) => submenu.handleKeydown(e, tabs.length)}
 	tabindex="-1"
 >
-	{#if phase === "eye"}
+	{#if submenu.phase === "eye"}
 		<div class="absolute inset-0 z-10 friends-bg-dim">
 			<div class="absolute inset-0 friends-bg-dim-overlay"></div>
 			<div class="friends-storm-clouds" aria-hidden="true"></div>
@@ -95,12 +94,12 @@
 				src="/T_Btl_AlloutFinish_Pc04_A1out.png"
 				alt=""
 				class="absolute inset-0 w-full h-full friends-art-img"
-				class:friends-art-content={phase === "content"}
+				class:friends-art-content={submenu.phase === "content"}
 			/>
-			<div class="absolute inset-0 friends-art-vignette" class:friends-vig-strong={phase === "content"}></div>
+			<div class="absolute inset-0 friends-art-vignette" class:friends-vig-strong={submenu.phase === "content"}></div>
 		</div>
 
-		{#if phase === "aoa"}
+		{#if submenu.phase === "aoa"}
 			<img
 				src="/T_Btl_AlloutFinishText_Pc04out.png"
 				alt=""
@@ -108,7 +107,7 @@
 			/>
 		{/if}
 
-		{#if phase === "content"}
+		{#if submenu.phase === "content"}
 		<div class="relative z-10 h-full flex flex-col submenu-content-panel">
 			<ParticleCanvas type="electric" class="pointer-events-none" />
 			<header class="submenu-header">
@@ -119,10 +118,10 @@
 				<div class="flex gap-2" role="tablist">
 					{#each tabs as tab, i}
 						<button
-							class={cn("submenu-tab-btn", i === activeTab ? "submenu-tab-active" : "submenu-tab-inactive")}
+							class={cn("submenu-tab-btn", i === submenu.activeTab ? "submenu-tab-active" : "submenu-tab-inactive")}
 							role="tab"
-							aria-selected={i === activeTab}
-							onclick={() => handleTabClick(i)}
+							aria-selected={i === submenu.activeTab}
+							onclick={() => submenu.handleTabClick(i)}
 						>{tab.name}</button>
 					{/each}
 				</div>
@@ -133,9 +132,9 @@
 					<img src="/arcana/strength.png" alt="" />
 				</div>
 
-				{#key activeTab}
+				{#key submenu.activeTab}
 					<div class="submenu-content-scroll">
-						{#if activeTab === 0}
+						{#if submenu.activeTab === 0}
 							<div class="max-w-5xl mx-auto w-full space-y-6">
 								<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 									{#each friendsData as friend, i}
@@ -495,13 +494,6 @@
 	}
 
 	/* ===== PHASE: CONTENT ===== */
-	:global(.submenu-content-panel) {
-		padding: 1rem;
-		max-width: 1200px;
-		margin: 0 auto;
-		width: 100%;
-	}
-
 	/* === Ally cards === */
 	.friends-ally-card {
 		padding: 1.5rem; border-radius: 1rem;

@@ -166,11 +166,14 @@
 		document.addEventListener("keydown", handleMainKeydown);
 
 		const mq = window.matchMedia("(max-width: 767px)");
-		mq.addEventListener("change", (e) => { isMobile = e.matches; });
+		const onMqChange = (e: MediaQueryListEvent) => { isMobile = e.matches; };
+		mq.addEventListener("change", onMqChange);
 
 		// Listen for submenu close events (instead of window.closeSubmenu hack)
 		window.addEventListener("submenu-close", closeSubmenu);
 		return () => {
+			document.removeEventListener("keydown", handleMainKeydown);
+			mq.removeEventListener("change", onMqChange);
 			window.removeEventListener("submenu-close", closeSubmenu);
 		};
 	});

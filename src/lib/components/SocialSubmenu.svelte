@@ -5,11 +5,7 @@
 	import { cn } from "$lib/utils";
 	import { createSubmenu } from "$lib/submenu.svelte";
 
-	const {
-		phase, closing, activeTab,
-		handleClose, skipToContent, handleKeydown, handleTabClick,
-		setupLifecycle
-	} = createSubmenu({
+	const submenu = createSubmenu({
 		images: [
 			"/T_UI_Camp_Status_Character_Glass_0002.png",
 			"/T_Btl_AlloutFinish_Pc02_A1out.png",
@@ -30,20 +26,23 @@
 	}
 
 	import { onMount } from "svelte";
-	onMount(() => setupLifecycle());
+	onMount(() => {
+		const cleanup = submenu.setupLifecycle();
+		return cleanup;
+	});
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
 	class="submenu-root fixed inset-0 z-50"
-	class:submenu-closing={closing}
+	class:submenu-closing={submenu.closing}
 	role="dialog"
 	aria-label="Social"
-	onkeydown={handleKeydown}
+	onkeydown={(e) => submenu.handleKeydown(e, tabs.length)}
 	tabindex="-1"
 >
 	<!-- Phase 1: Eye cut-in — Cherry Blossom Storm -->
-	{#if phase === "eye"}
+	{#if submenu.phase === "eye"}
 		<div class="absolute inset-0 z-10 social-bg-dim">
 			<div class="absolute inset-0 social-bg-dim-overlay"></div>
 			<div class="social-petal-glow" aria-hidden="true"></div>
@@ -84,12 +83,12 @@
 				src="/T_Btl_AlloutFinish_Pc02_A1out.png"
 				alt=""
 				class="absolute inset-0 w-full h-full social-art-img"
-				class:social-art-content={phase === "content"}
+				class:social-art-content={submenu.phase === "content"}
 			/>
-			<div class="absolute inset-0 social-art-vignette" class:social-vig-strong={phase === "content"}></div>
+			<div class="absolute inset-0 social-art-vignette" class:social-vig-strong={submenu.phase === "content"}></div>
 		</div>
 
-		{#if phase === "aoa"}
+		{#if submenu.phase === "aoa"}
 			{#each Array(3) as _, i}
 				<div class="aoa-ring" style="--ring-delay: {i * 0.08}s"></div>
 			{/each}
@@ -103,7 +102,7 @@
 			/>
 		{/if}
 
-		{#if phase === "content"}
+		{#if submenu.phase === "content"}
 		<div class="relative z-10 h-full flex flex-col submenu-content-panel">
 			<ParticleCanvas type="petals" class="pointer-events-none" />
 			<!-- Header -->
@@ -115,10 +114,10 @@
 				<div class="flex gap-2" role="tablist">
 					{#each tabs as tab, i}
 						<button
-							class={cn("submenu-tab-btn", i === activeTab ? "submenu-tab-active" : "submenu-tab-inactive")}
+							class={cn("submenu-tab-btn", i === submenu.activeTab ? "submenu-tab-active" : "submenu-tab-inactive")}
 							role="tab"
-							aria-selected={i === activeTab}
-							onclick={() => handleTabClick(i)}
+							aria-selected={i === submenu.activeTab}
+							onclick={() => submenu.handleTabClick(i)}
 						>{tab.name}</button>
 					{/each}
 				</div>
@@ -130,9 +129,9 @@
 					<img src="/arcana/lovers.png" alt="" />
 				</div>
 
-				{#key activeTab}
+				{#key submenu.activeTab}
 					<div class="submenu-content-scroll">
-						{#if activeTab === 0}
+						{#if submenu.activeTab === 0}
 							<div class="max-w-2xl mx-auto w-full space-y-4">
 								{#each profileData.socialLinks as link, i}
 									<a
@@ -535,13 +534,6 @@
 	}
 
 	/* ===== PHASE: CONTENT ===== */
-	:global(.submenu-content-panel) {
-		padding: 1rem;
-		max-width: 1200px;
-		margin: 0 auto;
-		width: 100%;
-	}
-
 	/* === Link cards === */
 	.social-link-card {
 		display: flex; align-items: center; gap: 1.5rem;

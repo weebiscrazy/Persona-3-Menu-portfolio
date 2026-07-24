@@ -165,9 +165,13 @@ html {
 }
 .submenu-arcana-watermark img { width: 100%; height: auto; }
 
-/* Closing animation for content panels */
+/* Content panel — shared base styles */
 .submenu-content-panel {
   animation: submenu-content-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
 }
 @keyframes submenu-content-in {
   from { opacity: 0; transform: translateY(12px) scale(0.97); }
