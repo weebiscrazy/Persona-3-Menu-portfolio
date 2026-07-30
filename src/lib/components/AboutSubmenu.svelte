@@ -167,28 +167,18 @@
 						<div class="about-sub-content">
 							{#if submenu.activeTab === 0}
 								<div class="about-profile-landing">
-									<div class="about-greeting">
-										<span class="about-greeting-text">Hey there! I'm</span>
-										<button
-											class="about-name-display"
-											class:about-name-alias={nameMode === 'alias'}
-											class:about-name-hover={isHovering}
-											onclick={toggleName}
-											onmouseenter={() => isHovering = true}
-											onmouseleave={() => isHovering = false}
-											title="Click to toggle name"
-										>
-											<span class="about-name-text">{nameLabel}</span>
-											<span class="about-name-toggle-hint">{nameMode === 'real' ? 'weebisagod' : profileData.name}</span>
-										</button>
-									</div>
-									<div class="about-gamertag-row">
-										<span class="about-gamertag-label">aka</span>
-										<span class="about-gamertag">"weeb"</span>
-										<span class="about-gamertag-sep">|</span>
-										<span class="about-gamertag-label">GT</span>
-										<span class="about-gamertag">weebisagod</span>
-									</div>
+									<button
+										class="about-name-display"
+										class:about-name-alias={nameMode === 'alias'}
+										class:about-name-hover={isHovering}
+										onclick={toggleName}
+										onmouseenter={() => isHovering = true}
+										onmouseleave={() => isHovering = false}
+										title="Click to toggle name"
+									>
+										<span class="about-name-text">{nameLabel}</span>
+										<span class="about-name-toggle-hint">{nameMode === 'real' ? 'weebisagod' : 'Ayush Jain'}</span>
+									</button>
 									<p class="about-bio-p">{profileData.bio}</p>
 								</div>
 							{:else if submenu.activeTab === 1}
@@ -620,15 +610,10 @@
 	.about-profile-landing {
 		display: flex; flex-direction: column; gap: 0.6rem;
 	}
-	.about-greeting { display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
-	.about-greeting-text {
-		font-family: var(--font-new-rodin); font-size: 0.9rem;
-		color: rgba(255,255,255,0.6); font-style: italic;
-	}
 	.about-name-display {
-		font-family: var(--font-skip); font-size: 1.6rem;
-		color: #15c2fc; text-shadow: 0 0 20px rgba(21,194,252,0.3);
-		line-height: 1; position: relative; cursor: pointer;
+		font-family: var(--font-skip); font-size: 2.2rem;
+		color: #15c2fc; text-shadow: 0 0 25px rgba(21,194,252,0.4);
+		line-height: 1.1; position: relative; cursor: pointer;
 		border: none; background: none; padding: 0;
 		transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
 					text-shadow 0.2s ease-out;
@@ -636,17 +621,17 @@
 	}
 	.about-name-display:hover {
 		transform: translateY(-3px);
-		text-shadow: 0 0 30px rgba(21,194,252,0.5), 0 0 60px rgba(21,194,252,0.2);
+		text-shadow: 0 0 40px rgba(21,194,252,0.6), 0 0 80px rgba(21,194,252,0.3);
 	}
 	.about-name-display:active {
 		transform: translateY(0) scale(0.95);
 	}
 	.about-name-alias {
 		color: #FD77D9;
-		text-shadow: 0 0 20px rgba(253,119,217,0.3);
+		text-shadow: 0 0 25px rgba(253,119,217,0.4);
 	}
 	.about-name-alias:hover {
-		text-shadow: 0 0 30px rgba(253,119,217,0.5), 0 0 60px rgba(253,119,217,0.2);
+		text-shadow: 0 0 40px rgba(253,119,217,0.6), 0 0 80px rgba(253,119,217,0.3);
 	}
 	.about-name-hover {
 		animation: name-wobble 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -670,20 +655,6 @@
 	}
 	.about-name-display:hover .about-name-toggle-hint {
 		opacity: 1;
-	}
-	.about-gamertag-row {
-		display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;
-	}
-	.about-gamertag-label {
-		font-family: var(--font-new-rodin); font-size: 0.7rem;
-		color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.1em;
-	}
-	.about-gamertag {
-		font-family: var(--font-skip); font-size: 0.95rem;
-		color: rgba(255,255,255,0.8); text-shadow: 0 1px 4px rgba(0,0,0,0.5);
-	}
-	.about-gamertag-sep {
-		color: rgba(255,255,255,0.15); font-size: 0.7rem;
 	}
 
 	.about-stat-detail {
