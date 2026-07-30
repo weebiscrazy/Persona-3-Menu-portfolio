@@ -23,6 +23,14 @@
 	const AOA_BG = "#15c2fc";
 
 	import { onMount } from "svelte";
+
+	let nameMode = $state<'real' | 'alias'>('real');
+	let isHovering = $state(false);
+	let nameLabel = $derived(nameMode === 'real' ? profileData.name : 'weebisagod');
+
+	function toggleName() {
+		nameMode = nameMode === 'real' ? 'alias' : 'real';
+	}
 	onMount(() => {
 		const cleanup = submenu.setupLifecycle();
 		return cleanup;
@@ -161,7 +169,18 @@
 								<div class="about-profile-landing">
 									<div class="about-greeting">
 										<span class="about-greeting-text">Hey there! I'm</span>
-										<span class="about-name-display">{profileData.name}</span>
+										<button
+											class="about-name-display"
+											class:about-name-alias={nameMode === 'alias'}
+											class:about-name-hover={isHovering}
+											onclick={toggleName}
+											onmouseenter={() => isHovering = true}
+											onmouseleave={() => isHovering = false}
+											title="Click to toggle name"
+										>
+											<span class="about-name-text">{nameLabel}</span>
+											<span class="about-name-toggle-hint">{nameMode === 'real' ? 'weebisagod' : profileData.name}</span>
+										</button>
 									</div>
 									<div class="about-gamertag-row">
 										<span class="about-gamertag-label">aka</span>
@@ -609,7 +628,48 @@
 	.about-name-display {
 		font-family: var(--font-skip); font-size: 1.6rem;
 		color: #15c2fc; text-shadow: 0 0 20px rgba(21,194,252,0.3);
-		line-height: 1;
+		line-height: 1; position: relative; cursor: pointer;
+		border: none; background: none; padding: 0;
+		transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+					text-shadow 0.2s ease-out;
+		transform: translateY(0);
+	}
+	.about-name-display:hover {
+		transform: translateY(-3px);
+		text-shadow: 0 0 30px rgba(21,194,252,0.5), 0 0 60px rgba(21,194,252,0.2);
+	}
+	.about-name-display:active {
+		transform: translateY(0) scale(0.95);
+	}
+	.about-name-alias {
+		color: #FD77D9;
+		text-shadow: 0 0 20px rgba(253,119,217,0.3);
+	}
+	.about-name-alias:hover {
+		text-shadow: 0 0 30px rgba(253,119,217,0.5), 0 0 60px rgba(253,119,217,0.2);
+	}
+	.about-name-hover {
+		animation: name-wobble 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+	}
+	@keyframes name-wobble {
+		0% { transform: translateY(-1px) rotate(0deg); }
+		25% { transform: translateY(-4px) rotate(-1deg); }
+		50% { transform: translateY(-2px) rotate(1deg); }
+		75% { transform: translateY(-4px) rotate(-0.5deg); }
+		100% { transform: translateY(-3px) rotate(0deg); }
+	}
+	.about-name-text {
+		position: relative; z-index: 1;
+	}
+	.about-name-toggle-hint {
+		position: absolute; bottom: -1.2rem; left: 0;
+		font-family: var(--font-new-rodin); font-size: 0.55rem;
+		color: rgba(255,255,255,0.25); text-shadow: none;
+		white-space: nowrap; opacity: 0;
+		transition: opacity 0.2s ease-out; pointer-events: none;
+	}
+	.about-name-display:hover .about-name-toggle-hint {
+		opacity: 1;
 	}
 	.about-gamertag-row {
 		display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;
