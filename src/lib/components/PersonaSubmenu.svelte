@@ -99,7 +99,7 @@
 			<ParticleCanvas type="data" class="pointer-events-none" />
 			<header class="submenu-header">
 				<div class="submenu-title-row">
-					<img src="/arcana/chariot.png" alt="Chariot" class="submenu-arcana-icon" />
+					<img src="/arcana/hermit.png" alt="Hermit" class="submenu-arcana-icon" />
 					<h1 class="submenu-title">PERSONA</h1>
 				</div>
 				<div class="flex gap-2" role="tablist">

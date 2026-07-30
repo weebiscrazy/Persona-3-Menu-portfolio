@@ -156,7 +156,7 @@
 						<div class="about-sub-content">
 							{#if submenu.activeTab === 0}
 								<p class="about-bio-p">{profileData.bio}</p>
-							{:else if activeTab === 1}
+							{:else if submenu.activeTab === 1}
 								<div class="grid grid-cols-2 gap-3">
 									{#each profileData.stats as stat}
 										<div class="about-stat-detail">
