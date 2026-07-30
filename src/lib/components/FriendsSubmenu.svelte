@@ -161,7 +161,7 @@
 												<h4 class="font-skip text-xl text-fg" style="text-shadow: var(--text-shadow-border)">{friend.name}</h4>
 												<p class="text-amber text-sm font-new-rodin">{friend.role}</p>
 											</div>
-											<p class="text-muted text-sm mb-4 italic font-new-rodin">"{friend.quote}"</p>
+											<p class="text-muted text-sm mb-4 italic font-new-rodin" style="text-shadow: 0 1px 4px rgba(0,0,0,0.5)">"{friend.quote}"</p>
 											{#if friend.url}
 												<a
 													href={friend.url}
@@ -200,7 +200,7 @@
 														</div>
 														<div class="relative">
 															<span class="block font-skip text-6xl text-amber/20 leading-none absolute -top-2 -left-2">"</span>
-															<p class="text-lg leading-relaxed text-muted relative z-10 italic font-new-rodin pl-6">{friend.quote}</p>
+															<p class="text-lg leading-relaxed text-muted relative z-10 italic font-new-rodin pl-6" style="text-shadow: 0 1px 4px rgba(0,0,0,0.5)">{friend.quote}</p>
 														</div>
 													</div>
 												</div>

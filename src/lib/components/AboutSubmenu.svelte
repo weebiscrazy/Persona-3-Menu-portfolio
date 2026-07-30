@@ -514,8 +514,9 @@
 		text-shadow: 0 0 20px rgba(21,194,252,0.25);
 	}
 	.about-info-tagline {
-		font-family: var(--font-new-rodin); color: rgba(255,255,255,0.45);
+		font-family: var(--font-new-rodin); color: rgba(255,255,255,0.6);
 		font-style: italic; font-size: 0.85rem; margin-top: 0.1rem;
+		text-shadow: 0 1px 4px rgba(0,0,0,0.5);
 	}
 
 	/* Stats */
@@ -535,8 +536,8 @@
 		text-shadow: 0 0 12px rgba(21,194,252,0.25);
 	}
 	.about-stat-lbl {
-		font-family: var(--font-new-rodin); font-size: 0.6rem; color: rgba(255,255,255,0.4);
-		text-align: center;
+		font-family: var(--font-new-rodin); font-size: 0.6rem; color: rgba(255,255,255,0.55);
+		text-align: center; text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 	}
 
 	/* Social */
@@ -565,8 +566,8 @@
 	.about-sub-content::-webkit-scrollbar-thumb { background: rgba(21,194,252,0.3); border-radius: 2px; }
 
 	.about-bio-p {
-		font-family: var(--font-new-rodin); color: rgba(255,255,255,0.7);
-		line-height: 1.6; font-size: 0.9rem;
+		font-family: var(--font-new-rodin); color: rgba(255,255,255,0.85);
+		line-height: 1.6; font-size: 0.9rem; text-shadow: 0 1px 4px rgba(0,0,0,0.5);
 	}
 
 	.about-stat-detail {
@@ -581,10 +582,11 @@
 		text-shadow: 0 0 15px rgba(21,194,252,0.25);
 	}
 	.about-stat-dl {
-		font-family: var(--font-new-rodin); color: rgba(255,255,255,0.5); font-size: 0.8rem;
+		font-family: var(--font-new-rodin); color: rgba(255,255,255,0.65); font-size: 0.8rem;
+		text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 	}
 
-	.about-bio-wrap p { font-family: var(--font-new-rodin); color: rgba(255,255,255,0.7); line-height: 1.6; font-size: 0.9rem; white-space: pre-wrap; }
+	.about-bio-wrap p { font-family: var(--font-new-rodin); color: rgba(255,255,255,0.85); line-height: 1.6; font-size: 0.9rem; white-space: pre-wrap; text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
 	.about-bio-sep { text-align: center; color: rgba(255,255,255,0.05); margin: 0.75rem 0; font-size: 0.7rem; }
 
 	.about-focus-box {
@@ -598,7 +600,8 @@
 	.about-focus-list { display: flex; flex-direction: column; gap: 0.4rem; list-style: none; padding: 0; margin: 0; }
 	.about-focus-li {
 		display: flex; align-items: center; gap: 0.5rem;
-		color: rgba(255,255,255,0.55); font-family: var(--font-new-rodin); font-size: 0.8rem;
+		color: rgba(255,255,255,0.7); font-family: var(--font-new-rodin); font-size: 0.8rem;
+		text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 	}
 	.about-fi-icon { font-size: 1rem; flex-shrink: 0; }
 

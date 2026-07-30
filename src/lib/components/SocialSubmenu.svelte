@@ -605,7 +605,8 @@
 		text-shadow: 0 2px 8px rgba(0,0,0,0.3);
 	}
 	.social-email-sub {
-		font-family: var(--font-new-rodin); color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-top: 0.1rem;
+		font-family: var(--font-new-rodin); color: rgba(255,255,255,0.8); font-size: 0.85rem; margin-top: 0.1rem;
+		text-shadow: 0 1px 4px rgba(0,0,0,0.5);
 	}
 	.social-copy-btn {
 		width: 100%; padding: 0.75rem 1.5rem; border-radius: 0.5rem;
@@ -639,8 +640,8 @@
 		text-shadow: var(--text-shadow-border);
 	}
 	.social-avail-lbl {
-		font-family: var(--font-new-rodin); color: rgba(255,255,255,0.6);
-		font-size: 0.7rem; margin-top: 0.1rem;
+		font-family: var(--font-new-rodin); color: rgba(255,255,255,0.7);
+		font-size: 0.7rem; margin-top: 0.1rem; text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 	}
 
 </style>

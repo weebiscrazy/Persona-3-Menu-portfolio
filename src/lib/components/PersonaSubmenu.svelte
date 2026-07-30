@@ -144,10 +144,10 @@ style="animation-delay: {0.3 + i * 0.12}s"
 												</div>
 											</div>
 
-											<p class="text-muted text-sm leading-relaxed mb-4 font-new-rodin">{persona.description}</p>
+											<p class="text-muted text-sm leading-relaxed mb-4 font-new-rodin" style="text-shadow: 0 1px 4px rgba(0,0,0,0.5)">{persona.description}</p>
 
 											<div class="pt-4 border-t border-fg/10">
-												<p class="text-xs text-muted/60 font-new-rodin mb-2 tracking-widest">FAVORITES</p>
+												<p class="text-xs text-muted/60 font-new-rodin mb-2 tracking-widest" style="text-shadow: 0 1px 3px rgba(0,0,0,0.5)">FAVORITES</p>
 												<div class="flex flex-wrap gap-1.5">
 													{#each persona.favorites as fav}
 														<span class="inline-block px-2.5 py-1 rounded-md bg-fg/10 text-fg/80 text-xs font-new-rodin">{fav}</span>
@@ -176,7 +176,7 @@ style="animation-delay: {0.3 + i * 0.12}s"
 											</div>
 											<div class="flex-1">
 												<h4 class="font-skip text-lg text-fg mb-1" style="text-shadow: var(--text-shadow-border)">{persona.name}</h4>
-												<p class="text-muted font-new-rodin italic leading-relaxed">{persona.funFact}</p>
+												<p class="text-muted font-new-rodin italic leading-relaxed" style="text-shadow: 0 1px 4px rgba(0,0,0,0.5)">{persona.funFact}</p>
 											</div>
 										</div>
 									</div>
@@ -187,19 +187,19 @@ style="animation-delay: {0.3 + i * 0.12}s"
 									<div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
 										<div class="p-4 rounded-xl bg-fg/5">
 											<p class="font-skip text-3xl text-button-1" style="text-shadow: var(--text-shadow-border)">Svelte 5</p>
-											<p class="text-muted text-sm font-new-rodin">Framework</p>
+											<p class="text-muted text-sm font-new-rodin" style="text-shadow: 0 1px 3px rgba(0,0,0,0.5)">Framework</p>
 										</div>
 										<div class="p-4 rounded-xl bg-fg/5">
 											<p class="font-skip text-3xl text-button-2" style="text-shadow: var(--text-shadow-border)">TypeScript</p>
-											<p class="text-muted text-sm font-new-rodin">Language</p>
+											<p class="text-muted text-sm font-new-rodin" style="text-shadow: 0 1px 3px rgba(0,0,0,0.5)">Language</p>
 										</div>
 										<div class="p-4 rounded-xl bg-fg/5">
 											<p class="font-skip text-3xl text-amber" style="text-shadow: var(--text-shadow-border)">Tailwind 4</p>
-											<p class="text-muted text-sm font-new-rodin">Styling</p>
+											<p class="text-muted text-sm font-new-rodin" style="text-shadow: 0 1px 3px rgba(0,0,0,0.5)">Styling</p>
 										</div>
 										<div class="p-4 rounded-xl bg-fg/5">
 											<p class="font-skip text-3xl text-button-1" style="text-shadow: var(--text-shadow-border)">Vite</p>
-											<p class="text-muted text-sm font-new-rodin">Bundler</p>
+											<p class="text-muted text-sm font-new-rodin" style="text-shadow: 0 1px 3px rgba(0,0,0,0.5)">Bundler</p>
 										</div>
 									</div>
 								</div>
