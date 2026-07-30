@@ -128,8 +128,8 @@
 										<div
 											class={cn(
 												"persona-hobby-card group stagger-in",
-												"relative p-6 rounded-2xl bg-fg/5 border border-fg/10",
-												"hover:border-amber/50 hover:bg-fg/10 hover:shadow-[0_0_30px_rgba(234,179,8,0.1)]",
+												"relative p-6 rounded-2xl",
+												"hover:border-amber/50 hover:shadow-[0_0_30px_rgba(234,179,8,0.1)]",
 												"transition-all duration-300"
 											)}
 style="animation-delay: {0.3 + i * 0.12}s"
@@ -140,7 +140,7 @@ style="animation-delay: {0.3 + i * 0.12}s"
 												</div>
 												<div class="flex-1 min-w-0">
 													<h4 class="font-skip text-xl text-fg truncate" style="text-shadow: var(--text-shadow-border)">{persona.name}</h4>
-													<div class="text-button-1 text-sm font-new-rodin tracking-wider mt-0.5">{stars(persona.rating)}</div>
+													<div class="text-button-1 text-sm font-new-rodin tracking-wider mt-0.5" style="text-shadow: 0 1px 3px rgba(0,0,0,0.4)">{stars(persona.rating)}</div>
 												</div>
 											</div>
 
@@ -150,7 +150,7 @@ style="animation-delay: {0.3 + i * 0.12}s"
 												<p class="text-xs text-muted/60 font-new-rodin mb-2 tracking-widest" style="text-shadow: 0 1px 3px rgba(0,0,0,0.5)">FAVORITES</p>
 												<div class="flex flex-wrap gap-1.5">
 													{#each persona.favorites as fav}
-														<span class="inline-block px-2.5 py-1 rounded-md bg-fg/10 text-fg/80 text-xs font-new-rodin">{fav}</span>
+														<span class="inline-block px-2.5 py-1 rounded-md bg-fg/10 text-fg/80 text-xs font-new-rodin" style="text-shadow: 0 1px 3px rgba(0,0,0,0.4)">{fav}</span>
 													{/each}
 												</div>
 											</div>
@@ -164,8 +164,8 @@ style="animation-delay: {0.3 + i * 0.12}s"
 									<div
 										class={cn(
 											"persona-fact-card stagger-in",
-											"relative p-6 rounded-2xl bg-fg/5 border border-fg/10",
-											"hover:border-amber/30 hover:bg-fg/10 hover:shadow-[0_0_20px_rgba(234,179,8,0.08)]",
+											"relative p-6 rounded-2xl",
+											"hover:border-amber/30 hover:shadow-[0_0_20px_rgba(234,179,8,0.08)]",
 											"transition-all duration-300"
 										)}
 										style="animation-delay: {0.3 + i * 0.12}s"
@@ -182,22 +182,22 @@ style="animation-delay: {0.3 + i * 0.12}s"
 									</div>
 								{/each}
 
-								<div class="mt-12 p-6 rounded-2xl bg-gradient-to-r from-amber/10 to-yellow/10 border border-fg/10 stagger-in" style="animation-delay: 0.8s">
+								<div class="mt-12 p-6 rounded-2xl bg-gradient-to-r from-amber/10 to-yellow/10 border border-fg/10 stagger-in persona-build-card" style="animation-delay: 0.8s">
 									<h4 class="font-skip text-xl mb-4 text-center text-amber" style="text-shadow: var(--text-shadow-border)">Current Build</h4>
 									<div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-										<div class="p-4 rounded-xl bg-fg/5">
+										<div class="p-4 rounded-xl persona-build-card">
 											<p class="font-skip text-3xl text-button-1" style="text-shadow: var(--text-shadow-border)">Svelte 5</p>
 											<p class="text-muted text-sm font-new-rodin" style="text-shadow: 0 1px 3px rgba(0,0,0,0.5)">Framework</p>
 										</div>
-										<div class="p-4 rounded-xl bg-fg/5">
+										<div class="p-4 rounded-xl persona-build-card">
 											<p class="font-skip text-3xl text-button-2" style="text-shadow: var(--text-shadow-border)">TypeScript</p>
 											<p class="text-muted text-sm font-new-rodin" style="text-shadow: 0 1px 3px rgba(0,0,0,0.5)">Language</p>
 										</div>
-										<div class="p-4 rounded-xl bg-fg/5">
+										<div class="p-4 rounded-xl persona-build-card">
 											<p class="font-skip text-3xl text-amber" style="text-shadow: var(--text-shadow-border)">Tailwind 4</p>
 											<p class="text-muted text-sm font-new-rodin" style="text-shadow: 0 1px 3px rgba(0,0,0,0.5)">Styling</p>
 										</div>
-										<div class="p-4 rounded-xl bg-fg/5">
+										<div class="p-4 rounded-xl persona-build-card">
 											<p class="font-skip text-3xl text-button-1" style="text-shadow: var(--text-shadow-border)">Vite</p>
 											<p class="text-muted text-sm font-new-rodin" style="text-shadow: 0 1px 3px rgba(0,0,0,0.5)">Bundler</p>
 										</div>
@@ -483,10 +483,29 @@ style="animation-delay: {0.3 + i * 0.12}s"
 	/* === Hobby cards === */
 	.persona-hobby-card {
 		animation: stagger-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+		background: rgba(0,0,0,0.5); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+		border-color: rgba(255,255,255,0.06);
+	}
+	.persona-hobby-card:hover {
+		background: rgba(0,0,0,0.6);
 	}
 
 	/* === Fact cards === */
 	.persona-fact-card {
 		animation: stagger-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+		background: rgba(0,0,0,0.5); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+		border-color: rgba(255,255,255,0.06);
+	}
+	.persona-fact-card:hover {
+		background: rgba(0,0,0,0.6);
+	}
+
+	/* === Build section cards === */
+	.persona-build-card {
+		background: rgba(0,0,0,0.45); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+		border-color: rgba(255,255,255,0.06);
+	}
+	.persona-build-card:hover {
+		background: rgba(0,0,0,0.55);
 	}
 </style>

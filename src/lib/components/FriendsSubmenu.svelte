@@ -159,7 +159,7 @@
 											</div>
 											<div class="mb-3">
 												<h4 class="font-skip text-xl text-fg" style="text-shadow: var(--text-shadow-border)">{friend.name}</h4>
-												<p class="text-amber text-sm font-new-rodin">{friend.role}</p>
+												<p class="text-amber text-sm font-new-rodin" style="text-shadow: 0 1px 3px rgba(0,0,0,0.4)">{friend.role}</p>
 											</div>
 											<p class="text-muted text-sm mb-4 italic font-new-rodin" style="text-shadow: 0 1px 4px rgba(0,0,0,0.5)">"{friend.quote}"</p>
 											{#if friend.url}
@@ -167,7 +167,7 @@
 													href={friend.url}
 													target="_blank"
 													rel="noopener noreferrer"
-													class="inline-flex items-center gap-2 text-sm font-new-rodin text-amber hover:text-button-2 transition-colors"
+													class="inline-flex items-center gap-2 text-sm font-new-rodin text-amber hover:text-button-2 transition-colors" style="text-shadow: 0 1px 3px rgba(0,0,0,0.4)"
 												>
 													<iconify-icon icon={friend.platform === "GitHub" ? "mdi:github" : friend.platform === "Twitter" ? "mdi:twitter" : "mdi:linkedin"} class="text-lg"></iconify-icon>
 													Connect
@@ -184,7 +184,7 @@
 										<div class="flex transition-transform duration-500 ease-out" style="transform: translateX({-currentSlide * (100 / slidesPerView)}%)">
 											{#each friendsData as friend, i}
 												<div class="w-[calc(100%/2)] px-4" style="min-width: {100 / slidesPerView}%">
-													<div class="h-full p-8 rounded-2xl bg-fg/5 border border-fg/10 hover:border-amber/30 transition-all">
+													<div class="h-full p-8 rounded-2xl border border-fg/10 hover:border-amber/30 transition-all friends-testimonial-card">
 														<div class="flex items-center gap-4 mb-6">
 															<div class="size-16 rounded-xl bg-gradient-to-br from-amber/20 to-stone/20 flex items-center justify-center overflow-hidden border-2 border-fg/10">
 																{#if friend.avatar}
@@ -195,7 +195,7 @@
 															</div>
 															<div>
 																<h4 class="font-skip text-xl text-fg" style="text-shadow: var(--text-shadow-border)">{friend.name}</h4>
-																<p class="text-amber text-sm font-new-rodin">{friend.role}</p>
+												<p class="text-amber text-sm font-new-rodin" style="text-shadow: 0 1px 3px rgba(0,0,0,0.4)">{friend.role}</p>
 															</div>
 														</div>
 														<div class="relative">
@@ -497,27 +497,27 @@
 	/* === Ally cards === */
 	.friends-ally-card {
 		padding: 1.5rem; border-radius: 1rem;
-		background: rgba(0,0,0,0.45); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+		background: rgba(0,0,0,0.55); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
 		border: 1px solid rgba(120,113,108,0.12);
 		transition: all 0.3s;
 		animation: stagger-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 	}
 	.friends-ally-card:hover {
 		border-color: rgba(120,113,108,0.5);
-		background: rgba(0,0,0,0.55);
+		background: rgba(0,0,0,0.65);
 		box-shadow: 0 0 30px rgba(120,113,108,0.1);
 	}
 
 	/* === Testimonials === */
 	.friends-testimonial-card {
 		padding: 2rem; border-radius: 1rem;
-		background: rgba(0,0,0,0.4); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+		background: rgba(0,0,0,0.5); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
 		border: 1px solid rgba(120,113,108,0.1);
 		transition: all 0.3s;
 	}
 	.friends-testimonial-card:hover {
 		border-color: rgba(120,113,108,0.3);
-		background: rgba(0,0,0,0.5);
+		background: rgba(0,0,0,0.6);
 	}
 
 
