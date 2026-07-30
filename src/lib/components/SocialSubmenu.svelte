@@ -125,9 +125,6 @@
 
 			<!-- Body -->
 			<div class="flex-1 flex flex-col min-h-0">
-				<div class="submenu-character-portrait" aria-hidden="true">
-					<img src="/T_UI_Camp_Status_Character_0002.png" alt="" />
-				</div>
 				<div class="submenu-arcana-watermark" aria-hidden="true">
 					<img src="/arcana/lovers.png" alt="" />
 				</div>
