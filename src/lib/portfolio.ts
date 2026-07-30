@@ -35,10 +35,10 @@ export interface ProfileData {
 }
 
 export const profileData: ProfileData = {
-	name: "Ayush",
-	title: "Full Stack Developer",
-	tagline: "Building cool things on the web",
-	bio: "Building cool things on the web. Passionate about clean code, great UX, and Persona games. Currently exploring the intersection of gaming aesthetics and modern web development.",
+	name: "Ayush Jain",
+	title: "crazyboy",
+	tagline: "I code for funsies",
+	bio: "Student, 16, JEE aspirant. Loves games (can you even doubt after seeing this?). Also likes stars and rage-baiting people. Creative free-coder, loves to make projects for fun.",
 	avatar: "/avatar.png",
 	stats: [
 		{ label: "Years Coding", value: "5+" },

@@ -128,9 +128,12 @@
 				<div class="about-info-side">
 					<img src="/T_Btl_AlloutFinishText_Pc01out.png" alt="" class="about-info-nameplate" />
 
-					<div>
+					<div class="about-name-tag">
 						<h2 class="about-info-title">{profileData.title}</h2>
 						<p class="about-info-tagline">"{profileData.tagline}"</p>
+						<div class="about-alias-row">
+							<span class="about-alias-badge">@{profileData.name.split(' ')[0].toLowerCase()}</span>
+						</div>
 					</div>
 
 					<div class="about-stats-grid">
@@ -155,7 +158,20 @@
 					{#key submenu.activeTab}
 						<div class="about-sub-content">
 							{#if submenu.activeTab === 0}
-								<p class="about-bio-p">{profileData.bio}</p>
+								<div class="about-profile-landing">
+									<div class="about-greeting">
+										<span class="about-greeting-text">Hey there! I'm</span>
+										<span class="about-name-display">{profileData.name}</span>
+									</div>
+									<div class="about-gamertag-row">
+										<span class="about-gamertag-label">aka</span>
+										<span class="about-gamertag">"weeb"</span>
+										<span class="about-gamertag-sep">|</span>
+										<span class="about-gamertag-label">GT</span>
+										<span class="about-gamertag">weebisagod</span>
+									</div>
+									<p class="about-bio-p">{profileData.bio}</p>
+								</div>
 							{:else if submenu.activeTab === 1}
 								<div class="grid grid-cols-2 gap-3">
 									{#each profileData.stats as stat}
@@ -518,6 +534,17 @@
 		font-style: italic; font-size: 0.85rem; margin-top: 0.1rem;
 		text-shadow: 0 1px 4px rgba(0,0,0,0.5);
 	}
+	.about-name-tag {
+		display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+	}
+	.about-alias-row { display: flex; gap: 0.35rem; align-items: center; }
+	.about-alias-badge {
+		font-family: var(--font-skip); font-size: 0.7rem;
+		padding: 0.15rem 0.5rem; border-radius: 9999px;
+		background: rgba(21,194,252,0.15); color: #15c2fc;
+		border: 1px solid rgba(21,194,252,0.2);
+		text-shadow: 0 0 8px rgba(21,194,252,0.2);
+	}
 
 	/* Stats */
 	.about-stats-grid {
@@ -568,6 +595,35 @@
 	.about-bio-p {
 		font-family: var(--font-new-rodin); color: rgba(255,255,255,0.85);
 		line-height: 1.6; font-size: 0.9rem; text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+	}
+
+	/* Profile landing tab */
+	.about-profile-landing {
+		display: flex; flex-direction: column; gap: 0.6rem;
+	}
+	.about-greeting { display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
+	.about-greeting-text {
+		font-family: var(--font-new-rodin); font-size: 0.9rem;
+		color: rgba(255,255,255,0.6); font-style: italic;
+	}
+	.about-name-display {
+		font-family: var(--font-skip); font-size: 1.6rem;
+		color: #15c2fc; text-shadow: 0 0 20px rgba(21,194,252,0.3);
+		line-height: 1;
+	}
+	.about-gamertag-row {
+		display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;
+	}
+	.about-gamertag-label {
+		font-family: var(--font-new-rodin); font-size: 0.7rem;
+		color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.1em;
+	}
+	.about-gamertag {
+		font-family: var(--font-skip); font-size: 0.95rem;
+		color: rgba(255,255,255,0.8); text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+	}
+	.about-gamertag-sep {
+		color: rgba(255,255,255,0.15); font-size: 0.7rem;
 	}
 
 	.about-stat-detail {
