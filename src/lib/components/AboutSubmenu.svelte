@@ -25,11 +25,19 @@
 	import { onMount } from "svelte";
 
 	let nameMode = $state<'real' | 'alias'>('real');
-	let isHovering = $state(false);
-	let nameLabel = $derived(nameMode === 'real' ? profileData.name : 'weebisagod');
+	let isFlipped = $derived(nameMode === 'alias');
+	let showBurst = $state(false);
+	let burstColor = $state('#15c2fc');
 
 	function toggleName() {
-		nameMode = nameMode === 'real' ? 'alias' : 'real';
+		const newMode = nameMode === 'real' ? 'alias' : 'real';
+		nameMode = newMode;
+		burstColor = newMode === 'alias' ? '#E60012' : '#15c2fc';
+		showBurst = true;
+		setTimeout(() => { showBurst = false; }, 600);
+		window.dispatchEvent(new CustomEvent('theme-change', {
+			detail: { mode: newMode === 'alias' ? 'p5' : 'p3' }
+		}));
 	}
 	onMount(() => {
 		const cleanup = submenu.setupLifecycle();
@@ -167,18 +175,30 @@
 						<div class="about-sub-content">
 							{#if submenu.activeTab === 0}
 								<div class="about-profile-landing">
-									<button
-										class="about-name-display"
-										class:about-name-alias={nameMode === 'alias'}
-										class:about-name-hover={isHovering}
-										onclick={toggleName}
-										onmouseenter={() => isHovering = true}
-										onmouseleave={() => isHovering = false}
-										title="Click to toggle name"
-									>
-										<span class="about-name-text">{nameLabel}</span>
-										<span class="about-name-toggle-hint">{nameMode === 'real' ? 'weebisagod' : 'Ayush Jain'}</span>
-									</button>
+									<div class="about-name-card-wrap">
+										<div class="about-name-burst" class:about-burst-active={showBurst} style="--burst-color: {burstColor}">
+											{#each Array(12) as _, i}
+												<div class="about-burst-particle" style="--ba: {i * 30}deg; --bd: {i * 0.02}s; --bdist: {60 + (i % 6) * 20}px; --bs: {4 + (i % 3) * 3}px"></div>
+											{/each}
+										</div>
+										<button
+											class="about-name-card"
+											onclick={toggleName}
+											onmouseenter={() => document.documentElement.style.setProperty('--name-glow', '0.6')}
+											onmouseleave={() => document.documentElement.style.setProperty('--name-glow', '0.4')}
+											title="Click to flip"
+										>
+											<div class="about-name-inner" class:about-name-flipped={isFlipped}>
+												<div class="about-name-face about-name-front">
+													<span class="about-name-label">Ayush Jain</span>
+												</div>
+												<div class="about-name-face about-name-back">
+													<span class="about-name-label">weebisagod</span>
+												</div>
+											</div>
+										</button>
+										<span class="about-name-flip-hint">Click to flip</span>
+									</div>
 									<p class="about-bio-p">{profileData.bio}</p>
 								</div>
 							{:else if submenu.activeTab === 1}
@@ -608,53 +628,96 @@
 
 	/* Profile landing tab */
 	.about-profile-landing {
-		display: flex; flex-direction: column; gap: 0.6rem;
+		display: flex; flex-direction: column; gap: 0.75rem;
 	}
-	.about-name-display {
-		font-family: var(--font-skip); font-size: 2.2rem;
-		color: #15c2fc; text-shadow: 0 0 25px rgba(21,194,252,0.4);
-		line-height: 1.1; position: relative; cursor: pointer;
-		border: none; background: none; padding: 0;
-		transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
-					text-shadow 0.2s ease-out;
-		transform: translateY(0);
+
+	/* === 3D Name Flip Card (Persona 5 Style) === */
+	.about-name-card-wrap {
+		position: relative;
+		perspective: 1000px;
+		width: fit-content;
 	}
-	.about-name-display:hover {
-		transform: translateY(-3px);
+	.about-name-card {
+		background: none; border: none; padding: 0; cursor: pointer;
+		display: block;
+	}
+	.about-name-inner {
+		position: relative;
+		width: fit-content;
+		transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+		transform-style: preserve-3d;
+	}
+	.about-name-flipped {
+		transform: rotateY(180deg);
+	}
+	.about-name-face {
+		backface-visibility: hidden;
+		padding: 0.25rem 0.5rem;
+		border-radius: 0.25rem;
+	}
+	.about-name-front {
+		background: rgba(21,194,252,0.08);
+		border: 1px solid rgba(21,194,252,0.2);
+	}
+	.about-name-back {
+		position: absolute; inset: 0;
+		transform: rotateY(180deg);
+		background: rgba(230,0,18,0.08);
+		border: 1px solid rgba(230,0,18,0.2);
+		display: flex; align-items: center;
+	}
+	.about-name-label {
+		font-family: var(--font-skip);
+		font-size: 2.2rem; line-height: 1.1;
+		white-space: nowrap;
+	}
+	.about-name-front .about-name-label {
+		color: #15c2fc;
+		text-shadow: 0 0 25px rgba(21,194,252,0.4);
+	}
+	.about-name-back .about-name-label {
+		color: #E60012;
+		text-shadow: 0 0 25px rgba(230,0,18,0.4);
+	}
+	.about-name-card:hover .about-name-front .about-name-label {
 		text-shadow: 0 0 40px rgba(21,194,252,0.6), 0 0 80px rgba(21,194,252,0.3);
 	}
-	.about-name-display:active {
-		transform: translateY(0) scale(0.95);
+	.about-name-card:hover .about-name-back .about-name-label {
+		text-shadow: 0 0 40px rgba(230,0,18,0.6), 0 0 80px rgba(230,0,18,0.3);
 	}
-	.about-name-alias {
-		color: #FD77D9;
-		text-shadow: 0 0 25px rgba(253,119,217,0.4);
-	}
-	.about-name-alias:hover {
-		text-shadow: 0 0 40px rgba(253,119,217,0.6), 0 0 80px rgba(253,119,217,0.3);
-	}
-	.about-name-hover {
-		animation: name-wobble 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-	}
-	@keyframes name-wobble {
-		0% { transform: translateY(-1px) rotate(0deg); }
-		25% { transform: translateY(-4px) rotate(-1deg); }
-		50% { transform: translateY(-2px) rotate(1deg); }
-		75% { transform: translateY(-4px) rotate(-0.5deg); }
-		100% { transform: translateY(-3px) rotate(0deg); }
-	}
-	.about-name-text {
-		position: relative; z-index: 1;
-	}
-	.about-name-toggle-hint {
-		position: absolute; bottom: -1.2rem; left: 0;
+	.about-name-flip-hint {
 		font-family: var(--font-new-rodin); font-size: 0.55rem;
-		color: rgba(255,255,255,0.25); text-shadow: none;
-		white-space: nowrap; opacity: 0;
-		transition: opacity 0.2s ease-out; pointer-events: none;
+		color: rgba(255,255,255,0.2); display: block;
+		margin-top: 0.2rem; transition: opacity 0.2s;
 	}
-	.about-name-display:hover .about-name-toggle-hint {
-		opacity: 1;
+	.about-name-card-wrap:hover .about-name-flip-hint {
+		color: rgba(255,255,255,0.4);
+	}
+
+	/* === Particle burst on flip === */
+	.about-name-burst {
+		position: absolute; left: 50%; top: 50%;
+		width: 0; height: 0; z-index: 10;
+		pointer-events: none;
+	}
+	.about-burst-particle {
+		position: absolute;
+		width: var(--bs); height: var(--bs);
+		margin-left: calc(var(--bs) * -0.5);
+		margin-top: calc(var(--bs) * -0.5);
+		background: var(--burst-color, #15c2fc);
+		border-radius: 50%;
+		opacity: 0;
+		transform: rotate(var(--ba)) translateY(0);
+	}
+	.about-burst-active .about-burst-particle {
+		animation: about-burst-fly 0.45s ease-out var(--bd) forwards;
+		box-shadow: 0 0 6px var(--burst-color), 0 0 20px var(--burst-color);
+	}
+	@keyframes about-burst-fly {
+		0% { opacity: 1; transform: rotate(var(--ba)) translateY(0) scale(1); }
+		60% { opacity: 0.8; transform: rotate(var(--ba)) translateY(calc(var(--bdist) * -1)) scale(0.6); }
+		100% { opacity: 0; transform: rotate(var(--ba)) translateY(calc(var(--bdist) * -1.3)) scale(0.2); }
 	}
 
 	.about-stat-detail {

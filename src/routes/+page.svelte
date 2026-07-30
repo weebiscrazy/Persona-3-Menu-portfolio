@@ -171,10 +171,16 @@
 
 		// Listen for submenu close events (instead of window.closeSubmenu hack)
 		window.addEventListener("submenu-close", closeSubmenu);
+		// Listen for P5 theme change from name flip
+		function onThemeChange(e: Event) {
+			document.documentElement.setAttribute('data-theme', (e as CustomEvent).detail.mode);
+		}
+		window.addEventListener("theme-change", onThemeChange);
 		return () => {
 			document.removeEventListener("keydown", handleMainKeydown);
 			mq.removeEventListener("change", onMqChange);
 			window.removeEventListener("submenu-close", closeSubmenu);
+			window.removeEventListener("theme-change", onThemeChange);
 		};
 	});
 </script>

@@ -84,6 +84,33 @@ html {
 }
 
 /* ==============================
+   Persona 5 Theme (on name flip)
+   ============================== */
+html[data-theme="p5"] {
+  --color-button-1: #E60012;
+  --color-button-2: #FF6B6B;
+  --color-button-3: #FF4444;
+  --color-water-mid: #8B0000;
+  --color-water-glow: #FF2222;
+}
+html[data-theme="p5"] .about-info-title,
+html[data-theme="p5"] .about-stat-val,
+html[data-theme="p5"] .about-stat-dv,
+html[data-theme="p5"] .about-focus-h {
+  color: #E60012;
+  text-shadow: 0 0 20px rgba(230,0,18,0.25);
+}
+html[data-theme="p5"] .about-stat-item:hover {
+  border-color: rgba(230,0,18,0.25);
+}
+html[data-theme="p5"] .about-content-divider {
+  background: linear-gradient(90deg, transparent, rgba(230,0,18,0.15), transparent);
+}
+html[data-theme="p5"] ::-webkit-scrollbar-thumb {
+  background: rgba(230,0,18,0.3);
+}
+
+/* ==============================
    Shared Submenu Animations
    ============================== */
 
